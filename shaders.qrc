@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file>cube-fs.glsl</file>
+        <file>cube-vs.glsl</file>
+    </qresource>
+</RCC>
