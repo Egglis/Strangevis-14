@@ -5,7 +5,4 @@ Environment::Environment(QObject* parent) : QObject(parent)
     m_volume = new Volume(this);
 }
 
-Volume* Environment::volume()
-{
-    return m_volume;
-}
+Volume* Environment::volume() { return m_volume; }

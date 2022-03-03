@@ -5,12 +5,14 @@
 #include <QtMath>
 
 RenderWidget::RenderWidget(Environment* env, QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_environment(env) {
+    : QOpenGLWidget(parent, f), m_environment(env)
+{
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0)); //?
 }
 
-void RenderWidget::mousePressEvent(QMouseEvent* p_event) {
+void RenderWidget::mousePressEvent(QMouseEvent* p_event)
+{
     m_currentX = static_cast<qreal>(p_event->x());
     m_currentY = static_cast<qreal>(p_event->y());
 
@@ -18,12 +20,15 @@ void RenderWidget::mousePressEvent(QMouseEvent* p_event) {
     m_previousY = m_currentY;
 }
 
-void RenderWidget::mouseMoveEvent(QMouseEvent* p_event) {
+void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
+{
     m_currentX = static_cast<qreal>(p_event->x());
     m_currentY = static_cast<qreal>(p_event->y());
 
-    if (p_event->buttons() & Qt::LeftButton) {
-        if (m_currentX != m_previousX || m_currentY != m_previousY) {
+    if (p_event->buttons() & Qt::LeftButton)
+    {
+        if (m_currentX != m_previousX || m_currentY != m_previousY)
+        {
             updateModelViewMatrix();
         }
     }
@@ -33,11 +38,13 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* p_event) {
     update();
 }
 
-void RenderWidget::updateModelViewMatrix() {
+void RenderWidget::updateModelViewMatrix()
+{
     QVector3D va = arcballVector(m_previousX, m_previousY);
     QVector3D vb = arcballVector(m_currentX, m_currentY);
 
-    if (va != vb) {
+    if (va != vb)
+    {
         qreal angle =
             acos(qMax(-1.0f, qMin(1.0f, QVector3D::dotProduct(va, vb))));
         QVector3D axis = QVector3D::crossProduct(va, vb);
@@ -51,7 +58,8 @@ void RenderWidget::updateModelViewMatrix() {
     }
 }
 
-void RenderWidget::initializeGL() {
+void RenderWidget::initializeGL()
+{
     initializeOpenGLFunctions();
     // initialize geometry
     Geometry::instance();
@@ -68,14 +76,16 @@ void RenderWidget::initializeGL() {
         qDebug() << "Could not link shader program!";
 }
 
-void RenderWidget::resizeGL(int w, int h) {
+void RenderWidget::resizeGL(int w, int h)
+{
     qreal aspectRatio = static_cast<qreal>(w) / static_cast<qreal>(h);
 
     m_projectionMatrix.setToIdentity();
     m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane, m_farPlane);
 }
 
-void RenderWidget::paintGL() {
+void RenderWidget::paintGL()
+{
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,7 +119,8 @@ void RenderWidget::paintGL() {
     m_cubeProgram.release();
 }
 
-QVector3D RenderWidget::arcballVector(qreal x, qreal y) {
+QVector3D RenderWidget::arcballVector(qreal x, qreal y)
+{
     QVector3D p = QVector3D(
         2.0f * static_cast<float>(x) / static_cast<float>(this->width()) - 1.0f,
         -2.0f * static_cast<float>(y) / static_cast<float>(this->height()) +
@@ -118,9 +129,11 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y) {
 
     float length2 = p.x() * p.x() + p.y() * p.y();
 
-    if (length2 < 1.0f) {
+    if (length2 < 1.0f)
+    {
         p.setZ(sqrtf(1.0f - length2));
-    } else {
+    } else
+    {
         p.normalize();
     }
     return p;

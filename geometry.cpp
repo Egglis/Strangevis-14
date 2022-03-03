@@ -7,12 +7,14 @@ Geometry::Geometry()
     : m_quadVertexBuffer(QOpenGLBuffer::VertexBuffer),
       m_quadIndexBuffer(QOpenGLBuffer::IndexBuffer),
       m_cubeVertexBuffer(QOpenGLBuffer::VertexBuffer),
-      m_cubeIndexBuffer(QOpenGLBuffer::IndexBuffer) {
+      m_cubeIndexBuffer(QOpenGLBuffer::IndexBuffer)
+{
     constructQuad();
     constructCube();
 }
 
-void Geometry::constructQuad() {
+void Geometry::constructQuad()
+{
     QVector3D verticesQuad[] = {
         QVector3D(-1.0f, -1.0f, 0.0f), // bottom left corner
         QVector3D(-1.0f, 1.0f, 0.0f),  // top left corner
@@ -34,7 +36,8 @@ void Geometry::constructQuad() {
     m_quadIndexBuffer.allocate(indicesQuad, sizeof(indicesQuad));
 }
 
-void Geometry::constructCube() {
+void Geometry::constructCube()
+{
     QVector3D verticesCube[] = {
         // front
         QVector3D(-1.0f, -1.0f, 1.0f),
@@ -71,25 +74,30 @@ void Geometry::constructCube() {
     m_cubeIndexBuffer.allocate(indicesCube, sizeof(indicesCube));
 }
 
-void Geometry::bindQuad() {
+void Geometry::bindQuad()
+{
     m_quadVertexBuffer.bind();
     m_quadIndexBuffer.bind();
 }
 
-void Geometry::drawQuad() {
+void Geometry::drawQuad()
+{
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 }
 
-void Geometry::bindCube() {
+void Geometry::bindCube()
+{
     m_cubeVertexBuffer.bind();
     m_cubeIndexBuffer.bind();
 }
 
-void Geometry::drawCube() {
+void Geometry::drawCube()
+{
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 }
 
-Geometry& Geometry::instance() {
+Geometry& Geometry::instance()
+{
     static Geometry geometry;
     return geometry;
 }

@@ -6,12 +6,16 @@
 
 Volume::Volume(QObject* parent)
     : QObject(parent), m_width(0), m_height(0), m_depth(0),
-      m_volumeTexture(QOpenGLTexture::Target3D), m_updateNeeded(false) {}
+      m_volumeTexture(QOpenGLTexture::Target3D), m_updateNeeded(false)
+{
+}
 
-bool Volume::load(const QString& fileName) {
+bool Volume::load(const QString& fileName)
+{
     QFile file(fileName);
 
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly))
+    {
         qDebug() << "Unable to open " << fileName << "!";
         return false;
     }
@@ -32,7 +36,8 @@ bool Volume::load(const QString& fileName) {
 
     if (stream.readRawData(reinterpret_cast<char*>(m_volumeData.data()),
                            volumeSize * sizeof(unsigned short)) !=
-        volumeSize * sizeof(unsigned short)) {
+        volumeSize * sizeof(unsigned short))
+    {
         return false;
     }
 
@@ -40,7 +45,8 @@ bool Volume::load(const QString& fileName) {
     m_height = static_cast<int>(height);
     m_depth = static_cast<int>(depth);
 
-    for (int i = 0; i < volumeSize; i++) {
+    for (int i = 0; i < volumeSize; i++)
+    {
         m_volumeData[i] *= 16;
     }
 
@@ -48,11 +54,14 @@ bool Volume::load(const QString& fileName) {
     return true;
 }
 
-void Volume::bind() {
-    if (m_updateNeeded) {
+void Volume::bind()
+{
+    if (m_updateNeeded)
+    {
         initializeOpenGLFunctions();
 
-        if (m_volumeTexture.isCreated()) {
+        if (m_volumeTexture.isCreated())
+        {
             m_volumeTexture.destroy();
         }
 
@@ -72,13 +81,16 @@ void Volume::bind() {
         m_updateNeeded = false;
     }
 
-    if (m_volumeTexture.isCreated()) {
+    if (m_volumeTexture.isCreated())
+    {
         m_volumeTexture.bind();
     }
 }
 
-void Volume::release() {
-    if (m_volumeTexture.isCreated()) {
+void Volume::release()
+{
+    if (m_volumeTexture.isCreated())
+    {
         m_volumeTexture.release();
     }
 }

@@ -1,30 +1,33 @@
 #include "mainwindow.h"
 
-#include <QMenuBar>
-#include <QMenu>
 #include <QAction>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMenu>
+#include <QMenuBar>
 
-MainWindow::MainWindow(Environment* env, QWidget* parent) : QMainWindow(parent), m_environment(env) {
+MainWindow::MainWindow(Environment* env, QWidget* parent)
+    : QMainWindow(parent), m_environment(env)
+{
 
-    env->setParent(this); // Endure destruction of env on destruction of MainWindow
-
+    env->setParent(
+        this); // Endure destruction of env on destruction of MainWindow
 
     QMenu* fileMenu = new QMenu("File");
 
-    QAction *fileOpenAction = new QAction("Open", this);
+    QAction* fileOpenAction = new QAction("Open", this);
     connect(fileOpenAction, &QAction::triggered, this, &MainWindow::fileOpen);
     fileMenu->addAction(fileOpenAction);
 
     QAction* fileAddWidgetAction = new QAction("Add Widget", this);
-    connect(fileAddWidgetAction, &QAction::triggered, this, &MainWindow::addWidget);
+    connect(fileAddWidgetAction, &QAction::triggered, this,
+            &MainWindow::addWidget);
     fileMenu->addAction(fileAddWidgetAction);
 
     QAction* fileRemoveWidgetAction = new QAction("Remove Widget", this);
-    connect(fileRemoveWidgetAction, &QAction::triggered, this, &MainWindow::removeWidget);
+    connect(fileRemoveWidgetAction, &QAction::triggered, this,
+            &MainWindow::removeWidget);
     fileMenu->addAction(fileRemoveWidgetAction);
-
 
     menuBar()->addMenu(fileMenu);
 
@@ -35,7 +38,8 @@ MainWindow::MainWindow(Environment* env, QWidget* parent) : QMainWindow(parent),
 
 void MainWindow::fileOpen()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open Volume File", QString(), "*.dat");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open Volume File",
+                                                    QString(), "*.dat");
 
     if (!fileName.isEmpty())
     {
@@ -78,8 +82,7 @@ void MainWindow::removeWidget()
         if (m_renderWidgets.empty())
         {
             widget->hide();
-        }
-        else
+        } else
         {
             delete widget;
         }

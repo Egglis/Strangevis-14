@@ -4,3 +4,16 @@ IndentWidth: 4
 # Force pointers to the type for C++.
 DerivePointerAlignment: false
 PointerAlignment: Left
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterClass: true
+  AfterControlStatement: Always
+  BeforeElse: true
+
+IncludeBlocks: Regroup
+FixNamespaceComments: true
