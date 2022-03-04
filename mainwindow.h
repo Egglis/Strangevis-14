@@ -7,7 +7,7 @@
 #include <QMainWindow>
 #include <QVector>
 
-class QHBoxLayout;
+class RectangularGridLayout;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -21,11 +21,11 @@ class MainWindow : public QMainWindow {
     void removeWidget();
 
   private:
-    void createWidget(bool create);
+    void createWidget();
     QVector<RenderWidget*> m_renderWidgets;
     QOpenGLWidget* m_hiddenWidget;
     QWidget* m_mainWidget;
-    QHBoxLayout* m_layout;
+    RectangularGridLayout* m_layout;
     Environment* m_environment;
 };
 #endif // MAINWINDOW_H
