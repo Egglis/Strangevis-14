@@ -24,6 +24,7 @@ qt_add_executable(strangevis WIN32
     renderwidget.cpp renderwidget.h
     environment.cpp environment.h
     volume.cpp volume.h
+    rectangulargridlayout.cpp rectangulargridlayout.h
 )
 
 set(shaders_resource_files

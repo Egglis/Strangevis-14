@@ -1,8 +1,8 @@
 #include "mainwindow.h"
+#include "rectangulargridlayout.h"
 
 #include <QAction>
 #include <QFileDialog>
-#include <QHBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
 
@@ -32,7 +32,7 @@ MainWindow::MainWindow(Environment* env, QWidget* parent)
     menuBar()->addMenu(fileMenu);
 
     m_mainWidget = new QWidget(this);
-    m_layout = new QHBoxLayout(m_mainWidget);
+    m_layout = new RectangularGridLayout(m_mainWidget);
     setCentralWidget(m_mainWidget);
 }
 
@@ -47,10 +47,10 @@ void MainWindow::fileOpen()
     }
 }
 
-void MainWindow::createWidget(bool create)
+void MainWindow::createWidget()
 {
     RenderWidget* widget = new RenderWidget(m_environment, m_mainWidget);
-    m_layout->addWidget(widget);
+    m_layout->addWidgetRectangular(widget);
     m_renderWidgets.push_back(widget);
 }
 
@@ -69,7 +69,8 @@ void MainWindow::addWidget()
             // TODO: reset any state of widget, since it was not newly created
         }
     }
-    createWidget(createNewWidget);
+    if (createNewWidget)
+        createWidget();
 }
 
 void MainWindow::removeWidget()
