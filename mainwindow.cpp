@@ -1,10 +1,12 @@
 #include "mainwindow.h"
+
 #include "rectangulargridlayout.h"
 
 #include <QAction>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
+
 
 MainWindow::MainWindow(Environment* env, QWidget* parent)
     : QMainWindow(parent), m_environment(env)
@@ -75,17 +77,19 @@ void MainWindow::addWidget()
 
 void MainWindow::removeWidget()
 {
-    if (m_renderWidgets.empty())
+    if (!m_renderWidgets.empty())
     {
         RenderWidget* widget = m_renderWidgets.back();
-        m_renderWidgets.pop_back();
 
-        if (m_renderWidgets.empty())
+        if (m_renderWidgets.size() == 1)
         {
             widget->hide();
-        } else
+        }
+        else
         {
+            m_layout->removeWidgetRectangular(widget);
             delete widget;
+            m_renderWidgets.pop_back();
         }
     }
 }

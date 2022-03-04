@@ -35,6 +35,27 @@ void RectangularGridLayout::addWidgetRectangular(QWidget* widget)
     }
 }
 
+void RectangularGridLayout::removeWidgetRectangular(QWidget* widget)
+{
+    if (appendOnRow)
+    {
+        rows.back()->removeWidget(widget);
+        if (rows.back()->count() == 0)
+        {
+            delete rows.back();
+            rows.pop_back();
+        }
+    }
+    else
+    {
+        int i = lastAddedIndex > 0 ? --lastAddedIndex : 0;
+        rows.at(i)->removeWidget(widget);
+        if (rows.at(i)->count() <= 0)
+        {
+            qDebug() << "Empty row";
+        }
+    }
+}
 
 void RectangularGridLayout::addRow()
 {
