@@ -4,7 +4,6 @@
 
 #include <algorithm>
 
-
 ParameterWidget::ParameterWidget(
     const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
     : QWidget(parent), m_properties{properties}
@@ -19,6 +18,8 @@ ParameterWidget::ParameterWidget(
             [this, x](const QVector4D& clippingPlane) {
                 x->setValue(floatToInt(clippingPlane.x()));
             });
+    createSliderLabel(x);
+
 
     QSlider* y = createSlider();
     clippingPlaneSliders.push_back(y);
@@ -30,6 +31,8 @@ ParameterWidget::ParameterWidget(
             [this, y](const QVector4D& clippingPlane) {
                 y->setValue(floatToInt(clippingPlane.y()));
             });
+    createSliderLabel(y);
+
 
     QSlider* z = createSlider();
     clippingPlaneSliders.push_back(z);
@@ -41,6 +44,7 @@ ParameterWidget::ParameterWidget(
             [this, z](const QVector4D& clippingPlane) {
                 z->setValue(floatToInt(clippingPlane.z()));
             });
+    createSliderLabel(z);
 
     QSlider* w = createSlider();
     clippingPlaneSliders.push_back(w);
@@ -52,6 +56,7 @@ ParameterWidget::ParameterWidget(
             [this, w](const QVector4D& clippingPlane) {
                 w->setValue(floatToInt(clippingPlane.w()));
             });
+    createSliderLabel(w);
 
     setLayout(&layout);
     setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -63,6 +68,17 @@ QSlider* ParameterWidget::createSlider()
     slider->setMinimum(0);
     slider->setMaximum(100);
     return slider;
+}
+
+void ParameterWidget::createSliderLabel(QSlider* slider)
+{
+    QLabel* label = new QLabel(this);
+    auto updateLabel = [this, label](int value) { label->setNum(intToFloat(value));};
+    connect(slider, &QSlider::valueChanged,
+            updateLabel);
+    sliderLabels.push_back(label);
+    layout.addWidget(label);
+    updateLabel(slider->value());
 }
 
 float ParameterWidget::intToFloat(int value)
@@ -85,7 +101,7 @@ void ParameterWidget::updateClippingPlane()
 {
     QVector4D clippingPlane = QVector4D();
 
-    for(int i = 0; i<4; i++)
+    for (int i = 0; i < 4; i++)
     {
         clippingPlane[i] = intToFloat(clippingPlaneSliders[i]->value());
     }

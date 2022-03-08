@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QSlider>
+#include <QLabel>
 #include <memory>
 
 class SharedProperties;
@@ -19,8 +20,10 @@ class ParameterWidget : public QWidget
     private:
     const std::shared_ptr<SharedProperties>& m_properties;
     QSlider* createSlider();
+    void createSliderLabel(QSlider* slider);
     QVBoxLayout layout;
     QVector<QSlider*> clippingPlaneSliders;
+    QVector<QLabel*> sliderLabels;
     QWidget* m_widget;
 
     float m_lowerBound = -2.0f;

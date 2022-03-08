@@ -34,7 +34,6 @@ MainWindow::MainWindow(Environment* env, QWidget* parent)
 
     menuBar()->addMenu(fileMenu);
 
-
     m_mainWidget = new QWidget(this);
     m_mainApplicationLayout = new QVBoxLayout(m_mainWidget);
     m_parameterWidget = new ParameterWidget(x_properties, m_mainWidget);
