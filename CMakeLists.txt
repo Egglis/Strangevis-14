@@ -23,6 +23,7 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     environment.cpp
     volume.cpp
+    properties/sharedproperties.cpp
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
 )
