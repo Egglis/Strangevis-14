@@ -26,6 +26,7 @@ qt_add_executable(strangevis WIN32
     properties/sharedproperties.cpp
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
+    ui/parameterwidget.cpp
 )
 
 set(shaders_resource_files
@@ -37,7 +38,7 @@ qt6_add_resources(strangevis "shaders"
     PREFIX
         "/shaders"
     FILES
-        ${shaders_resource_files}
+    ${shaders_resource_files}
 )
 
 target_link_libraries(strangevis PRIVATE

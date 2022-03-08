@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include "ui/renderwidget.h"
+#include "ui/parameterwidget.h"
 #include "environment.h"
 
 #include <QMainWindow>
 #include <QVector>
+#include <memory>
 
 class RectangularGridLayout;
 
@@ -21,11 +23,13 @@ class MainWindow : public QMainWindow {
     void removeWidget();
 
   private:
-    void createWidget();
+    std::shared_ptr<SharedProperties> x_properties;
     QVector<RenderWidget*> m_renderWidgets;
     QOpenGLWidget* m_hiddenWidget;
     QWidget* m_mainWidget;
-    RectangularGridLayout* m_layout;
+    ParameterWidget* m_parameterWidget;
+    RectangularGridLayout* m_renderLayout;
+    QVBoxLayout* m_mainApplicationLayout;
     Environment* m_environment;
 };
 #endif // MAINWINDOW_H
