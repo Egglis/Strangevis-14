@@ -19,17 +19,17 @@ find_package(Qt6 COMPONENTS REQUIRED
 
 qt_add_executable(strangevis WIN32
     main.cpp
-    mainwindow.cpp mainwindow.h
-    geometry.cpp geometry.h
-    renderwidget.cpp renderwidget.h
-    environment.cpp environment.h
-    volume.cpp volume.h
-    rectangulargridlayout.cpp rectangulargridlayout.h
+    mainwindow.cpp
+    geometry.cpp
+    environment.cpp
+    volume.cpp
+    ui/renderwidget.cpp
+    ui/rectangulargridlayout.cpp
 )
 
 set(shaders_resource_files
-    "cube-fs.glsl"
-    "cube-vs.glsl"
+    "shaders/cube-fs.glsl"
+    "shaders/cube-vs.glsl"
 )
 
 qt6_add_resources(strangevis "shaders"

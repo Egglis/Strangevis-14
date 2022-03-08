@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "renderwidget.h"
+#include "ui/renderwidget.h"
 #include "environment.h"
 
 #include <QMainWindow>

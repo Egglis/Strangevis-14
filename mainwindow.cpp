@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include "rectangulargridlayout.h"
+#include "ui/rectangulargridlayout.h"
 
 #include <QAction>
 #include <QFileDialog>
