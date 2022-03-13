@@ -21,6 +21,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
   protected:
     virtual void mousePressEvent(QMouseEvent* p_event);
     virtual void mouseMoveEvent(QMouseEvent* p_event);
+    virtual void wheelEvent(QWheelEvent* p_event);
     virtual void initializeGL();
     virtual void resizeGL(int w, int h);
     virtual void paintGL();
@@ -36,6 +37,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     QMatrix4x4 m_modelViewMatrix;
     qreal m_currentX, m_currentY;
     qreal m_previousX, m_previousY;
+    qreal m_zoomScale = 1.0;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
