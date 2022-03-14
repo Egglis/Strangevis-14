@@ -10,6 +10,7 @@
 #include <memory>
 
 class RectangularGridLayout;
+class MainWindowWidget;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -19,17 +20,10 @@ class MainWindow : public QMainWindow {
 
   public slots:
     void fileOpen();
-    void addWidget();
-    void removeWidget();
 
   private:
     std::shared_ptr<SharedProperties> x_properties;
-    QVector<RenderWidget*> m_renderWidgets;
-    QOpenGLWidget* m_hiddenWidget;
-    QWidget* m_mainWidget;
-    ParameterWidget* m_parameterWidget;
-    RectangularGridLayout* m_renderLayout;
-    QVBoxLayout* m_mainApplicationLayout;
+    MainWindowWidget* m_mainWidget;
     Environment* m_environment;
 };
 #endif // MAINWINDOW_H

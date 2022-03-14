@@ -63,7 +63,7 @@ ParameterWidget::ParameterWidget(
     m_gradientMethodWidget->setValue(m_properties->gradientMethod());
 
     setLayout(&layout);
-    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
 QSlider* ParameterWidget::createClippingPlaneSlider()

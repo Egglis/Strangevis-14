@@ -2,13 +2,12 @@
 #ifndef PARAMETER_WIDGET_H
 #define PARAMETER_WIDGET_H
 
+#include <QFormLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QSlider>
-#include <QVBoxLayout>
-#include <QFormLayout>
 #include <QWidget>
 #include <memory>
-
 
 class SharedProperties;
 class GradientMethodWidget;
@@ -25,7 +24,7 @@ class ParameterWidget : public QWidget
     const std::shared_ptr<SharedProperties>& m_properties;
     QSlider* createClippingPlaneSlider();
     void createSliderLabel(QSlider* slider);
-    QVBoxLayout layout;
+    QHBoxLayout layout;
     QVector<QSlider*> clippingPlaneSliders;
     QVector<QLabel*> sliderLabels;
 
@@ -45,13 +44,13 @@ class ParameterWidget : public QWidget
 class GradientMethodWidget : public QWidget
 {
     Q_OBJECT
-    public:
+  public:
     GradientMethodWidget(QWidget* parent);
-    public slots:
+  public slots:
     void setValue(int value);
-    private slots:
+  private slots:
     void updateLabel(int value);
-    signals:
+  signals:
     void valueChanged(int value);
 
   private:
