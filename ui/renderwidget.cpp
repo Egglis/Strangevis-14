@@ -42,14 +42,13 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
 
 // Scrolling wheel event
 void RenderWidget::wheelEvent(QWheelEvent *p_event){
-    QPoint deg = (p_event->angleDelta()/8);
-    m_zoomScale = 1;
+    QPoint deg = p_event->angleDelta();
+    float zoomScale = 1.0;
 
-    if(deg.y() < 0 ){ m_zoomScale = m_zoomScale/1.1;}
-    if(deg.y() > 0) { m_zoomScale = m_zoomScale*1.1;}
+    if(deg.y() < 0){ zoomScale = zoomScale/1.1;}
+    if(deg.y() > 0){ zoomScale = zoomScale*1.1;}
 
-    m_modelViewMatrix.scale(m_zoomScale);
-    updateModelViewMatrix();
+    m_modelViewMatrix.scale(zoomScale);
 
     update();
 }

@@ -37,7 +37,6 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     QMatrix4x4 m_modelViewMatrix;
     qreal m_currentX, m_currentY;
     qreal m_previousX, m_previousY;
-    qreal m_zoomScale = 1.0;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
