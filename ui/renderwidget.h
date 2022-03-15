@@ -21,6 +21,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
   protected:
     virtual void mousePressEvent(QMouseEvent* p_event);
     virtual void mouseMoveEvent(QMouseEvent* p_event);
+    virtual void wheelEvent(QWheelEvent* p_event);
     virtual void initializeGL();
     virtual void resizeGL(int w, int h);
     virtual void paintGL();

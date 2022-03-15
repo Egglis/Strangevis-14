@@ -76,6 +76,7 @@ void MainWindow::addWidget()
     if (createNewWidget)
     {
         RenderWidget* widget = new RenderWidget(m_environment, x_properties, m_mainWidget);
+        widget->setFocusPolicy(Qt::WheelFocus);
         m_renderLayout->addWidgetRectangular(widget);
         m_renderWidgets.push_back(widget);
     }

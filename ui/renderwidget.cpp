@@ -2,6 +2,7 @@
 #include "../geometry.h"
 
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QtMath>
 
 RenderWidget::RenderWidget(Environment* env, std::shared_ptr<SharedProperties> properties, QWidget* parent, Qt::WindowFlags f)
@@ -39,6 +40,19 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
     update();
 }
 
+// Scrolling wheel event
+void RenderWidget::wheelEvent(QWheelEvent *p_event){
+    QPoint deg = p_event->angleDelta();
+    float zoomScale = 1.0;
+
+    if(deg.y() < 0){ zoomScale = zoomScale/1.1;}
+    if(deg.y() > 0){ zoomScale = zoomScale*1.1;}
+
+    m_modelViewMatrix.scale(zoomScale);
+
+    update();
+}
+
 void RenderWidget::updateModelViewMatrix()
 {
     QVector3D va = arcballVector(m_previousX, m_previousY);
@@ -53,7 +67,6 @@ void RenderWidget::updateModelViewMatrix()
         QMatrix4x4 inverseModelViewMatrix = m_modelViewMatrix.inverted();
         QVector4D transformedAxis =
             inverseModelViewMatrix * QVector4D(axis, 0.0f);
-
         m_modelViewMatrix.rotate(qRadiansToDegrees(angle),
                                  transformedAxis.toVector3D());
     }
@@ -120,6 +133,7 @@ void RenderWidget::paintGL()
     m_cubeProgram.enableAttributeArray(location);
     m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
                                      sizeof(QVector3D));
+
 
     Geometry::instance().drawCube();
 
