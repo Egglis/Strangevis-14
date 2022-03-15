@@ -8,85 +8,56 @@ ParameterWidget::ParameterWidget(
     const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
     : QWidget(parent), m_properties{properties}
 {
-    QSlider* x = createClippingPlaneSlider();
-    clippingPlaneSliders.push_back(x);
-    layout.addWidget(x);
-    x->setValue(floatToInt(m_properties->clippingPlane().x()));
-    connect(x, &QSlider::valueChanged, this,
+
+    ClippingWidget* x = new ClippingWidget(this);
+    m_clippingPlaneWidgets.push_back(x);
+    x->setValue(m_properties->clippingPlane().x());
+    connect(x, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
     connect(m_properties.get(), &SharedProperties::clippingPlaneChanged,
             [this, x](const QVector4D& clippingPlane) {
-                x->setValue(floatToInt(clippingPlane.x()));
+                x->setValue(clippingPlane.x());
             });
-    createSliderLabel(x);
+    m_layout.addWidget(x);
 
-    QSlider* y = createClippingPlaneSlider();
-    clippingPlaneSliders.push_back(y);
-    layout.addWidget(y);
-    y->setValue(floatToInt(m_properties->clippingPlane().y()));
-    connect(y, &QSlider::valueChanged, this,
+    ClippingWidget* y = new ClippingWidget(this);
+    m_clippingPlaneWidgets.push_back(y);
+    y->setValue(m_properties->clippingPlane().y());
+    connect(y, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
     connect(m_properties.get(), &SharedProperties::clippingPlaneChanged,
             [this, y](const QVector4D& clippingPlane) {
-                y->setValue(floatToInt(clippingPlane.y()));
+                y->setValue(clippingPlane.y());
             });
-    createSliderLabel(y);
+    m_layout.addWidget(y);
 
-    QSlider* z = createClippingPlaneSlider();
-    clippingPlaneSliders.push_back(z);
-    layout.addWidget(z);
-    z->setValue(floatToInt(m_properties->clippingPlane().z()));
-    connect(z, &QSlider::valueChanged, this,
-            &ParameterWidget::updateClippingPlane);
-    connect(m_properties.get(), &SharedProperties::clippingPlaneChanged,
-            [this, z](const QVector4D& clippingPlane) {
-                z->setValue(floatToInt(clippingPlane.z()));
-            });
-    createSliderLabel(z);
+    ClippingWidget* z = new ClippingWidget(this);
+    m_clippingPlaneWidgets.push_back(z);
+    z->setValue(m_properties->clippingPlane().z());
+    m_layout.addWidget(z);
 
-    QSlider* w = createClippingPlaneSlider();
-    clippingPlaneSliders.push_back(w);
-    layout.addWidget(w);
-    w->setValue(floatToInt(m_properties->clippingPlane().w()));
-    connect(w, &QSlider::valueChanged, this,
+    ClippingWidget* w = new ClippingWidget(this);
+    m_clippingPlaneWidgets.push_back(w);
+    w->setValue(m_properties->clippingPlane().w());
+    connect(w, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
     connect(m_properties.get(), &SharedProperties::clippingPlaneChanged,
             [this, w](const QVector4D& clippingPlane) {
-                w->setValue(floatToInt(clippingPlane.w()));
+                w->setValue(clippingPlane.w());
             });
-    createSliderLabel(w);
+    m_layout.addWidget(w);
 
     m_gradientMethodWidget = new GradientMethodWidget(this);
-    layout.addWidget(m_gradientMethodWidget);
+    m_layout.addWidget(m_gradientMethodWidget);
     connect(m_gradientMethodWidget, &GradientMethodWidget::valueChanged,
             m_properties.get(), &SharedProperties::updateGradientMethod);
     m_gradientMethodWidget->setValue(m_properties->gradientMethod());
 
-    setLayout(&layout);
-    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setLayout(&m_layout);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
-QSlider* ParameterWidget::createClippingPlaneSlider()
-{
-    QSlider* slider = new QSlider(Qt::Orientation::Horizontal, this);
-    slider->setMinimum(0);
-    slider->setMaximum(100);
-    return slider;
-}
-
-void ParameterWidget::createSliderLabel(QSlider* slider)
-{
-    QLabel* label = new QLabel(this);
-    auto updateLabel = [this, label](int value) {
-        label->setNum(intToFloat(value));
-    };
-    connect(slider, &QSlider::valueChanged, updateLabel);
-    sliderLabels.push_back(label);
-    layout.addWidget(label);
-    updateLabel(slider->value());
-}
-
-float ParameterWidget::intToFloat(int value)
+float ClippingWidget::intToFloat(int value)
 {
     float t = static_cast<float>((value - m_sliderMinimum)) /
               static_cast<float>((m_sliderMaximum - m_sliderMinimum));
@@ -94,7 +65,7 @@ float ParameterWidget::intToFloat(int value)
     return newValue;
 }
 
-int ParameterWidget::floatToInt(float value)
+int ClippingWidget::floatToInt(float value)
 {
     float t = (value - m_lowerBound) / (m_upperBound - m_lowerBound);
     int newValue =
@@ -108,7 +79,7 @@ void ParameterWidget::updateClippingPlane()
 
     for (int i = 0; i < 4; i++)
     {
-        clippingPlane[i] = intToFloat(clippingPlaneSliders[i]->value());
+        clippingPlane[i] = m_clippingPlaneWidgets[i]->getValue();
     }
     m_properties->updateClippingPlane(clippingPlane);
 }
@@ -149,4 +120,28 @@ void GradientMethodWidget::setValue(int value)
     m_gradientMethodSlider->setValue(value);
     updateLabel(value);
     emit valueChanged(value);
+}
+
+ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent)
+{
+    m_slider = new QSlider(Qt::Orientation::Horizontal, this);
+    m_slider->setMinimum(0);
+    m_slider->setMaximum(100);
+
+    m_label = new QLabel(this);
+    auto updateLabel = [this](int value) {
+        QString s;
+        s.setNum(intToFloat(value), 'f', 2);
+        m_label->setText(s);
+    };
+    connect(m_slider, &QSlider::valueChanged, updateLabel);
+    m_layout.addRow(m_label, m_slider);
+    connect(m_slider, &QSlider::valueChanged, this,
+            &ClippingWidget::valueChanged);
+    setLayout(&m_layout);
+}
+
+void ClippingWidget::setValue(float value)
+{
+    m_slider->setValue(floatToInt(value));
 }

@@ -27,6 +27,7 @@ qt_add_executable(strangevis WIN32
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
     ui/parameterwidget.cpp
+    ui/mainwindowwidget.cpp
 )
 
 set(shaders_resource_files
