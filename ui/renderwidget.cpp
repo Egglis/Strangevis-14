@@ -74,10 +74,6 @@ void RenderWidget::initializeGL()
                                                ":/shaders/shaders/cube-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
-    // if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-    //                                            ":/shaders/shaders/cube.frag.qsb"))
-    //     qDebug() << "Could not load fragment shader!";
-
     if (!m_cubeProgram.link())
         qDebug() << "Could not link shader program!";
 }
@@ -100,7 +96,7 @@ void RenderWidget::paintGL()
     glDepthFunc(GL_LESS);
 
     QVector4D planeEquation = x_properties->clippingPlane();
-    qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " << planeEquation[1] << "*y + " << planeEquation[2] << "*z + " << planeEquation[3] << " = 0";
+    // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " << planeEquation[1] << "*y + " << planeEquation[2] << "*z + " << planeEquation[3] << " = 0";
 
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_modelViewMatrix;
