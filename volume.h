@@ -6,12 +6,13 @@
 #include <QOpenGLTexture>
 #include <QVector>
 
-
-class Volume : public QObject, protected QOpenGLExtraFunctions {
+class Volume : public QObject, protected QOpenGLExtraFunctions
+{
     Q_OBJECT
   public:
     explicit Volume(QObject* parent = nullptr);
     bool load(const QString& filename);
+    std::tuple<int,int,int> getDimensions() { return std::tuple<int, int, int>{m_width, m_height, m_depth}; };
 
     void bind();
     void release();

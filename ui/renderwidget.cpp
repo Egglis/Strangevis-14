@@ -1,16 +1,22 @@
 #include "renderwidget.h"
+
 #include "../geometry.h"
 
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QtMath>
 
-RenderWidget::RenderWidget(Environment* env, std::shared_ptr<SharedProperties> properties, QWidget* parent, Qt::WindowFlags f)
+RenderWidget::RenderWidget(Environment* env,
+                           std::shared_ptr<SharedProperties> properties,
+                           QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_environment(env), x_properties{properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0)); //?
-    connect(x_properties.get(), &SharedProperties::clippingPlaneChanged, [this](){update();});
+    connect(x_properties.get(), &SharedProperties::clippingPlaneChanged,
+            [this]() { update(); });
+    connect(x_properties.get(), &SharedProperties::gradientMethodChanged,
+            [this]() { update(); });
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -79,17 +85,13 @@ void RenderWidget::initializeGL()
     // initialize geometry
     Geometry::instance();
 
-    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                               ":/shaders/shaders/cube-vs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(
+            QOpenGLShader::Vertex, ":/shaders/shaders/cube-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
-    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                               ":/shaders/shaders/cube-fs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(
+            QOpenGLShader::Fragment, ":/shaders/shaders/cube-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
-
-    // if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-    //                                            ":/shaders/shaders/cube.frag.qsb"))
-    //     qDebug() << "Could not load fragment shader!";
 
     if (!m_cubeProgram.link())
         qDebug() << "Could not link shader program!";
@@ -105,6 +107,7 @@ void RenderWidget::resizeGL(int w, int h)
 
 void RenderWidget::paintGL()
 {
+    int location = -1;
 
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -113,15 +116,28 @@ void RenderWidget::paintGL()
     glDepthFunc(GL_LESS);
 
     QVector4D planeEquation = x_properties->clippingPlane();
-    qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " << planeEquation[1] << "*y + " << planeEquation[2] << "*z + " << planeEquation[3] << " = 0";
+    // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " <<
+    // planeEquation[1] << "*y + " << planeEquation[2] << "*z + " <<
+    // planeEquation[3] << " = 0";
 
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_modelViewMatrix;
 
     m_cubeProgram.bind();
-    m_cubeProgram.setUniformValue(0, planeEquation);
-    m_cubeProgram.setUniformValue(1,
-                                  modelViewProjectionMatrix);
+    location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
+    m_cubeProgram.setUniformValue(location, planeEquation);
+    location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
+    m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
+    location = m_cubeProgram.uniformLocation("gradientMethod");
+    m_cubeProgram.setUniformValue(location, x_properties->gradientMethod());
+
+    auto [width, height, depth] = m_environment->volume()->getDimensions();
+    location = m_cubeProgram.uniformLocation("width");
+    m_cubeProgram.setUniformValue(location, width);
+    location = m_cubeProgram.uniformLocation("height");
+    m_cubeProgram.setUniformValue(location, height);
+    location = m_cubeProgram.uniformLocation("depth");
+    m_cubeProgram.setUniformValue(location, depth);
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
@@ -129,7 +145,7 @@ void RenderWidget::paintGL()
 
     Geometry::instance().bindCube();
 
-    int location = m_cubeProgram.attributeLocation("vertexPosition");
+    location = m_cubeProgram.attributeLocation("vertexPosition");
     m_cubeProgram.enableAttributeArray(location);
     m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
                                      sizeof(QVector3D));
@@ -156,7 +172,8 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
     if (length2 < 1.0f)
     {
         p.setZ(sqrtf(1.0f - length2));
-    } else
+    }
+    else
     {
         p.normalize();
     }
