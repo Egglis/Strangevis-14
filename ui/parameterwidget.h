@@ -11,6 +11,8 @@
 
 class SharedProperties;
 class GradientMethodWidget;
+class ClippingWidget;
+
 
 class ParameterWidget : public QWidget
 {
@@ -22,23 +24,37 @@ class ParameterWidget : public QWidget
 
   private:
     const std::shared_ptr<SharedProperties>& m_properties;
-    QSlider* createClippingPlaneSlider();
-    void createSliderLabel(QSlider* slider);
-    QHBoxLayout layout;
-    QVector<QSlider*> clippingPlaneSliders;
-    QVector<QLabel*> sliderLabels;
-
+    QHBoxLayout m_layout;
+    QVector<ClippingWidget*> m_clippingPlaneWidgets;
     GradientMethodWidget* m_gradientMethodWidget;
+
+  private slots:
+    void updateClippingPlane();
+};
+
+class ClippingWidget : public QWidget
+{
+    Q_OBJECT
+  public:
+    ClippingWidget(QWidget* parent);
+    float getValue() { return intToFloat(m_slider->value()); };
+  public slots:
+    void setValue(float value);
+  signals:
+    void valueChanged(int value);
+
+  private:
+    float intToFloat(int value);
+    int floatToInt(float value);
+
+    QFormLayout m_layout;
+    QSlider* m_slider;
+    QLabel* m_label;
 
     float m_lowerBound = -2.0f;
     float m_upperBound = 2.0f;
     int m_sliderMaximum = 100;
     int m_sliderMinimum = 0;
-
-    float intToFloat(int value);
-    int floatToInt(float value);
-  private slots:
-    void updateClippingPlane();
 };
 
 class GradientMethodWidget : public QWidget
@@ -57,6 +73,8 @@ class GradientMethodWidget : public QWidget
     QSlider* m_gradientMethodSlider;
     QLabel* m_gradientMethodLabel;
     QFormLayout m_layout;
+
+
 };
 
 #endif
