@@ -1,16 +1,15 @@
 #include "geometry.h"
 
 #include <QDebug>
-#include <QVector3D>
 
 Geometry::Geometry()
     : m_quadVertexBuffer(QOpenGLBuffer::VertexBuffer),
       m_quadIndexBuffer(QOpenGLBuffer::IndexBuffer),
-      m_cubeVertexBuffer(QOpenGLBuffer::VertexBuffer),
-      m_cubeIndexBuffer(QOpenGLBuffer::IndexBuffer)
+      m_boxVertexBuffer(QOpenGLBuffer::VertexBuffer),
+      m_boxIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
     constructQuad();
-    constructCube();
+    constructBox(QVector3D(1.0f, 1.0f, 1.0f));
 }
 
 void Geometry::constructQuad()
@@ -36,42 +35,51 @@ void Geometry::constructQuad()
     m_quadIndexBuffer.allocate(indicesQuad, sizeof(indicesQuad));
 }
 
-void Geometry::constructCube()
+void Geometry::constructBox(QVector3D dimensions)
 {
-    QVector3D verticesCube[] = {
+    auto [width, height, depth] = dimensions;
+    float maxDim = std::max(width, std::max(height, depth));
+    auto [x, y, z] = QVector3D{width / maxDim, height / maxDim, depth / maxDim};
+    QVector3D verticesBox[] = {
         // front
-        QVector3D(-1.0f, -1.0f, 1.0f),
-        QVector3D(1.0f, -1.0f, 1.0f),
-        QVector3D(1.0f, 1.0f, 1.0f),
-        QVector3D(-1.0f, 1.0f, 1.0f),
-
+        QVector3D(-x, -y, z),
+        QVector3D(x, -y, z),
+        QVector3D(x, y, z),
+        QVector3D(-x, y, z),
         // back
-        QVector3D(-1.0f, -1.0f, -1.0f),
-        QVector3D(1.0f, -1.0f, -1.0f),
-        QVector3D(1.0f, 1.0f, -1.0f),
-        QVector3D(-1.0f, 1.0f, -1.0f),
+        QVector3D(-x, -y, -z),
+        QVector3D(x, -y, -z),
+        QVector3D(x, y, -z),
+        QVector3D(-x, y, -z),
     };
 
-    GLushort indicesCube[] = {// front
-                              0, 1, 2, 2, 3, 0,
-                              // right
-                              1, 5, 6, 6, 2, 1,
-                              // back
-                              7, 6, 5, 5, 4, 7,
-                              // left
-                              4, 0, 3, 3, 7, 4,
-                              // bottom
-                              4, 5, 1, 1, 0, 4,
-                              // top
-                              3, 2, 6, 6, 7, 3};
+    if (m_boxVertexBuffer.isCreated())
+    {
+        m_boxVertexBuffer.destroy();
+    }
+    m_boxVertexBuffer.create();
+    m_boxVertexBuffer.bind();
+    m_boxVertexBuffer.allocate(verticesBox, sizeof(verticesBox));
 
-    m_cubeVertexBuffer.create();
-    m_cubeVertexBuffer.bind();
-    m_cubeVertexBuffer.allocate(verticesCube, sizeof(verticesCube));
+    if (!m_boxIndexBuffer.isCreated())
+    {
+        GLushort indicesBox[] = {// front
+                                  0, 1, 2, 2, 3, 0,
+                                  // right
+                                  1, 5, 6, 6, 2, 1,
+                                  // back
+                                  7, 6, 5, 5, 4, 7,
+                                  // left
+                                  4, 0, 3, 3, 7, 4,
+                                  // bottom
+                                  4, 5, 1, 1, 0, 4,
+                                  // top
+                                  3, 2, 6, 6, 7, 3};
 
-    m_cubeIndexBuffer.create();
-    m_cubeIndexBuffer.bind();
-    m_cubeIndexBuffer.allocate(indicesCube, sizeof(indicesCube));
+        m_boxIndexBuffer.create();
+        m_boxIndexBuffer.bind();
+        m_boxIndexBuffer.allocate(indicesBox, sizeof(indicesBox));
+    }
 }
 
 void Geometry::bindQuad()
@@ -85,13 +93,13 @@ void Geometry::drawQuad()
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 }
 
-void Geometry::bindCube()
+void Geometry::bindBox()
 {
-    m_cubeVertexBuffer.bind();
-    m_cubeIndexBuffer.bind();
+    m_boxVertexBuffer.bind();
+    m_boxIndexBuffer.bind();
 }
 
-void Geometry::drawCube()
+void Geometry::drawBox()
 {
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 }

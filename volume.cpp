@@ -3,6 +3,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QFile>
+#include <QVector3D>
 
 Volume::Volume(QObject* parent)
     : QObject(parent), m_width(0), m_height(0), m_depth(0),
@@ -51,6 +52,7 @@ bool Volume::load(const QString& fileName)
     }
 
     m_updateNeeded = true;
+    emit dimensionsChanged(QVector3D(m_width, m_height, m_depth));
     return true;
 }
 

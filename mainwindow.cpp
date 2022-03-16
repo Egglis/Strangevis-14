@@ -3,6 +3,8 @@
 #include "properties/sharedproperties.h"
 #include "ui/mainwindowwidget.h"
 #include "ui/rectangulargridlayout.h"
+#include "geometry.h"
+#include "volume.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -39,6 +41,10 @@ MainWindow::MainWindow(Environment* env, QWidget* parent)
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
                              p_2dRenderWidget, p_2dToolBarWidget, this);
     setCentralWidget(m_mainWidget);
+
+    connect(m_environment->volume(), &Volume::dimensionsChanged, this, [](QVector3D dims) {
+        Geometry::instance().constructBox(dims);
+    });
 }
 
 void MainWindow::fileOpen()

@@ -2,7 +2,7 @@
 #define GEOMETRY_H
 
 #include <QOpenGLBuffer>
-
+#include <QVector3D>
 class Geometry {
   protected:
     Geometry();
@@ -13,17 +13,18 @@ class Geometry {
     void bindQuad();
     void drawQuad();
 
-    void bindCube();
-    void drawCube();
+    void bindBox();
+    void drawBox();
+
+    void constructBox(QVector3D dimensions);
 
   private:
     void constructQuad();
-    void constructCube();
 
     QOpenGLBuffer m_quadVertexBuffer;
     QOpenGLBuffer m_quadIndexBuffer;
 
-    QOpenGLBuffer m_cubeVertexBuffer;
-    QOpenGLBuffer m_cubeIndexBuffer;
+    QOpenGLBuffer m_boxVertexBuffer;
+    QOpenGLBuffer m_boxIndexBuffer;
 };
 #endif // GEOMETRY_H

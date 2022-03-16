@@ -133,17 +133,17 @@ void RenderWidget::paintGL()
 
     auto [width, height, depth] = m_environment->volume()->getDimensions();
     location = m_cubeProgram.uniformLocation("width");
-    m_cubeProgram.setUniformValue(location, width);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(width));
     location = m_cubeProgram.uniformLocation("height");
-    m_cubeProgram.setUniformValue(location, height);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
-    m_cubeProgram.setUniformValue(location, depth);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
     m_environment->volume()->bind();
 
-    Geometry::instance().bindCube();
+    Geometry::instance().bindBox();
 
     location = m_cubeProgram.attributeLocation("vertexPosition");
     m_cubeProgram.enableAttributeArray(location);
@@ -151,7 +151,7 @@ void RenderWidget::paintGL()
                                      sizeof(QVector3D));
 
 
-    Geometry::instance().drawCube();
+    Geometry::instance().drawBox();
 
     glActiveTexture(GL_TEXTURE0);
     m_environment->volume()->release();
