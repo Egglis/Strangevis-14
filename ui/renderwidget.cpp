@@ -18,8 +18,7 @@ RenderWidget::RenderWidget(Environment* env,
     connect(x_properties.get(), &SharedProperties::gradientMethodChanged,
             [this]() { update(); });
 
-    connect(m_environment->volume(), &Volume::dimensionsChanged,
-            [this](QVector3D dims) {});
+    connect(m_environment->volume(), &Volume::dimensionsChanged, this, &RenderWidget::updateBoxScalingMatrix);
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -131,7 +130,7 @@ void RenderWidget::paintGL()
     // planeEquation[3] << " = 0";
 
     QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * scaledModelViewMatrix();
+        m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
@@ -188,14 +187,13 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
     }
     return p;
 }
-QMatrix4x4 RenderWidget::scaledModelViewMatrix()
+void RenderWidget::updateBoxScalingMatrix()
 {
-    QMatrix4x4 scaledModelView = m_modelViewMatrix;
+    m_boxScalingMatrix.setToIdentity();
     auto dims = m_environment->volume()->getDimensions();
     auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    if (!maxDim == 0.0f)
+    if (maxDim)
     {
-        scaledModelView.scale(dims / maxDim);
+        m_boxScalingMatrix.scale(dims / maxDim);
     }
-    return scaledModelView;
 }
