@@ -29,6 +29,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
 
   private:
     void updateModelViewMatrix();
+    QMatrix4x4 scaledModelViewMatrix();
 
     Environment* m_environment;
     std::shared_ptr<SharedProperties> x_properties;
