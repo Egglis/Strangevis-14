@@ -109,11 +109,11 @@ void RenderWidget::paintGL()
 {
     int location = -1;
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QVector4D planeEquation = x_properties->clippingPlane();
     // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " <<
