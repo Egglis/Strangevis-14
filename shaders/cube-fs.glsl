@@ -35,30 +35,30 @@ vec3 calculateGradient()
 
     if (gradientMethod == 0) // Central Difference
     {
-        gradient.x = 0.5f * (texture(volumeTexture, vec3(x + dx, y, z)).r -
+        gradient.x = 1/(2*dx) * (texture(volumeTexture, vec3(x + dx, y, z)).r -
                              texture(volumeTexture, vec3(x - dx, y, z)).r);
-        gradient.y = 0.5f * (texture(volumeTexture, vec3(x, y + dy, z)).r -
+        gradient.y = 1/(2*dy) * (texture(volumeTexture, vec3(x, y + dy, z)).r -
                              texture(volumeTexture, vec3(x, y - dy, z)).r);
-        gradient.z = 0.5f * (texture(volumeTexture, vec3(x, y, z + dz)).r -
+        gradient.z = 1/(2*dz) * (texture(volumeTexture, vec3(x, y, z + dz)).r -
                              texture(volumeTexture, vec3(x, y, z - dz)).r);
     }
     if (gradientMethod == 1) // Forward Difference
     {
-        gradient.x = texture(volumeTexture, vec3(x + dx, y, z)).r -
-                     texture(volumeTexture, vec3(x, y, z)).r;
-        gradient.y = texture(volumeTexture, vec3(x, y + dy, z)).r -
-                     texture(volumeTexture, vec3(x, y, z)).r;
-        gradient.z = texture(volumeTexture, vec3(x, y, z + dz)).r -
-                     texture(volumeTexture, vec3(x, y, z)).r;
+        gradient.x = 1/dx * (texture(volumeTexture, vec3(x + dx, y, z)).r -
+                     texture(volumeTexture, vec3(x, y, z)).r);
+        gradient.y = 1/dy*(texture(volumeTexture, vec3(x, y + dy, z)).r -
+                     texture(volumeTexture, vec3(x, y, z)).r);
+        gradient.z = 1/dz*(texture(volumeTexture, vec3(x, y, z + dz)).r -
+                     texture(volumeTexture, vec3(x, y, z))).r;
     }
     if (gradientMethod == 2) // Backward Difference
     {
-        gradient.x = texture(volumeTexture, vec3(x, y, z)).r -
-                     texture(volumeTexture, vec3(x - dx, y, z)).r;
-        gradient.y = texture(volumeTexture, vec3(x, y, z)).r -
-                     texture(volumeTexture, vec3(x, y - dy, z)).r;
-        gradient.z = texture(volumeTexture, vec3(x, y, z)).r -
-                     texture(volumeTexture, vec3(x, y, z - dz)).r;
+        gradient.x = 1/dx*(texture(volumeTexture, vec3(x, y, z)).r -
+                     texture(volumeTexture, vec3(x - dx, y, z)).r);
+        gradient.y = 1/dy*(texture(volumeTexture, vec3(x, y, z)).r -
+                     texture(volumeTexture, vec3(x, y - dy, z)).r);
+        gradient.z = 1/dz*(texture(volumeTexture, vec3(x, y, z)).r -
+                     texture(volumeTexture, vec3(x, y, z - dz)).r);
     }
     return gradient;
 }
