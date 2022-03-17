@@ -3,6 +3,9 @@
 #include "properties/sharedproperties.h"
 #include "ui/mainwindowwidget.h"
 #include "ui/rectangulargridlayout.h"
+#include "ui/renderwidget.h"
+#include "ui/orthogonalslicewidget.h"
+#include "ui/parameterwidget.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -30,10 +33,10 @@ MainWindow::MainWindow(Environment* env, QWidget* parent)
         new RenderWidget(m_environment, x_properties, this);
     ParameterWidget* p_3dToolBarWidget =
         new ParameterWidget(x_properties, this);
-    RenderWidget* p_2dRenderWidget =
-        new RenderWidget(m_environment, x_properties, this);
-    ParameterWidget* p_2dToolBarWidget =
-        new ParameterWidget(x_properties, this);
+    OrthogonalSliceWidget* p_2dRenderWidget =
+        new OrthogonalSliceWidget(m_environment, x_properties, this);
+    OrthogonalSliceToolbar* p_2dToolBarWidget =
+        new OrthogonalSliceToolbar(x_properties, this);
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
