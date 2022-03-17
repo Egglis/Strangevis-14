@@ -12,11 +12,13 @@ RenderWidget::RenderWidget(Environment* env,
     : QOpenGLWidget(parent, f), m_environment(env), x_properties{properties}
 {
     m_modelViewMatrix.setToIdentity();
-    m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0)); //?
+    m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
     connect(x_properties.get(), &SharedProperties::clippingPlaneChanged,
             [this]() { update(); });
     connect(x_properties.get(), &SharedProperties::gradientMethodChanged,
             [this]() { update(); });
+
+    connect(m_environment->volume(), &Volume::dimensionsChanged, this, &RenderWidget::updateBoxScalingMatrix);
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -47,12 +49,19 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
 }
 
 // Scrolling wheel event
-void RenderWidget::wheelEvent(QWheelEvent *p_event){
+void RenderWidget::wheelEvent(QWheelEvent* p_event)
+{
     QPoint deg = p_event->angleDelta();
     float zoomScale = 1.0;
 
-    if(deg.y() < 0){ zoomScale = zoomScale/1.1;}
-    if(deg.y() > 0){ zoomScale = zoomScale*1.1;}
+    if (deg.y() < 0)
+    {
+        zoomScale = zoomScale / 1.1;
+    }
+    if (deg.y() > 0)
+    {
+        zoomScale = zoomScale * 1.1;
+    }
 
     m_modelViewMatrix.scale(zoomScale);
 
@@ -109,11 +118,11 @@ void RenderWidget::paintGL()
 {
     int location = -1;
 
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QVector4D planeEquation = x_properties->clippingPlane();
     // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " <<
@@ -121,7 +130,7 @@ void RenderWidget::paintGL()
     // planeEquation[3] << " = 0";
 
     QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * m_modelViewMatrix;
+        m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
@@ -133,11 +142,11 @@ void RenderWidget::paintGL()
 
     auto [width, height, depth] = m_environment->volume()->getDimensions();
     location = m_cubeProgram.uniformLocation("width");
-    m_cubeProgram.setUniformValue(location, width);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(width));
     location = m_cubeProgram.uniformLocation("height");
-    m_cubeProgram.setUniformValue(location, height);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
-    m_cubeProgram.setUniformValue(location, depth);
+    m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
@@ -149,7 +158,6 @@ void RenderWidget::paintGL()
     m_cubeProgram.enableAttributeArray(location);
     m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
                                      sizeof(QVector3D));
-
 
     Geometry::instance().drawCube();
 
@@ -178,4 +186,14 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
         p.normalize();
     }
     return p;
+}
+void RenderWidget::updateBoxScalingMatrix()
+{
+    m_boxScalingMatrix.setToIdentity();
+    auto dims = m_environment->volume()->getDimensions();
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    if (maxDim)
+    {
+        m_boxScalingMatrix.scale(dims / maxDim);
+    }
 }

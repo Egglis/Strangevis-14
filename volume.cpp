@@ -51,6 +51,7 @@ bool Volume::load(const QString& fileName)
     }
 
     m_updateNeeded = true;
+    emit dimensionsChanged(QVector3D(m_width, m_height, m_depth));
     return true;
 }
 

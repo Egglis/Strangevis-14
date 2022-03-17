@@ -29,12 +29,14 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
 
   private:
     void updateModelViewMatrix();
+    void updateBoxScalingMatrix();
 
     Environment* m_environment;
     std::shared_ptr<SharedProperties> x_properties;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_modelViewMatrix;
+    QMatrix4x4 m_boxScalingMatrix;
     qreal m_currentX, m_currentY;
     qreal m_previousX, m_previousY;
 
