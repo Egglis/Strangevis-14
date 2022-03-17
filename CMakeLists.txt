@@ -26,6 +26,7 @@ qt_add_executable(strangevis WIN32
     properties/sharedproperties.cpp
     properties/slicingplaneproperties.cpp
     ui/renderwidget.cpp
+    ui/orthogonalslicewidget.cpp
     ui/rectangulargridlayout.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
@@ -34,6 +35,8 @@ qt_add_executable(strangevis WIN32
 set(shaders_resource_files
     "shaders/cube-fs.glsl"
     "shaders/cube-vs.glsl"
+    "shaders/slice-fs.glsl"
+    "shaders/slice-vs.glsl"
 )
 
 qt6_add_resources(strangevis "shaders"
