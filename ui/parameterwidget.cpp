@@ -34,6 +34,12 @@ ParameterWidget::ParameterWidget(
     ClippingWidget* z = new ClippingWidget(this);
     m_clippingPlaneWidgets.push_back(z);
     z->setValue(m_properties->clippingPlane().z());
+    connect(z, &ClippingWidget::valueChanged, this,
+            &ParameterWidget::updateClippingPlane);
+    connect(m_properties.get(), &SharedProperties::clippingPlaneChanged,
+            [this, z](const QVector4D& clippingPlane) {
+                z->setValue(clippingPlane.z());
+            });
     m_layout.addWidget(z);
 
     ClippingWidget* w = new ClippingWidget(this);
