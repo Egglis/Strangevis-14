@@ -30,6 +30,7 @@ qt_add_executable(strangevis WIN32
     ui/mainwindowwidget.cpp
     geometry/edge.cpp
     geometry/plane.cpp
+    geometry/quad.cpp
 )
 
 set(shaders_resource_files
