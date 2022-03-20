@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(strangevis VERSION 1.0.0 LANGUAGES CXX)
+enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -53,3 +54,5 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
 )
+
+add_subdirectory(tests)
