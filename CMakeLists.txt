@@ -28,6 +28,7 @@ qt_add_executable(strangevis WIN32
     ui/rectangulargridlayout.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
+    geometry/cube.cpp
     geometry/edge.cpp
     geometry/plane.cpp
     geometry/quad.cpp
