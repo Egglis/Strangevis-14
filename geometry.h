@@ -1,6 +1,9 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include "geometry/cube.h"
+#include "geometry/quad.h"
+
 #include <QOpenGLBuffer>
 
 class Geometry {
@@ -17,8 +20,8 @@ class Geometry {
     void drawCube();
 
   private:
-    void constructQuad();
-    void constructCube();
+    void allocateQuad();
+    void allocateCube();
 
     QOpenGLBuffer m_quadVertexBuffer;
     QOpenGLBuffer m_quadIndexBuffer;
