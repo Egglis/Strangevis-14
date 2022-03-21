@@ -32,12 +32,12 @@ QVector3D Edge::parameterization(float t) const
 std::pair<QVector3D, QVector3D> Edge::parameterization() const
 {
     QVector3D first = m_b - m_a;
-    QVector3D second = edgeStart();
+    QVector3D second = start();
     return std::pair(first, second);
 }
 
 // Not normalized
 QVector3D Edge::direction() const { return m_b - m_a; }
 
-QVector3D Edge::edgeStart() const { return m_a; }
-QVector3D Edge::edgeEnd() const { return m_b; }
+QVector3D Edge::start() const { return m_a; }
+QVector3D Edge::end() const { return m_b; }

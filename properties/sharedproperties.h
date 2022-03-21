@@ -1,6 +1,9 @@
 #ifndef SHAREDPROPERTIES_H
 #define SHAREDPROPERTIES_H
 
+#include "clippingplaneproperties.h"
+#include "gradientproperties.h"
+
 #include <QObject>
 #include <QVector3D>
 
@@ -10,20 +13,12 @@ class SharedProperties : public QObject
   public:
     SharedProperties();
 
-    const QVector4D& clippingPlane() { return m_clippingPlane; };
-    void updateClippingPlane(QVector4D clippingPlane);
-
-    const int gradientMethod() { return m_gradientMethod; };
-    public slots:
-    void updateGradientMethod(int gradientMethod);
-
-  signals:
-    void clippingPlaneChanged(const QVector4D& newClippingPlane);
-    void gradientMethodChanged(int gradientMethod);
+    ClippingPlaneProperties& clippingPlane() { return m_clippingPlane; };
+    GradientProperties& gradientMethod() { return m_gradientMethod; };
 
   private:
-    QVector4D m_clippingPlane;
-    int m_gradientMethod;
+    ClippingPlaneProperties m_clippingPlane;
+    GradientProperties m_gradientMethod;
 };
 
 #endif // SHAREDPROPERTIES_H

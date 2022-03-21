@@ -13,7 +13,7 @@ TEST_CASE("Constructed edge is independent of vertex order")
     REQUIRE(edge1.parameterization() == edge2.parameterization());
 }
 
-TEST_CASE("Parameterization  overload is consistent")
+TEST_CASE("Parameterization overload is consistent")
 {
     QVector3D vertex1 {1,0,0};
     QVector3D vertex2 {0,1,0};

@@ -13,8 +13,8 @@ class Edge
     // edge and t==1.0 at ending edge
     std::pair<QVector3D, QVector3D> parameterization() const;
     QVector3D direction() const;
-    QVector3D edgeStart() const;
-    QVector3D edgeEnd() const;
+    QVector3D start() const;
+    QVector3D end() const;
 
   private:
     QVector3D m_a;

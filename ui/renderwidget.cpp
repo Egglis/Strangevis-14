@@ -9,16 +9,18 @@
 RenderWidget::RenderWidget(Environment* env,
                            std::shared_ptr<SharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_environment(env), x_properties{properties}
+    : QOpenGLWidget(parent, f), m_environment(env), m_properties{properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
-    connect(x_properties.get(), &SharedProperties::clippingPlaneChanged,
-            [this]() { update(); });
-    connect(x_properties.get(), &SharedProperties::gradientMethodChanged,
-            [this]() { update(); });
+    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+            [this](Plane plane) { update(); });
+    connect(&m_properties.get()->gradientMethod(), &GradientProperties::gradientMethodChanged,
+            [this](GradientMethod method) { update(); });
 
-    connect(m_environment->volume(), &Volume::dimensionsChanged, this, &RenderWidget::updateBoxScalingMatrix);
+    connect(m_environment->volume(), &Volume::dimensionsChanged, this,
+            &RenderWidget::updateBoxScalingMatrix);
+
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -124,7 +126,7 @@ void RenderWidget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    QVector4D planeEquation = x_properties->clippingPlane();
+    QVector4D planeEquation = {m_properties->clippingPlane().plane().normal().normalized(), m_properties->clippingPlane().plane().d()};
     // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " <<
     // planeEquation[1] << "*y + " << planeEquation[2] << "*z + " <<
     // planeEquation[3] << " = 0";
@@ -138,7 +140,7 @@ void RenderWidget::paintGL()
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
-    m_cubeProgram.setUniformValue(location, x_properties->gradientMethod());
+    m_cubeProgram.setUniformValue(location, static_cast<int>(m_properties->gradientMethod().method()));
 
     auto [width, height, depth] = m_environment->volume()->getDimensions();
     location = m_cubeProgram.uniformLocation("width");
