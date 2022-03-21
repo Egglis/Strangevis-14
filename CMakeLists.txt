@@ -29,10 +29,12 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     environment.cpp
     volume.cpp
+    transfertexture.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
     ui/renderwidget.cpp
+    ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
     ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
