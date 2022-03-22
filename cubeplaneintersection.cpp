@@ -21,6 +21,12 @@ void CubePlaneIntersection::changePlane(Plane plane)
         m_vertexPositions = rotateToXYPlane(m_textureCoords);
         m_sortedOrder = convexHullGiftWrapping(m_vertexPositions);
     }
+    else
+    {
+        m_textureCoords = std::vector<QVector3D>{};
+        m_vertexPositions = std::vector<QVector2D>{};
+        m_sortedOrder = std::vector<unsigned short>{};
+    }
 }
 
 std::vector<QVector3D> CubePlaneIntersection::intersectionVertices()

@@ -5,12 +5,13 @@
 #include <QVector3D>
 
 ObliqueSliceWidget::ObliqueSliceWidget(
-    std::shared_ptr<Environment> env, std::shared_ptr<SharedProperties> properties,
-    QWidget* parent, Qt::WindowFlags f)
+    std::shared_ptr<Environment> env,
+    std::shared_ptr<SharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_environment(env), m_properties{properties},
-    m_cubePlaneIntersection(m_properties->clippingPlane().plane())
+      m_cubePlaneIntersection(m_properties->clippingPlane().plane())
 {
-    m_modelViewMatrix.scale(1/sqrt(3.0));
+    m_modelViewMatrix.scale(1 / sqrt(3.0));
 }
 
 void ObliqueSliceWidget::initializeGL()
@@ -32,14 +33,14 @@ void ObliqueSliceWidget::initializeGL()
     auto updateObliqueSlice = [this]() {
         Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
     };
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
-    [this, updateObliqueSlice](const Plane& plane){
-        m_cubePlaneIntersection.changePlane(plane);
-        updateObliqueSlice();
-        update();
-    });
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
+            [this, updateObliqueSlice](const Plane& plane) {
+                m_cubePlaneIntersection.changePlane(plane);
+                updateObliqueSlice();
+                update();
+            });
     updateObliqueSlice();
-
 }
 
 void ObliqueSliceWidget::paintGL()
@@ -58,17 +59,21 @@ void ObliqueSliceWidget::paintGL()
     m_environment->volume()->bind();
 
     Geometry::instance().bindObliqueSliceVertex();
-
-    int location = m_sliceProgram.attributeLocation("vertexPosition");
-    m_sliceProgram.enableAttributeArray(location);
-    m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 2,
-                                      sizeof(QVector2D));
+    {
+        int location = m_sliceProgram.attributeLocation("vertexPosition");
+        m_sliceProgram.enableAttributeArray(location);
+        m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 2,
+                                          sizeof(QVector2D));
+    }
 
     Geometry::instance().bindObliqueSliceTexCoord();
-    location = m_sliceProgram.attributeLocation("texCoord");
-    m_sliceProgram.enableAttributeArray(location);
-    m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
-                                      sizeof(QVector3D));
+    {
+        int location = m_sliceProgram.attributeLocation("texCoord");
+        m_sliceProgram.enableAttributeArray(location);
+        m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
+                                          sizeof(QVector3D));
+    }
+
     Geometry::instance().drawObliqueSlice();
 
     glActiveTexture(GL_TEXTURE0);

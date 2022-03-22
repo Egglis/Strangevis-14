@@ -80,7 +80,6 @@ void Geometry::allocateObliqueSlice(const CubePlaneIntersection& intersection)
                                 sortedOrder.size() * sizeof(sortedOrder[0]));
 }
 
-
 void Geometry::bindQuad()
 {
     m_quadVertexBuffer.bind();
