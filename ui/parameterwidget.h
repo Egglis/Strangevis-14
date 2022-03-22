@@ -14,7 +14,6 @@ class SharedProperties;
 class GradientMethodWidget;
 class ClippingWidget;
 
-
 class ParameterWidget : public QWidget
 {
     Q_OBJECT
