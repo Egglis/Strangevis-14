@@ -3,6 +3,8 @@
 
 #include "../environment.h"
 #include "../properties/sharedproperties.h"
+#include "../properties/clippingplaneproperties.h"
+#include "../properties/gradientproperties.h"
 
 #include <QMatrix4x4>
 #include <QOpenGLShaderProgram>
@@ -32,7 +34,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     void updateBoxScalingMatrix();
 
     Environment* m_environment;
-    std::shared_ptr<SharedProperties> x_properties;
+    std::shared_ptr<SharedProperties> m_properties;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_modelViewMatrix;

@@ -1,6 +1,7 @@
+#ifndef PARAMETERWIDGET_H
+#define PARAMETERWIDGET_H
 
-#ifndef PARAMETER_WIDGET_H
-#define PARAMETER_WIDGET_H
+#include "../properties/gradientproperties.h"
 
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -63,18 +64,17 @@ class GradientMethodWidget : public QWidget
   public:
     GradientMethodWidget(QWidget* parent);
   public slots:
+    void setValue(GradientMethod method);
     void setValue(int value);
   private slots:
-    void updateLabel(int value);
+    void updateLabel(GradientMethod method);
   signals:
-    void valueChanged(int value);
+    void valueChanged(GradientMethod method);
 
   private:
     QSlider* m_gradientMethodSlider;
     QLabel* m_gradientMethodLabel;
     QFormLayout m_layout;
-
-
 };
 
-#endif
+#endif // PARAMETERWIDGET_H
