@@ -1,7 +1,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "cubeplaneintersection.h"
+#include "geometry/cubeplaneintersection.h"
 #include "geometry/cube.h"
 #include "geometry/quad.h"
 

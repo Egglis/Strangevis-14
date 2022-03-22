@@ -1,8 +1,8 @@
 #ifndef CUBEPLANEINTERSECTION_H
 #define CUBEPLANEINTERSECTION_H
-#include "geometry/plane.h"
-#include "geometry/edge.h"
-#include "geometry/cube.h"
+#include "plane.h"
+#include "edge.h"
+#include "cube.h"
 
 #include <QVector2D>
 #include <QVector3D>

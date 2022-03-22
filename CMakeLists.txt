@@ -24,7 +24,6 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     environment.cpp
     volume.cpp
-    cubeplaneintersection.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
@@ -33,6 +32,7 @@ qt_add_executable(strangevis WIN32
     ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
+    geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp
     geometry/plane.cpp

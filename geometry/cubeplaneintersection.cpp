@@ -1,6 +1,6 @@
 #include "cubeplaneintersection.h"
 
-#include "geometry/utils.h"
+#include "utils.h"
 
 #include <QMatrix4x4>
 #include <QVector>

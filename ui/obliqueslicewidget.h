@@ -4,7 +4,7 @@
 #include "../environment.h"
 #include "../properties/sharedproperties.h"
 #include "../properties/clippingplaneproperties.h"
-#include "../cubeplaneintersection.h"
+#include "../geometry/cubeplaneintersection.h"
 #include "parameterwidget.h"
 
 #include <QHBoxLayout>
