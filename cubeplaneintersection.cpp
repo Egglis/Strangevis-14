@@ -5,7 +5,6 @@
 #include <QMatrix4x4>
 #include <QVector>
 
-
 CubePlaneIntersection::CubePlaneIntersection(Plane plane)
     : m_cube{}, m_plane{plane}
 {
@@ -20,6 +19,7 @@ void CubePlaneIntersection::changePlane(Plane plane)
     if (m_textureCoords.size() > 2)
     {
         m_vertexPositions = rotateToXYPlane(m_textureCoords);
+        m_sortedOrder = convexHullGiftWrapping(m_vertexPositions);
     }
 }
 

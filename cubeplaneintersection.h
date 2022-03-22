@@ -22,6 +22,8 @@ class CubePlaneIntersection
       return m_vertexPositions;
     };
 
+    const std::vector<unsigned short>& getConvexHullIndexOrder() const { return m_sortedOrder;};
+
   private:
     Cube m_cube;
     std::vector<QVector3D> intersectionVertices();
@@ -31,7 +33,7 @@ class CubePlaneIntersection
     Plane m_plane;
     std::vector<QVector3D> m_textureCoords;
     std::vector<QVector2D> m_vertexPositions;
-    std::vector<QVector2D> rotateToXYPlane(std::vector<QVector3D> input);
+    std::vector<unsigned short> m_sortedOrder;
 };
 
 
