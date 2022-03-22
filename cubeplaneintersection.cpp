@@ -1,5 +1,6 @@
 #include "cubeplaneintersection.h"
 
+#include "geometry/utils.h"
 
 #include <QMatrix4x4>
 #include <QVector>
@@ -15,6 +16,11 @@ void CubePlaneIntersection::changePlane(Plane plane)
 {
     m_plane = plane;
     m_textureCoords = intersectionVertices();
+
+    if (m_textureCoords.size() > 2)
+    {
+        m_vertexPositions = rotateToXYPlane(m_textureCoords);
+    }
 }
 
 std::vector<QVector3D> CubePlaneIntersection::intersectionVertices()
@@ -62,4 +68,3 @@ QVector3D CubePlaneIntersection::linePlaneIntersectionPoint(Edge e) const
         denominator;
     return e.parameterization(t);
 }
-

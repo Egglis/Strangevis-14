@@ -24,6 +24,7 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     environment.cpp
     volume.cpp
+    cubeplaneintersection.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
@@ -34,6 +35,7 @@ qt_add_executable(strangevis WIN32
     geometry/cube.cpp
     geometry/edge.cpp
     geometry/plane.cpp
+    geometry/utils.cpp
     geometry/quad.cpp
 )
 
