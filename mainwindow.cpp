@@ -4,6 +4,7 @@
 #include "ui/mainwindowwidget.h"
 #include "ui/renderwidget.h"
 #include "ui/parameterwidget.h"
+#include "ui/obliqueslicewidget.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -29,8 +30,8 @@ MainWindow::MainWindow(QWidget* parent)
         new RenderWidget(m_environment, m_properties, this);
     ParameterWidget* p_3dToolBarWidget =
         new ParameterWidget(m_properties, this);
-    RenderWidget* p_2dRenderWidget =
-        new RenderWidget(m_environment, m_properties, this);
+    ObliqueSliceWidget* p_2dRenderWidget =
+        new ObliqueSliceWidget(m_environment, m_properties, this);
     ParameterWidget* p_2dToolBarWidget =
         new ParameterWidget(m_properties, this);
 

@@ -30,6 +30,7 @@ qt_add_executable(strangevis WIN32
     properties/gradientproperties.cpp
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
+    ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
     geometry/cube.cpp
@@ -42,6 +43,8 @@ qt_add_executable(strangevis WIN32
 set(shaders_resource_files
     "shaders/cube-fs.glsl"
     "shaders/cube-vs.glsl"
+    "shaders/slice-fs.glsl"
+    "shaders/slice-vs.glsl"
 )
 
 qt6_add_resources(strangevis "shaders"
