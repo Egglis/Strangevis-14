@@ -1,5 +1,5 @@
 #include "renderwidget.h"
-#include "../transfertexture.h"
+
 #include "../geometry.h"
 
 #include <QMouseEvent>
@@ -22,7 +22,6 @@ RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
             &RenderWidget::updateBoxScalingMatrix);
 
 }
-
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
 {
@@ -107,8 +106,6 @@ void RenderWidget::initializeGL()
 
     if (!m_cubeProgram.link())
         qDebug() << "Could not link shader program!";
-
-
 }
 
 void RenderWidget::resizeGL(int w, int h)
@@ -122,8 +119,6 @@ void RenderWidget::resizeGL(int w, int h)
 void RenderWidget::paintGL()
 {
     int location = -1;
-
-
 
     glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -152,21 +147,16 @@ void RenderWidget::paintGL()
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
-
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
     m_cubeProgram.setUniformValue("transferTexture", 1);
-
     m_environment->volume()->bind();
 
 
-    // TEST
+    // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
-    TransferTexture tfn = TransferTexture();
-    tfn.init();
-    tfn.bind();
-    // END TEST
-
+    m_environment->transferTexture()->init();
+    m_environment->transferTexture()->bind();
 
     Geometry::instance().bindCube();
 
@@ -179,14 +169,9 @@ void RenderWidget::paintGL()
     glActiveTexture(GL_TEXTURE0);
 
 
-
+    m_environment->transferTexture()->release();
     m_environment->volume()->release();
-
     m_cubeProgram.release();
-
-
-
-
 }
 
 QVector3D RenderWidget::arcballVector(qreal x, qreal y)
