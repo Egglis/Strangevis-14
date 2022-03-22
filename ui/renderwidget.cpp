@@ -6,10 +6,10 @@
 #include <QWheelEvent>
 #include <QtMath>
 
-RenderWidget::RenderWidget(Environment* env,
+RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
                            std::shared_ptr<SharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_environment(env), m_properties{properties}
+    : QOpenGLWidget(parent, f), m_environment{env}, m_properties{properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));

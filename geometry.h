@@ -6,7 +6,8 @@
 
 #include <QOpenGLBuffer>
 
-class Geometry {
+class Geometry
+{
   protected:
     Geometry();
 

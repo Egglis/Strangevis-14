@@ -19,11 +19,15 @@ void Geometry::allocateQuad()
 
     m_quadVertexBuffer.create();
     m_quadVertexBuffer.bind();
-    m_quadVertexBuffer.allocate(quad.vertices().data(), sizeof(quad.vertices()[0]));
+    m_quadVertexBuffer.allocate(quad.vertices().data(),
+                                quad.vertices().size() *
+                                    sizeof(quad.vertices()[0]));
 
     m_quadIndexBuffer.create();
     m_quadIndexBuffer.bind();
-    m_quadIndexBuffer.allocate(quad.indices().data(), sizeof(quad.indices()[0]));
+    m_quadIndexBuffer.allocate(quad.indices().data(),
+                               quad.indices().size() *
+                                   sizeof(quad.indices()[0]));
 }
 
 void Geometry::allocateCube()
@@ -32,12 +36,16 @@ void Geometry::allocateCube()
 
     m_cubeVertexBuffer.create();
     m_cubeVertexBuffer.bind();
-    m_cubeVertexBuffer.allocate(cube.vertices().data(), cube.vertices().size()*sizeof(cube.vertices()[0]));
+    m_cubeVertexBuffer.allocate(cube.vertices().data(),
+                                cube.vertices().size() *
+                                    sizeof(cube.vertices()[0]));
 
     m_cubeIndexBuffer.create();
     m_cubeIndexBuffer.bind();
-    m_cubeIndexBuffer.allocate(cube.indices().data(), cube.indices().size()* sizeof(cube.indices()[0]));
-};
+    m_cubeIndexBuffer.allocate(cube.indices().data(),
+                               cube.indices().size() *
+                                   sizeof(cube.indices()[0]));
+}
 
 void Geometry::bindQuad()
 {

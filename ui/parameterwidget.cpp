@@ -1,8 +1,9 @@
 #include "parameterwidget.h"
 
-#include "../properties/sharedproperties.h"
 #include "../properties/clippingplaneproperties.h"
 #include "../properties/gradientproperties.h"
+#include "../properties/sharedproperties.h"
+
 
 ParameterWidget::ParameterWidget(
     const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
@@ -13,7 +14,8 @@ ParameterWidget::ParameterWidget(
     x->setValue(m_properties->clippingPlane().plane().normal().x());
     connect(x, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
             [this, x](const Plane& clippingPlane) {
                 x->setValue(clippingPlane.normal().x());
             });
@@ -24,9 +26,9 @@ ParameterWidget::ParameterWidget(
     y->setValue(m_properties->clippingPlane().plane().normal().y());
     connect(y, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
             [this, y](const Plane& clippingPlane) {
-
                 y->setValue(clippingPlane.normal().y());
             });
     m_layout.addWidget(y);
@@ -36,7 +38,8 @@ ParameterWidget::ParameterWidget(
     z->setValue(m_properties->clippingPlane().plane().normal().z());
     connect(z, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
             [this, z](const Plane& clippingPlane) {
                 z->setValue(clippingPlane.normal().z());
             });
@@ -47,18 +50,40 @@ ParameterWidget::ParameterWidget(
     w->setValue(m_properties->clippingPlane().plane().d());
     connect(w, &ClippingWidget::valueChanged, this,
             &ParameterWidget::updateClippingPlane);
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
             [this, w](const Plane& clippingPlane) {
+                w->setValue(clippingPlane.d());
             });
     m_layout.addWidget(w);
 
+    // m_angleWidget = new AngleWidget(nullptr);
+    // connect(m_angleWidget, &AngleWidget::valueChanged,
+    //         [this](int degrees) {
+    //             m_properties->updateAngle(qDegreesToRadians(degrees));
+    //         });
+    // connect(m_properties.get(), &SharedProperties::angleChanged,
+    //         [this](float radians) {
+    //             m_angleWidget->setValue(radians);
+    //         });
+    // m_angleWidget->setValue(m_properties->angle());
+    // // m_layout.addWidget(new QWidget());
+    // m_layout.addWidget(m_angleWidget);
+
     m_gradientMethodWidget = new GradientMethodWidget(nullptr);
     connect(m_gradientMethodWidget, &GradientMethodWidget::valueChanged,
-            &m_properties.get()->gradientMethod(), &GradientProperties::updateGradientMethod);
+            &m_properties.get()->gradientMethod(),
+            &GradientProperties::updateGradientMethod);
     m_gradientMethodWidget->setValue(m_properties->gradientMethod().method());
     m_layout.addWidget(m_gradientMethodWidget);
 
-    setLayout(&m_layout);
+    // Expect 4 vertices
+    // m_intersection = CubePlaneIntersection(m_properties->clippingPlane());
+    // connect(&m_properties.get()->clippingPlane(),
+    // &ClippingPlaneProperties::clippingPlaneChanged,
+    //         [this](const Plane& clippingPlane) {
+    //             m_intersection.changePlane(clippingPlane);
+    //         });
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
@@ -136,7 +161,8 @@ void GradientMethodWidget::setValue(int value)
     emit valueChanged(method);
 }
 
-ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent), m_layout{this}
+ClippingWidget::ClippingWidget(QWidget* parent)
+    : QWidget(parent), m_layout{this}
 {
     m_slider = new QSlider(Qt::Orientation::Horizontal, this);
     m_slider->setMinimum(m_sliderMinimum);
@@ -157,4 +183,22 @@ ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent), m_layout{this
 void ClippingWidget::setValue(float value)
 {
     m_slider->setValue(floatToInt(value));
+}
+
+AngleWidget::AngleWidget(QWidget* parent) : QWidget(parent), m_layout{this}
+{
+    m_slider = new QSlider(Qt::Orientation::Horizontal, this);
+    m_slider->setMinimum(m_sliderMinimum);
+    m_slider->setMaximum(m_sliderMaximum);
+
+    m_label = new QLabel(this);
+    auto updateLabel = [this](int degrees) { m_label->setNum(degrees); };
+    connect(m_slider, &QSlider::valueChanged, updateLabel);
+    m_layout.addRow(m_label, m_slider);
+    connect(m_slider, &QSlider::valueChanged, this, &AngleWidget::valueChanged);
+}
+
+void AngleWidget::setValue(float radians)
+{
+    m_slider->setValue(static_cast<int>(qRadiansToDegrees(radians)));
 }
