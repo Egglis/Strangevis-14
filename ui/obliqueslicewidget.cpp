@@ -124,6 +124,7 @@ ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
     checkboxLayout->addWidget(&m_flipVerticalCheckbox);
     m_layout.addLayout(checkboxLayout);
     m_layout.addWidget(&m_parameterWidget);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
 ObliqueSliceWidget::ObliqueSliceWidget(
