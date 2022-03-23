@@ -17,6 +17,11 @@ find_package(Qt6 COMPONENTS REQUIRED
     OpenGLWidgets
     )
 
+# Set path to our custom CMAKE scripts
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+
+# Include Qt deployment helper function
+include(windeployqt)
 
 qt_add_executable(strangevis WIN32
     main.cpp
@@ -61,5 +66,6 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
 )
+windeployqt(strangevis)
 
 add_subdirectory(tests)
