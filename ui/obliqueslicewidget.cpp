@@ -9,7 +9,8 @@ ObliqueSliceWidget::ObliqueSliceWidget(
     std::shared_ptr<SharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_environment(env), m_properties{properties},
-      m_cubePlaneIntersection(m_properties->clippingPlane().plane())
+      m_cubePlaneIntersection(m_properties->clippingPlane().plane()),
+      m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
 }
@@ -47,7 +48,7 @@ void ObliqueSliceWidget::paintGL()
 {
 
     Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_sliceProgram.bind();
@@ -80,4 +81,52 @@ void ObliqueSliceWidget::paintGL()
     m_environment->volume()->release();
 
     m_sliceProgram.release();
+}
+
+void ObliqueSliceWidget::rotate(float degrees)
+{
+    QVector3D zAxis(0, 0, 1);
+    m_modelViewMatrix.rotate(m_prevRotation, zAxis);
+    m_modelViewMatrix.rotate(-degrees, zAxis);
+    m_prevRotation = degrees;
+    update();
+}
+void ObliqueSliceWidget::flipHorizontal(bool flip)
+{
+    int scale = flip != m_horizontalFlipped ? -1 : 1;
+    float prevRotation = m_prevRotation;
+    rotate(0);
+    m_modelViewMatrix.scale(scale, 1);
+    m_horizontalFlipped = flip;
+    rotate(prevRotation);
+}
+void ObliqueSliceWidget::flipVertical(bool flip)
+{
+    int scale = flip != m_verticalFlipped ? -1 : 1;
+    float prevRotation = m_prevRotation;
+    rotate(0);
+    m_modelViewMatrix.scale(1, scale);
+    m_verticalFlipped = flip;
+    rotate(prevRotation);
+}
+ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    : m_flipHorizontalCheckbox{tr("Flip Horizontal")},
+      m_flipVerticalCheckbox{tr("Flip Vertical")}, m_layout{this}, m_parameterWidget(properties, this)
+{
+    m_dial.setRange(0, 359);
+    connect(&m_dial, &QDial::valueChanged, this,
+            &ObliqueSliceRotationWidget::angleChanged);
+
+    connect(&m_flipHorizontalCheckbox, &QCheckBox::stateChanged, this,
+            &ObliqueSliceRotationWidget::flipHorizontal);
+    connect(&m_flipVerticalCheckbox, &QCheckBox::stateChanged, this,
+            &ObliqueSliceRotationWidget::flipVertical);
+    QVBoxLayout* rotationLayout = new QVBoxLayout();
+    rotationLayout->addWidget(&m_dial);
+    QHBoxLayout* checkboxLayout = new QHBoxLayout();
+    checkboxLayout->addWidget(&m_flipHorizontalCheckbox);
+    checkboxLayout->addWidget(&m_flipVerticalCheckbox);
+    rotationLayout->addLayout(checkboxLayout);
+    m_layout.addLayout(rotationLayout);
+    m_layout.addWidget(&m_parameterWidget);
 }

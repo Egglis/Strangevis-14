@@ -32,8 +32,12 @@ MainWindow::MainWindow(QWidget* parent)
         new ParameterWidget(m_properties, this);
     ObliqueSliceWidget* p_2dRenderWidget =
         new ObliqueSliceWidget(m_environment, m_properties, this);
-    ParameterWidget* p_2dToolBarWidget =
-        new ParameterWidget(m_properties, this);
+    ObliqueSliceRotationWidget* p_2dToolBarWidget =
+        new ObliqueSliceRotationWidget(m_properties, this);
+
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::angleChanged, p_2dRenderWidget, &ObliqueSliceWidget::rotate);
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal, p_2dRenderWidget, &ObliqueSliceWidget::flipHorizontal);
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical, p_2dRenderWidget, &ObliqueSliceWidget::flipVertical);
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,

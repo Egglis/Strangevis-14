@@ -19,22 +19,22 @@ MainWindowWidget::MainWindowWidget(QWidget* p_3dRenderWidget,
     m_3dRenderWidget->setParent(this);
     m_3dToolBarWidget->setParent(this);
 
-    m_mainWindowLayout->addLayout(m_3dRenderLayout);
-    m_mainWindowLayout->addLayout(m_2dRenderLayout);
+    m_mainWindowLayout->addLayout(m_3dRenderLayout, 1);
+    m_mainWindowLayout->addLayout(m_2dRenderLayout, 1);
 }
 
 QVBoxLayout* MainWindowWidget::create2dRenderLayout()
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
-    vLayout->addWidget(m_2dRenderWidget);
-    vLayout->addWidget(m_2dToolBarWidget);
+    vLayout->addWidget(m_2dRenderWidget, 5);
+    vLayout->addWidget(m_2dToolBarWidget, 1);
     return vLayout;
 }
 
 QVBoxLayout* MainWindowWidget::create3dRenderLayout()
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
-    vLayout->addWidget(m_3dRenderWidget);
-    vLayout->addWidget(m_3dToolBarWidget);
+    vLayout->addWidget(m_3dRenderWidget, 5);
+    vLayout->addWidget(m_3dToolBarWidget, 1);
     return vLayout;
 }

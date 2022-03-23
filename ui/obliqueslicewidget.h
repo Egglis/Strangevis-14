@@ -11,6 +11,8 @@
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
+#include <QDial>
+#include <QCheckBox>
 
 
 class ObliqueSliceWidget : public QOpenGLWidget,
@@ -24,6 +26,10 @@ class ObliqueSliceWidget : public QOpenGLWidget,
                           QWidget* parent = nullptr,
                           Qt::WindowFlags f = Qt::WindowFlags());
 
+  public slots:
+    void rotate(float degrees);
+    void flipHorizontal(bool flip);
+    void flipVertical(bool flip);
   protected:
     virtual void initializeGL();
     virtual void paintGL();
@@ -34,7 +40,27 @@ class ObliqueSliceWidget : public QOpenGLWidget,
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;
     QMatrix4x4 m_modelViewMatrix;
+    float m_prevRotation;
+    bool m_horizontalFlipped;
+    bool m_verticalFlipped;
 
 };
 
+class ObliqueSliceRotationWidget : public QWidget
+{
+  Q_OBJECT
+  public:
+    ObliqueSliceRotationWidget(const std::shared_ptr<SharedProperties>& properties, QWidget* parent = nullptr);
+
+  signals:
+    void angleChanged(float angleDegrees);
+    void flipVertical(bool flip);
+    void flipHorizontal(bool flip);
+  private:
+    QDial m_dial;
+    QCheckBox m_flipHorizontalCheckbox;
+    QCheckBox m_flipVerticalCheckbox;
+    QHBoxLayout m_layout;
+    ParameterWidget m_parameterWidget;
+};
 #endif // OBLIQUESLICEWIDGET_H
