@@ -2,21 +2,29 @@
 #define RENDERWIDGET_H
 
 #include "../environment.h"
-#include "../properties/sharedproperties.h"
 #include "../properties/clippingplaneproperties.h"
 #include "../properties/gradientproperties.h"
+#include "../properties/sharedproperties.h"
+#include "transferfunctionwidget.h"
+#include "parameterwidget.h"
 
 #include <QMatrix4x4>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLExtraFunctions>
+#include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <memory>
 
-class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
+
+class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
+{
     Q_OBJECT
 
   public:
-    RenderWidget(std::shared_ptr<Environment> env, std::shared_ptr<SharedProperties> properties, QWidget* parent = nullptr,
+    RenderWidget(std::shared_ptr<Environment> env,
+                 std::shared_ptr<SharedProperties> properties,
+                 QWidget* parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
@@ -47,4 +55,15 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     qreal m_fov = 60.0;
 };
 
-#endif
+class ExtendedParameterWidget : public QWidget
+{
+  public:
+    ExtendedParameterWidget(const std::shared_ptr<SharedProperties>& properties,
+                            QWidget* parent);
+
+  private:
+    QVBoxLayout m_layout;
+    TransferWidget m_transferWidget;
+    ParameterWidget m_parameterWidget;
+};
+#endif // RENDERWIDGET_H

@@ -100,6 +100,8 @@ ColorMapSelector::ColorMapSelector(QWidget* parent,
     }
     connect(m_box, &QComboBox::currentIndexChanged, this,
             &ColorMapSelector::setIndex);
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->addWidget(m_box);
 };
 
 void ColorMapSelector::setIndex(int index)
