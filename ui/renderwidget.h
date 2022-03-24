@@ -12,7 +12,6 @@
 #include <QOpenGLWidget>
 #include <memory>
 
-
 class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 

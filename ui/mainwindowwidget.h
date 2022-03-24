@@ -30,5 +30,5 @@ class MainWindowWidget : public QWidget {
 
     QHBoxLayout* m_mainWindowLayout;
 
-}
+};
 #endif // MAINWINDOWWIDGET_H

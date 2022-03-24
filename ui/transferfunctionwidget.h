@@ -1,10 +1,10 @@
-#ifndef TRANSFER_WIDGET_H
-#define TRANSFER_WIDGET_H
+#ifndef TRANSFERFUNCTIONWIDGET_H
+#define TRANSFERFUNCTIONWIDGET_H
 
 #include "../transfertexture.h"
 
 #include <QWidget>
-#include <QGridLayout>
+#include <QHBoxLayout>
 #include <QOpenGLTexture>
 #include <QSlider>
 #include <QComboBox>
@@ -14,7 +14,7 @@ class SharedProperties;
 /*
 TODO:
 Add DataPoints
-Add Colormaps 
+Add Colormaps
 Add more settings
 
 */
@@ -46,7 +46,7 @@ class TransferWidget : public QWidget {
         bool loadColorMaps();
 
         const std::shared_ptr<SharedProperties>& m_properties;
-        QGridLayout m_layout;
+        QHBoxLayout* m_layout;
         int m_index;
         ColorMapSelector* m_selector;
         std::vector<ColorMap> m_colorMaps;
@@ -54,4 +54,4 @@ class TransferWidget : public QWidget {
 
 
 
-#endif // TRANSFER_WIDGET_H
+#endif // TRANSFERFUNCTIONWIDGET_H
