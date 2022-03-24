@@ -2,7 +2,9 @@
 
 #include "properties/sharedproperties.h"
 #include "ui/mainwindowwidget.h"
-#include "ui/rectangulargridlayout.h"
+#include "ui/renderwidget.h"
+#include "ui/parameterwidget.h"
+#include "ui/obliqueslicewidget.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -10,13 +12,11 @@
 #include <QMenuBar>
 
 
-MainWindow::MainWindow(Environment* env, QWidget* parent)
-    : QMainWindow(parent), m_environment(env)
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
 {
-    x_properties = std::make_shared<SharedProperties>();
-
-    env->setParent(
-        this); // Ensure destruction of env on destruction of MainWindow
+    m_environment = std::make_shared<Environment>();
+    m_properties = std::make_shared<SharedProperties>();
 
     QMenu* fileMenu = new QMenu("File");
 
@@ -27,13 +27,16 @@ MainWindow::MainWindow(Environment* env, QWidget* parent)
     menuBar()->addMenu(fileMenu);
 
     RenderWidget* p_3dRenderWidget =
-        new RenderWidget(m_environment, x_properties, this);
+        new RenderWidget(m_environment, m_properties, this);
     ParameterWidget* p_3dToolBarWidget =
-        new ParameterWidget(x_properties, this);
-    RenderWidget* p_2dRenderWidget =
-        new RenderWidget(m_environment, x_properties, this);
-    ParameterWidget* p_2dToolBarWidget =
-        new ParameterWidget(x_properties, this);
+        new ParameterWidget(m_properties, this);
+    ObliqueSliceWidget* p_2dRenderWidget =
+        new ObliqueSliceWidget(m_environment, m_properties, this);
+    ObliqueSliceRotationWidget* p_2dToolBarWidget =
+        new ObliqueSliceRotationWidget(m_properties, this);
+
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal, p_2dRenderWidget->renderWidget(), &ObliqueSliceRenderWidget::flipHorizontal);
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical, p_2dRenderWidget->renderWidget(), &ObliqueSliceRenderWidget::flipVertical);
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,

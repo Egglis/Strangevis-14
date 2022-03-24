@@ -6,10 +6,10 @@
 #include <QWheelEvent>
 #include <QtMath>
 
-RenderWidget::RenderWidget(Environment* env,
+RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
                            std::shared_ptr<SharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_environment(env), m_properties{properties}
+    : QOpenGLWidget(parent, f), m_environment{env}, m_properties{properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
@@ -127,9 +127,6 @@ void RenderWidget::paintGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QVector4D planeEquation = {m_properties->clippingPlane().plane().normal().normalized(), m_properties->clippingPlane().plane().d()};
-    // qDebug() << "Plane Equation: " << planeEquation[0] << "*x + " <<
-    // planeEquation[1] << "*y + " << planeEquation[2] << "*z + " <<
-    // planeEquation[3] << " = 0";
 
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;

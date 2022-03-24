@@ -17,7 +17,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     Q_OBJECT
 
   public:
-    RenderWidget(Environment* env, std::shared_ptr<SharedProperties> properties, QWidget* parent = nullptr,
+    RenderWidget(std::shared_ptr<Environment> env, std::shared_ptr<SharedProperties> properties, QWidget* parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
@@ -33,7 +33,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
     void updateModelViewMatrix();
     void updateBoxScalingMatrix();
 
-    Environment* m_environment;
+    std::shared_ptr<Environment> m_environment;
     std::shared_ptr<SharedProperties> m_properties;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;

@@ -14,7 +14,6 @@ class SharedProperties;
 class GradientMethodWidget;
 class ClippingWidget;
 
-
 class ParameterWidget : public QWidget
 {
     Q_OBJECT
@@ -23,14 +22,14 @@ class ParameterWidget : public QWidget
                     QWidget* parent);
     QSize sizeHint() { return QSize{300, 200}; };
 
-  private:
     const std::shared_ptr<SharedProperties>& m_properties;
+  public slots:
+    void updateClippingPlane();
+
+  private:
     QHBoxLayout m_layout;
     QVector<ClippingWidget*> m_clippingPlaneWidgets;
     GradientMethodWidget* m_gradientMethodWidget;
-
-  private slots:
-    void updateClippingPlane();
 };
 
 class ClippingWidget : public QWidget

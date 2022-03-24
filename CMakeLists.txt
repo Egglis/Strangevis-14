@@ -17,6 +17,11 @@ find_package(Qt6 COMPONENTS REQUIRED
     OpenGLWidgets
     )
 
+# Set path to our custom CMAKE scripts
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+
+# Include Qt deployment helper function
+include(windeployqt)
 
 qt_add_executable(strangevis WIN32
     main.cpp
@@ -29,17 +34,22 @@ qt_add_executable(strangevis WIN32
     properties/gradientproperties.cpp
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
+    ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
+    geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp
     geometry/plane.cpp
+    geometry/utils.cpp
     geometry/quad.cpp
 )
 
 set(shaders_resource_files
     "shaders/cube-fs.glsl"
     "shaders/cube-vs.glsl"
+    "shaders/slice-fs.glsl"
+    "shaders/slice-vs.glsl"
 )
 
 qt6_add_resources(strangevis "shaders"
@@ -56,5 +66,6 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
 )
+windeployqt(strangevis)
 
 add_subdirectory(tests)

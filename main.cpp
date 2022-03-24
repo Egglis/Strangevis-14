@@ -17,8 +17,7 @@ int main(int argc, char* argv[])
     format.setOption(QSurfaceFormat::DeprecatedFunctions, true);
     QSurfaceFormat::setDefaultFormat(format);
 
-    Environment* env = new Environment();
-    MainWindow window(env);
+    MainWindow window{};
     window.resize(768, 768);
     window.show();
 

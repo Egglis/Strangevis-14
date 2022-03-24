@@ -16,14 +16,14 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    MainWindow(Environment* env, QWidget* parent = nullptr);
+    MainWindow(QWidget* parent = nullptr);
 
   public slots:
     void fileOpen();
 
   private:
-    std::shared_ptr<SharedProperties> x_properties;
+    std::shared_ptr<SharedProperties> m_properties;
     MainWindowWidget* m_mainWidget;
-    Environment* m_environment;
+    std::shared_ptr<Environment> m_environment;
 };
 #endif // MAINWINDOW_H
