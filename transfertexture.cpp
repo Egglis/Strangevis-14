@@ -15,13 +15,6 @@ void TransferTexture::setColorMap(ColorMap colormap)
     m_updateNeeded = true;
 };
 
-/*
-void TransferTexture::updateA(float value){
-    m_colorMap[1] = value;
-    m_updateNeeded = true;
-}
-*/
-
 void TransferTexture::bind()
 {
     if (m_updateNeeded)

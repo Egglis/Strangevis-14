@@ -14,7 +14,7 @@ class TransferProperties : public QObject
     public slots:
         void updateTransferTexture(ColorMap cmap);
     signals:
-        void transferTextureChanged(ColorMap alpha);
+        void transferTextureChanged(ColorMap cmap);
     private:
         ColorMap m_colorMap;
 
