@@ -18,19 +18,11 @@ Add Colormaps
 Add more settings
 
 */
-class ColorMapSelector : public QWidget
+class ColorMapSelector : public QComboBox
 {
         Q_OBJECT
     public:
         ColorMapSelector(QWidget* parent, std::vector<ColorMap> options);
-        int getSelectedItem() {return m_selectedItem; };
-    public slots:
-        void setIndex(int index);
-    signals:
-        void valueChanged(int index);
-    private:
-        QComboBox* m_box;
-        int m_selectedItem;
 };
 
 

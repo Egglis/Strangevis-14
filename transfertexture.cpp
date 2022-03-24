@@ -49,7 +49,7 @@ void TransferTexture::bind()
     }
     if (m_transferTexture.isCreated())
     {
-        m_transferTexture.bind(1);
+        m_transferTexture.bind();
     }
 };
 
@@ -67,12 +67,6 @@ ColorMap::ColorMap(QString name, std::vector<GLfloat>& data)
     qDebug() << "new Colormap" << name;
 };
 
-ColorMap::ColorMap()
+ColorMap::ColorMap() : m_name{"RGB"}, m_colorMapData(256*4)
 {
-    // Defualt RGB ColorMap, i know there is a better way, but i am lazy
-    m_name = "RGB";
-    for (int i = 0; i < 256 * 4; i++)
-    {
-        m_colorMapData.push_back(0);
-    }
 }

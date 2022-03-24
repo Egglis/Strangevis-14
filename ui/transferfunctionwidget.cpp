@@ -7,23 +7,25 @@
 #include <QFile>
 #include <QtXml>
 
-
 TransferWidget::TransferWidget(
     const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
     : QWidget(parent), m_properties{properties}
 {
     // TODO: Check if loading of xml file fails and either reload or give user
     // warning dialog
-    bool load = loadColorMaps();
+    loadColorMaps();
     m_layout = new QHBoxLayout();
     m_selector = new ColorMapSelector(nullptr, m_colorMaps);
-    connect(m_selector, &ColorMapSelector::valueChanged, this,
+    connect(m_selector, &ColorMapSelector::currentIndexChanged, this,
             &TransferWidget::setSelectedColorMap);
     connect(this, &TransferWidget::valueChanged,
             &m_properties.get()->colorMap(),
             &TransferProperties::transferTextureChanged);
     m_layout->addWidget(m_selector);
     setLayout(m_layout);
+    int result = m_selector->findText("gist_gray");
+    result > -1 ? m_selector->setCurrentIndex(result)
+                : setSelectedColorMap(0);
 };
 
 bool TransferWidget::loadColorMaps()
@@ -91,21 +93,10 @@ void TransferWidget::setSelectedColorMap(int index)
 
 ColorMapSelector::ColorMapSelector(QWidget* parent,
                                    std::vector<ColorMap> colorMaps)
-    : QWidget(parent)
+    : QComboBox(parent)
 {
-    m_box = new QComboBox(this);
-    for (int i = 0; i < colorMaps.size(); i++)
+    for (const auto& colorMap : colorMaps)
     {
-        m_box->addItem(colorMaps[i].getName());
+        addItem(colorMap.getName());
     }
-    connect(m_box, &QComboBox::currentIndexChanged, this,
-            &ColorMapSelector::setIndex);
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(m_box);
-};
-
-void ColorMapSelector::setIndex(int index)
-{
-    m_selectedItem = index;
-    emit valueChanged(m_selectedItem);
-};
+}
