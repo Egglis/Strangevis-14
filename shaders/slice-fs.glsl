@@ -3,10 +3,13 @@
 in vec3 tex;
 out vec4 fragmentColor;
 
-uniform sampler3D volumeTexture;
+layout(location = 0) uniform sampler3D volumeTexture;
+layout(location = 1) uniform sampler1D transferTexture;
 
 void main(void)
 {
     float volumeValue = texture(volumeTexture, tex).r;
-    fragmentColor = vec4(pow(vec3(volumeValue),vec3(1/2.2)), 1.0);
+    vec4 tfn = texture(transferTexture, volumeValue);
+    fragmentColor = vec4(vec3(volumeValue), 1.0);
+    fragmentColor = vec4(tfn.rgb, 1.0);
 }

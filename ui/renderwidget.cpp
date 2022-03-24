@@ -1,10 +1,15 @@
 #include "renderwidget.h"
 
 #include "../geometry.h"
+#include "../transfertexture.h"
+#include "parameterwidget.h"
+#include "transferfunctionwidget.h"
 
+#include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QtMath>
+
 
 RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
                            std::shared_ptr<SharedProperties> properties,
@@ -13,14 +18,19 @@ RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
-    connect(&m_properties.get()->clippingPlane(), &ClippingPlaneProperties::clippingPlaneChanged,
+    connect(&m_properties.get()->clippingPlane(),
+            &ClippingPlaneProperties::clippingPlaneChanged,
             [this](Plane plane) { update(); });
-    connect(&m_properties.get()->gradientMethod(), &GradientProperties::gradientMethodChanged,
+    connect(&m_properties.get()->gradientMethod(),
+            &GradientProperties::gradientMethodChanged,
             [this](GradientMethod method) { update(); });
 
     connect(m_environment->volume(), &Volume::dimensionsChanged, this,
             &RenderWidget::updateBoxScalingMatrix);
 
+    connect(&m_properties.get()->colorMap(),
+            &TransferProperties::transferTextureChanged, this,
+            &RenderWidget::updateTransferTexture);
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -126,7 +136,9 @@ void RenderWidget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    QVector4D planeEquation = {m_properties->clippingPlane().plane().normal().normalized(), m_properties->clippingPlane().plane().d()};
+    QVector4D planeEquation = {
+        m_properties->clippingPlane().plane().normal().normalized(),
+        m_properties->clippingPlane().plane().d()};
 
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;
@@ -137,7 +149,8 @@ void RenderWidget::paintGL()
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
-    m_cubeProgram.setUniformValue(location, static_cast<int>(m_properties->gradientMethod().method()));
+    m_cubeProgram.setUniformValue(
+        location, static_cast<int>(m_properties->gradientMethod().method()));
 
     auto [width, height, depth] = m_environment->volume()->getDimensions();
     location = m_cubeProgram.uniformLocation("width");
@@ -151,6 +164,11 @@ void RenderWidget::paintGL()
     m_cubeProgram.setUniformValue("volumeTexture", 0);
     m_environment->volume()->bind();
 
+    // Transfer Texture
+    glActiveTexture(GL_TEXTURE1);
+    m_cubeProgram.setUniformValue("transferTexture", 1);
+    m_environment->transferTexture()->bind();
+
     Geometry::instance().bindCube();
 
     location = m_cubeProgram.attributeLocation("vertexPosition");
@@ -159,10 +177,10 @@ void RenderWidget::paintGL()
                                      sizeof(QVector3D));
 
     Geometry::instance().drawCube();
-
     glActiveTexture(GL_TEXTURE0);
-    m_environment->volume()->release();
 
+    m_environment->transferTexture()->release();
+    m_environment->volume()->release();
     m_cubeProgram.release();
 }
 
@@ -195,4 +213,20 @@ void RenderWidget::updateBoxScalingMatrix()
     {
         m_boxScalingMatrix.scale(dims / maxDim);
     }
+}
+
+void RenderWidget::updateTransferTexture(ColorMap cmap)
+{
+    m_environment->transferTexture()->setColorMap(cmap);
+    update();
+}
+
+ExtendedParameterWidget::ExtendedParameterWidget(
+    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    : QWidget(parent), m_parameterWidget(properties, this),
+      m_transferWidget(properties, this), m_layout{this}
+{
+    m_layout.addWidget(&m_transferWidget);
+    m_layout.addWidget(&m_parameterWidget);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }

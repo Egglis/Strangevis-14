@@ -13,6 +13,8 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
+    connect(&m_properties.get()->colorMap(),
+            &TransferProperties::transferTextureChanged, [this](){ update();});
 }
 
 void ObliqueSliceRenderWidget::initializeGL()
@@ -59,7 +61,12 @@ void ObliqueSliceRenderWidget::paintGL()
     m_sliceProgram.setUniformValue("volumeTexture", 0);
     m_environment->volume()->bind();
 
+    // Transfer Texture
+    glActiveTexture(GL_TEXTURE1);
+    m_sliceProgram.setUniformValue("transferTexture", 1);
+    m_environment->transferTexture()->bind();
     Geometry::instance().bindObliqueSliceVertex();
+
     {
         int location = m_sliceProgram.attributeLocation("vertexPosition");
         m_sliceProgram.enableAttributeArray(location);
@@ -79,8 +86,16 @@ void ObliqueSliceRenderWidget::paintGL()
 
     glActiveTexture(GL_TEXTURE0);
     m_environment->volume()->release();
+    glActiveTexture(GL_TEXTURE1);
+    m_environment->transferTexture()->release();
 
     m_sliceProgram.release();
+}
+
+void ObliqueSliceRenderWidget::updateTransferTexture(ColorMap cmap)
+{
+    m_environment->transferTexture()->setColorMap(cmap);
+    update();
 }
 
 void ObliqueSliceRenderWidget::rotate(float degrees)

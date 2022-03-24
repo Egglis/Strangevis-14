@@ -15,6 +15,7 @@ find_package(Qt6 COMPONENTS REQUIRED
     Gui
     Widgets
     OpenGLWidgets
+    Xml
     )
 
 # Set path to our custom CMAKE scripts
@@ -29,10 +30,13 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     environment.cpp
     volume.cpp
+    transfertexture.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
+    properties/transferproperties.cpp
     ui/renderwidget.cpp
+    ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
     ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
@@ -59,12 +63,20 @@ qt6_add_resources(strangevis "shaders"
     ${shaders_resource_files}
 )
 
+qt6_add_resources(strangevis "cmaps"
+    PREFIX
+        "/cmaps"
+    FILES
+    "res/cmaps.xml"
+)
+
 target_link_libraries(strangevis PRIVATE
     OpenGL32
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
     Qt6::OpenGLWidgets
+    Qt6::Xml
 )
 windeployqt(strangevis)
 

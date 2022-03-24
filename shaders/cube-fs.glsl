@@ -3,7 +3,8 @@
 in vec3 volumePosition;
 out vec4 fragmentColor;
 
-uniform sampler3D volumeTexture;
+layout(location = 0) uniform sampler3D volumeTexture;
+layout(location = 1) uniform sampler1D transferTexture;
 uniform int gradientMethod;
 uniform int width;
 uniform int height;
@@ -15,7 +16,8 @@ void main(void)
 {
     vec3 gradient = calculateGradient();
     float volumeValue = texture(volumeTexture, vec3(volumePosition.xyz)).r;
-    fragmentColor = vec4(vec3(volumeValue), length(gradient));
+    vec4 tfn = texture(transferTexture, volumeValue);
+    fragmentColor = vec4(tfn.rgb, length(gradient));
 }
 
 vec3 calculateGradient()

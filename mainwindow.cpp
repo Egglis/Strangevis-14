@@ -5,6 +5,8 @@
 #include "ui/renderwidget.h"
 #include "ui/parameterwidget.h"
 #include "ui/obliqueslicewidget.h"
+#include "ui/rectangulargridlayout.h"
+#include "ui/transferfunctionwidget.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -28,8 +30,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     RenderWidget* p_3dRenderWidget =
         new RenderWidget(m_environment, m_properties, this);
-    ParameterWidget* p_3dToolBarWidget =
-        new ParameterWidget(m_properties, this);
+    ExtendedParameterWidget* p_3dToolBarWidget =
+        new ExtendedParameterWidget(m_properties, this);
     ObliqueSliceWidget* p_2dRenderWidget =
         new ObliqueSliceWidget(m_environment, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
