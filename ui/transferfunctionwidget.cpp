@@ -23,8 +23,7 @@ TransferWidget::TransferWidget(const std::shared_ptr<SharedProperties>& properti
 bool TransferWidget::loadColorMaps(){
     // Open file for Reading
     QDomDocument xml;
-    QFile f("../res/cmaps.xml");
-    if (!f.open(QIODevice::ReadOnly)) {
+    QFile f(":cmaps/res/cmaps.xml");
         // Error:
         qDebug() << "Error while loading file";
         return false;

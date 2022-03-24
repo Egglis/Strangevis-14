@@ -63,6 +63,13 @@ qt6_add_resources(strangevis "shaders"
     ${shaders_resource_files}
 )
 
+qt6_add_resources(strangevis "cmaps"
+    PREFIX
+        "/cmaps"
+    FILES
+    "res/cmaps.xml"
+)
+
 target_link_libraries(strangevis PRIVATE
     OpenGL32
     Qt6::Core
