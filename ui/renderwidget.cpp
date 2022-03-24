@@ -162,13 +162,12 @@ void RenderWidget::paintGL()
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
-    m_cubeProgram.setUniformValue("transferTexture", 1);
     m_environment->volume()->bind();
 
     // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
+    m_cubeProgram.setUniformValue("transferTexture", 1);
     m_environment->transferTexture()->bind();
-    ColorMap cmap = m_environment->transferTexture()->getColorMap();
 
     Geometry::instance().bindCube();
 

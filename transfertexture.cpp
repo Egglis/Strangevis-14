@@ -46,11 +46,10 @@ void TransferTexture::bind()
                                   m_colorMap.m_colorMapData.data());
 
         m_updateNeeded = false;
-
-        if (m_transferTexture.isCreated())
-        {
-            m_transferTexture.bind(1);
-        }
+    }
+    if (m_transferTexture.isCreated())
+    {
+        m_transferTexture.bind(1);
     }
 };
 

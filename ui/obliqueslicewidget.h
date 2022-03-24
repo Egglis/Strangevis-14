@@ -36,6 +36,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     virtual void paintGL();
 
   private:
+    void updateTransferTexture(ColorMap cmap);
     std::shared_ptr<SharedProperties> m_properties;
     std::shared_ptr<Environment> m_environment;
     QOpenGLShaderProgram m_sliceProgram;
