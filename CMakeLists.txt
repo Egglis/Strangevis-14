@@ -15,6 +15,7 @@ find_package(Qt6 COMPONENTS REQUIRED
     Gui
     Widgets
     OpenGLWidgets
+    Xml
     )
 
 # Set path to our custom CMAKE scripts
@@ -33,6 +34,7 @@ qt_add_executable(strangevis WIN32
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
+    properties/transferproperties.cpp
     ui/renderwidget.cpp
     ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
@@ -67,6 +69,7 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::OpenGLWidgets
+    Qt6::Xml
 )
 windeployqt(strangevis)
 

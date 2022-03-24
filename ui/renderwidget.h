@@ -32,6 +32,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions {
   private:
     void updateModelViewMatrix();
     void updateBoxScalingMatrix();
+    void updateTransferTexture(ColorMap cmap);
 
     std::shared_ptr<Environment> m_environment;
     std::shared_ptr<SharedProperties> m_properties;

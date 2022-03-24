@@ -1,6 +1,7 @@
 #include "renderwidget.h"
 
 #include "../geometry.h"
+#include "../transfertexture.h"
 
 #include <QMouseEvent>
 #include <QWheelEvent>
@@ -20,6 +21,11 @@ RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
 
     connect(m_environment->volume(), &Volume::dimensionsChanged, this,
             &RenderWidget::updateBoxScalingMatrix);
+
+    
+    connect(&m_properties.get()->colorMap(), &TransferProperties::transferTextureChanged,
+            this, &RenderWidget::updateTransferTexture);
+    
 
 }
 
@@ -155,9 +161,14 @@ void RenderWidget::paintGL()
 
     // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
-    m_environment->transferTexture()->init();
     m_environment->transferTexture()->bind();
-
+    ColorMap cmap = m_environment->transferTexture()->getColorMap();
+    /*
+    for(int i = 0; i < 256; i++){
+        qDebug() << cmap.m_colorMapData[i][0] << cmap.m_colorMapData[i][1] << cmap.m_colorMapData[i][2] << cmap.m_colorMapData[i][3];
+    }
+    */
+    
     Geometry::instance().bindCube();
 
     location = m_cubeProgram.attributeLocation("vertexPosition");
@@ -203,4 +214,8 @@ void RenderWidget::updateBoxScalingMatrix()
     {
         m_boxScalingMatrix.scale(dims / maxDim);
     }
+}
+
+void RenderWidget::updateTransferTexture(ColorMap cmap){
+    m_environment->transferTexture()->setColorMap(cmap);
 }

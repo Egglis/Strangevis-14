@@ -5,6 +5,8 @@
 #include "ui/renderwidget.h"
 #include "ui/parameterwidget.h"
 #include "ui/obliqueslicewidget.h"
+#include "ui/rectangulargridlayout.h"
+#include "ui/transferfunctionwidget.h"
 
 #include <QAction>
 #include <QFileDialog>
