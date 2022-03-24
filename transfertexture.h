@@ -30,9 +30,9 @@ class TransferTexture : public QObject
 
     void addColor();
     void removeColor();
-    void updateA(float value);
-    void setColorMap(ColorMap colormap);
+    void setColorMap(ColorMap cmap);
     ColorMap getColorMap() { return m_colorMap; };
+    
 
     void bind();
     void release();
