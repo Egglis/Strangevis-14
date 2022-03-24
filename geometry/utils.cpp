@@ -1,13 +1,16 @@
 #include "utils.h"
+
 #include "plane.h"
 
 #include <QMatrix4x4>
+
 
 // Adapted from
 // https://iq.opengenus.org/gift-wrap-jarvis-march-algorithm-convex-hull/
 // Returns the indexes of input that form a convex hull over the points in
 // input.
-std::vector<unsigned short> convexHullGiftWrapping(const std::vector<QVector2D>& input)
+std::vector<unsigned short>
+convexHullGiftWrapping(const std::vector<QVector2D>& input)
 {
 
     if (input.size() < 3)
@@ -17,14 +20,7 @@ std::vector<unsigned short> convexHullGiftWrapping(const std::vector<QVector2D>&
     std::vector<unsigned short> output{};
     output.reserve(input.size());
 
-    int leftMostVertex = 0;
-    for (int i = 0; i < input.size(); i++)
-    {
-        if (input[i].x() < input[leftMostVertex].x())
-        {
-            leftMostVertex = i;
-        }
-    }
+    int startingVertex = 0;
 
     // We want to examine all points in input and find the point that forming an
     // edge with our starting point is such that all other points in the input
@@ -41,10 +37,10 @@ std::vector<unsigned short> convexHullGiftWrapping(const std::vector<QVector2D>&
                           : Orientation::Clockwise;
     };
     int n = input.size();
-    // Start from leftmost point, keep moving counterclockwise
+    // Start from any point guaranteed on the hull, keep moving counterclockwise
     // until reach the start point again.  This loop runs O(h)
     // times where h is number of points in result or output.
-    int p = leftMostVertex;
+    int p = startingVertex;
     int q;
     do
     {
@@ -67,12 +63,11 @@ std::vector<unsigned short> convexHullGiftWrapping(const std::vector<QVector2D>&
         // Set p as q for next iteration, so that q is added to
         // result 'hull'
         p = q;
-    } while (p != leftMostVertex); // While we don't come to first point
+    } while (p != startingVertex); // While we don't come to first point
     return std::move(output);
 }
 
-std::vector<QVector2D>
-rotateToXYPlane(const std::vector<QVector3D>& input)
+std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
 {
     assert(input.size() > 2);
     Plane plane = Plane(input[0], input[1], input[2]);
