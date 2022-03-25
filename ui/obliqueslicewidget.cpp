@@ -25,11 +25,11 @@ void ObliqueSliceRenderWidget::initializeGL()
     Geometry::instance();
 
     if (!m_sliceProgram.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, ":/shaders/shaders/slice-vs.glsl"))
+            QOpenGLShader::Vertex, ":shaders/slice-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
     if (!m_sliceProgram.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, ":/shaders/shaders/slice-fs.glsl"))
+            QOpenGLShader::Fragment, ":shaders/slice-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
     if (!m_sliceProgram.link())

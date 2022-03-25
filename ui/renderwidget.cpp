@@ -107,11 +107,11 @@ void RenderWidget::initializeGL()
     Geometry::instance();
 
     if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, ":/shaders/shaders/cube-vs.glsl"))
+            QOpenGLShader::Vertex, ":shaders/cube-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
     if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, ":/shaders/shaders/cube-fs.glsl"))
+            QOpenGLShader::Fragment, ":shaders/cube-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
     if (!m_cubeProgram.link())

@@ -59,15 +59,19 @@ set(shaders_resource_files
 qt6_add_resources(strangevis "shaders"
     PREFIX
         "/shaders"
+    BASE
+        "shaders"
     FILES
-    ${shaders_resource_files}
+        ${shaders_resource_files}
 )
 
 qt6_add_resources(strangevis "cmaps"
     PREFIX
         "/cmaps"
+    BASE
+        "res"
     FILES
-    "res/cmaps.xml"
+        "res/cmaps.xml"
 )
 
 target_link_libraries(strangevis PRIVATE
