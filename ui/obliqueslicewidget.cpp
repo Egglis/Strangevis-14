@@ -5,8 +5,8 @@
 #include <QVector3D>
 
 ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
-    std::shared_ptr<TextureStore> textureStore,
-    std::shared_ptr<SharedProperties> properties, QWidget* parent,
+    const std::shared_ptr<ITextureStore> textureStore,
+    const std::shared_ptr<const ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore(textureStore), m_properties{properties},
       m_cubePlaneIntersection(m_properties->clippingPlane().plane()),
@@ -60,12 +60,12 @@ void ObliqueSliceRenderWidget::paintGL()
 
     glActiveTexture(GL_TEXTURE0);
     m_sliceProgram.setUniformValue("volumeTexture", 0);
-    m_textureStore->volume()->bind();
+    m_textureStore->volume().bind();
 
     // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
     m_sliceProgram.setUniformValue("transferFunction", 1);
-    m_textureStore->transferFunction()->bind();
+    m_textureStore->transferFunction().bind();
     Geometry::instance().bindObliqueSliceVertex();
 
     {
@@ -86,16 +86,16 @@ void ObliqueSliceRenderWidget::paintGL()
     Geometry::instance().drawObliqueSlice();
 
     glActiveTexture(GL_TEXTURE0);
-    m_textureStore->volume()->release();
+    m_textureStore->volume().release();
     glActiveTexture(GL_TEXTURE1);
-    m_textureStore->transferFunction()->release();
+    m_textureStore->transferFunction().release();
 
     m_sliceProgram.release();
 }
 
 void ObliqueSliceRenderWidget::updateTransferTexture(ColorMap cmap)
 {
-    m_textureStore->transferFunction()->setColorMap(cmap);
+    m_textureStore->transferFunction().setColorMap(cmap);
     update();
 }
 
@@ -126,7 +126,7 @@ void ObliqueSliceRenderWidget::flipVertical(bool flip)
     rotate(prevRotation);
 }
 ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
-    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
     : m_flipHorizontalCheckbox{tr("Flip Horizontal")},
       m_flipVerticalCheckbox{tr("Flip Vertical")}, m_layout{this},
       m_parameterWidget(properties, this)
@@ -144,8 +144,8 @@ ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
 }
 
 ObliqueSliceWidget::ObliqueSliceWidget(
-    std::shared_ptr<TextureStore> textureStore,
-    std::shared_ptr<SharedProperties> properties, QWidget* parent,
+    const std::shared_ptr<ITextureStore>& textureStore,
+    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent,
     Qt::WindowFlags f)
     : QWidget(parent)
 {

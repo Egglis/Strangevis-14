@@ -10,7 +10,7 @@
 #include <QComboBox>
 
 
-class SharedProperties;
+class ISharedProperties;
 /*
 TODO:
 Add DataPoints
@@ -29,7 +29,7 @@ class ColorMapSelector : public QComboBox
 class TransferWidget : public QWidget {
         Q_OBJECT
     public:
-        TransferWidget(const std::shared_ptr<SharedProperties>& properties, QWidget* parent);
+        TransferWidget(const std::shared_ptr<ISharedProperties> properties, QWidget* parent);
     public slots:
         void setSelectedColorMap(int index);
     signals:
@@ -37,7 +37,7 @@ class TransferWidget : public QWidget {
     private:
         bool loadColorMaps();
 
-        const std::shared_ptr<SharedProperties>& m_properties;
+        const std::shared_ptr<ISharedProperties> m_properties;
         QHBoxLayout* m_layout;
         int m_index;
         ColorMapSelector* m_selector;

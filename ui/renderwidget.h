@@ -20,7 +20,8 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     Q_OBJECT
 
   public:
-    RenderWidget(std::shared_ptr<TextureStore> textureStore,
+    RenderWidget(const std::shared_ptr<ITextureStore> textureStore,
+                 const std::shared_ptr<const ISharedProperties> properties,
                  QWidget* parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -38,8 +39,8 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void updateBoxScalingMatrix();
     void updateTransferTexture(ColorMap cmap);
 
-    std::shared_ptr<TextureStore> m_textureStore;
-    std::shared_ptr<SharedProperties> m_properties;
+    const std::shared_ptr<ITextureStore> m_textureStore;
+    const std::shared_ptr<const ISharedProperties> m_properties;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_modelViewMatrix;
@@ -55,7 +56,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 class ExtendedParameterWidget : public QWidget
 {
   public:
-    ExtendedParameterWidget(const std::shared_ptr<SharedProperties>& properties,
+    ExtendedParameterWidget(const std::shared_ptr<ISharedProperties>& properties,
                             QWidget* parent);
 
   private:

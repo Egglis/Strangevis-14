@@ -57,7 +57,6 @@ void TransferTexture::release()
 ColorMap::ColorMap(QString name, std::vector<GLfloat>& data)
     : m_name{name}, m_colorMapData{data}
 {
-    qDebug() << "new Colormap" << name;
 };
 
 ColorMap::ColorMap() : m_name{"RGB"}, m_colorMapData(256*4)

@@ -5,7 +5,7 @@
 #include "../properties/sharedproperties.h"
 
 ParameterWidget::ParameterWidget(
-    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties> properties, QWidget* parent)
     : QWidget(parent), m_properties{properties}, m_layout{this}
 {
     ClippingWidget* x = new ClippingWidget(nullptr);

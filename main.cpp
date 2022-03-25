@@ -1,5 +1,7 @@
-#include "environment.h"
 #include "mainwindow.h"
+
+#include "properties/sharedproperties.h"
+#include "texturestore.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
@@ -17,7 +19,10 @@ int main(int argc, char* argv[])
     format.setOption(QSurfaceFormat::DeprecatedFunctions, true);
     QSurfaceFormat::setDefaultFormat(format);
 
-    MainWindow window{};
+    auto textureStore = std::make_shared<TextureStore>();
+    auto properties = std::make_shared<SharedProperties>();
+
+    MainWindow window{std::move(textureStore), std::move(properties)};
     window.resize(768, 768);
     window.show();
 

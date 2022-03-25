@@ -11,8 +11,8 @@
 #include <QtMath>
 
 
-RenderWidget::RenderWidget(std::shared_ptr<TextureStore> textureStore,
-                           std::shared_ptr<SharedProperties> properties,
+RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
+                           std::shared_ptr<const ISharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore}, m_properties{properties}
 {
@@ -25,7 +25,7 @@ RenderWidget::RenderWidget(std::shared_ptr<TextureStore> textureStore,
             &GradientProperties::gradientMethodChanged,
             [this](GradientMethod method) { update(); });
 
-    connect(m_textureStore->volume(), &Volume::dimensionsChanged, this,
+    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
             &RenderWidget::updateBoxScalingMatrix);
 
     connect(&m_properties.get()->colorMap(),
@@ -152,7 +152,7 @@ void RenderWidget::paintGL()
     m_cubeProgram.setUniformValue(
         location, static_cast<int>(m_properties->gradientMethod().method()));
 
-    auto [width, height, depth] = m_textureStore->volume()->getDimensions();
+    auto [width, height, depth] = m_textureStore->volume().getDimensions();
     location = m_cubeProgram.uniformLocation("width");
     m_cubeProgram.setUniformValue(location, static_cast<int>(width));
     location = m_cubeProgram.uniformLocation("height");
@@ -162,12 +162,12 @@ void RenderWidget::paintGL()
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
-    m_textureStore->volume()->bind();
+    m_textureStore->volume().bind();
 
     // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
     m_cubeProgram.setUniformValue("transferFunction", 1);
-    m_textureStore->transferFunction()->bind();
+    m_textureStore->transferFunction().bind();
 
     Geometry::instance().bindCube();
 
@@ -179,8 +179,8 @@ void RenderWidget::paintGL()
     Geometry::instance().drawCube();
     glActiveTexture(GL_TEXTURE0);
 
-    m_textureStore->transferFunction()->release();
-    m_textureStore->volume()->release();
+    m_textureStore->transferFunction().release();
+    m_textureStore->volume().release();
     m_cubeProgram.release();
 }
 
@@ -207,7 +207,7 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
 void RenderWidget::updateBoxScalingMatrix()
 {
     m_boxScalingMatrix.setToIdentity();
-    auto dims = m_textureStore->volume()->getDimensions();
+    auto dims = m_textureStore->volume().getDimensions();
     auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
     if (maxDim)
     {
@@ -217,12 +217,12 @@ void RenderWidget::updateBoxScalingMatrix()
 
 void RenderWidget::updateTransferTexture(ColorMap cmap)
 {
-    m_textureStore->transferFunction()->setColorMap(cmap);
+    m_textureStore->transferFunction().setColorMap(cmap);
     update();
 }
 
 ExtendedParameterWidget::ExtendedParameterWidget(
-    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
     : QWidget(parent), m_parameterWidget(properties, this),
       m_transferWidget(properties, this), m_layout{this}
 {

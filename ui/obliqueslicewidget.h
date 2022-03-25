@@ -21,7 +21,8 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     Q_OBJECT
 
   public:
-    ObliqueSliceRenderWidget(std::shared_ptr<TextureStore> textureStore,
+    ObliqueSliceRenderWidget(const std::shared_ptr<ITextureStore> textureStore,
+                             const std::shared_ptr<const ISharedProperties> properties,
                              QWidget* parent = nullptr,
                              Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -36,8 +37,8 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
 
   private:
     void updateTransferTexture(ColorMap cmap);
-    std::shared_ptr<SharedProperties> m_properties;
-    std::shared_ptr<TextureStore> m_textureStore;
+    const std::shared_ptr<ITextureStore> m_textureStore;
+    const std::shared_ptr<const ISharedProperties> m_properties;
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;
     QMatrix4x4 m_modelViewMatrix;
@@ -50,7 +51,8 @@ class ObliqueSliceWidget : public QWidget
 {
     Q_OBJECT
   public:
-    ObliqueSliceWidget(std::shared_ptr<TextureStore> textureStore,
+    ObliqueSliceWidget(const std::shared_ptr<ITextureStore>& textureStore,
+                       const std::shared_ptr<ISharedProperties>& properties,
                        QWidget* parent = nullptr,
                        Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -67,7 +69,7 @@ class ObliqueSliceRotationWidget : public QWidget
     Q_OBJECT
   public:
     ObliqueSliceRotationWidget(
-        const std::shared_ptr<SharedProperties>& properties,
+        const std::shared_ptr<ISharedProperties>& properties,
         QWidget* parent = nullptr);
 
   signals:

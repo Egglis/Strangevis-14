@@ -8,7 +8,7 @@
 #include <QtXml>
 
 TransferWidget::TransferWidget(
-    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties> properties, QWidget* parent)
     : QWidget(parent), m_properties{properties}
 {
     // TODO: Check if loading of xml file fails and either reload or give user
@@ -32,7 +32,7 @@ bool TransferWidget::loadColorMaps()
 {
     // Open file for Reading
     QDomDocument xml;
-    QFile f(":cmaps/res/cmaps.xml");
+    QFile f(":cmaps/cmaps.xml");
     if (!f.open(QIODevice::ReadOnly))
     {
         // Error:
@@ -51,8 +51,6 @@ bool TransferWidget::loadColorMaps()
         {
             QString name = component.attribute("name");
             QString space = component.attribute("space"); // Might use later
-
-            qDebug() << "Loading Colormap:" << name;
 
             // Extract RGB values and alpha values
             QDomElement child = component.firstChild().toElement();
