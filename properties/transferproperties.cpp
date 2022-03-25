@@ -8,5 +8,5 @@ TransferProperties::TransferProperties(ColorMap cmap) : m_colorMap{cmap}
 
 void TransferProperties::updateTransferTexture(ColorMap cmap){
     m_colorMap = cmap;
-    emit transferTextureChanged(cmap);
+    emit transferFunctionChanged(cmap);
 }

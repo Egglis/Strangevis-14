@@ -3,7 +3,7 @@
 
 #include "ui/renderwidget.h"
 #include "ui/parameterwidget.h"
-#include "environment.h"
+#include "texturestore.h"
 
 #include <QMainWindow>
 #include <QVector>
@@ -22,7 +22,8 @@ class MainWindow : public QMainWindow {
     void fileOpen();
 
   private:
-    std::shared_ptr<SharedProperties> m_properties;
+    const std::shared_ptr<SharedProperties> m_properties;
+    const std::shared_ptr<TextureStore> m_textureStore;
     MainWindowWidget* m_mainWidget;
     std::shared_ptr<Environment> m_environment;
 };

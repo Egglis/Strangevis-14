@@ -29,11 +29,11 @@ MainWindow::MainWindow(QWidget* parent)
     menuBar()->addMenu(fileMenu);
 
     RenderWidget* p_3dRenderWidget =
-        new RenderWidget(m_environment, m_properties, this);
+        new RenderWidget(m_textureStore, m_properties, this);
     ExtendedParameterWidget* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, this);
     ObliqueSliceWidget* p_2dRenderWidget =
-        new ObliqueSliceWidget(m_environment, m_properties, this);
+        new ObliqueSliceWidget(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
         new ObliqueSliceRotationWidget(m_properties, this);
 
@@ -53,6 +53,6 @@ void MainWindow::fileOpen()
 
     if (!fileName.isEmpty())
     {
-        m_environment->volume()->load(fileName);
+        m_textureStore->volume()->load(fileName);
     }
 }

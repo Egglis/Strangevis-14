@@ -28,7 +28,7 @@ qt_add_executable(strangevis WIN32
     main.cpp
     mainwindow.cpp
     geometry.cpp
-    environment.cpp
+    texturestore.cpp
     volume.cpp
     transfertexture.cpp
     properties/sharedproperties.cpp

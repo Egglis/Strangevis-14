@@ -20,7 +20,7 @@ TransferWidget::TransferWidget(
             &TransferWidget::setSelectedColorMap);
     connect(this, &TransferWidget::valueChanged,
             &m_properties.get()->colorMap(),
-            &TransferProperties::transferTextureChanged);
+            &TransferProperties::transferFunctionChanged);
     m_layout->addWidget(m_selector);
     setLayout(m_layout);
     int result = m_selector->findText("gist_gray");

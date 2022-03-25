@@ -1,10 +1,10 @@
 #ifndef OBLIQUESLICEWIDGET_H
 #define OBLIQUESLICEWIDGET_H
 
-#include "../environment.h"
 #include "../geometry/cubeplaneintersection.h"
 #include "../properties/clippingplaneproperties.h"
 #include "../properties/sharedproperties.h"
+#include "../texturestore.h"
 #include "parameterwidget.h"
 
 #include <QCheckBox>
@@ -21,8 +21,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     Q_OBJECT
 
   public:
-    ObliqueSliceRenderWidget(std::shared_ptr<Environment> env,
-                             std::shared_ptr<SharedProperties> properties,
+    ObliqueSliceRenderWidget(std::shared_ptr<TextureStore> textureStore,
                              QWidget* parent = nullptr,
                              Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -38,7 +37,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
   private:
     void updateTransferTexture(ColorMap cmap);
     std::shared_ptr<SharedProperties> m_properties;
-    std::shared_ptr<Environment> m_environment;
+    std::shared_ptr<TextureStore> m_textureStore;
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;
     QMatrix4x4 m_modelViewMatrix;
@@ -51,8 +50,7 @@ class ObliqueSliceWidget : public QWidget
 {
     Q_OBJECT
   public:
-    ObliqueSliceWidget(std::shared_ptr<Environment> env,
-                       std::shared_ptr<SharedProperties> properties,
+    ObliqueSliceWidget(std::shared_ptr<TextureStore> textureStore,
                        QWidget* parent = nullptr,
                        Qt::WindowFlags f = Qt::WindowFlags());
 
