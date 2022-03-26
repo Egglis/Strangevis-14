@@ -26,6 +26,7 @@ include(windeployqt)
 
 qt_add_executable(strangevis WIN32
     main.cpp
+    application.cpp
     mainwindow.cpp
     geometry.cpp
     texturestore.cpp

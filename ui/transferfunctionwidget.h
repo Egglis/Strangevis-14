@@ -24,24 +24,25 @@ class ColorMapSelector : public QComboBox
 {
     Q_OBJECT
   public:
-    ColorMapSelector(QWidget* parent, std::vector<ColorMap> options);
+    ColorMapSelector(QWidget* parent, std::vector<QString> options);
 };
 
 class TransferWidget : public QWidget
 {
     Q_OBJECT
   public:
-    TransferWidget(const std::shared_ptr<ISharedProperties> properties,
+    TransferWidget(const std::shared_ptr<ISharedProperties> properties, const std::shared_ptr<const IColorMapStore> colorMapStore,
                    QWidget* parent);
   public slots:
-    void setSelectedColorMap(int index);
+    void setSelectedColorMap(const QString& name);
   signals:
-    void valueChanged(ColorMap cmap);
+    void valueChanged(const QString& cmap);
 
   private:
     const std::shared_ptr<ISharedProperties> m_properties;
+    const std::shared_ptr<const IColorMapStore> m_colorMapStore;
     QHBoxLayout* m_layout;
-    int m_index;
+    QString m_selectedColorMap;
     ColorMapSelector* m_selector;
     std::vector<ColorMap> m_colorMaps;
 };

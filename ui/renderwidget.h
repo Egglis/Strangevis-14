@@ -37,7 +37,6 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
   private:
     void updateModelViewMatrix();
     void updateBoxScalingMatrix();
-    void updateTransferTexture(tfn::ColorMap cmap);
 
     const std::shared_ptr<ITextureStore> m_textureStore;
     const std::shared_ptr<const ISharedProperties> m_properties;
@@ -56,7 +55,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 class ExtendedParameterWidget : public QWidget
 {
   public:
-    ExtendedParameterWidget(const std::shared_ptr<ISharedProperties>& properties,
+    ExtendedParameterWidget(const std::shared_ptr<ISharedProperties>& properties, const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
                             QWidget* parent);
 
   private:

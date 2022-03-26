@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    MainWindow(std::shared_ptr<ITextureStore> textureStore, std::shared_ptr<ISharedProperties> properties, QWidget* parent = nullptr);
+    MainWindow(std::shared_ptr<ITextureStore> textureStore, std::shared_ptr<ISharedProperties> properties, std::shared_ptr<tfn::IColorMapStore> colorMapStore, QWidget* parent = nullptr);
 
   public slots:
     void fileOpen();
@@ -24,6 +24,7 @@ class MainWindow : public QMainWindow {
   private:
     const std::shared_ptr<ISharedProperties> m_properties;
     const std::shared_ptr<ITextureStore> m_textureStore;
+    const std::shared_ptr<tfn::IColorMapStore> m_colorMapStore;
     MainWindowWidget* m_mainWidget;
 };
 #endif // MAINWINDOW_H

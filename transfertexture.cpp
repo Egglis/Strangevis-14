@@ -1,8 +1,8 @@
 #include "transfertexture.h"
 
 #include <QFile>
-#include <QtXml>
 #include <QVector4D>
+#include <QtXml>
 
 namespace tfn
 {
@@ -13,7 +13,7 @@ TransferTexture::TransferTexture(QObject* parent)
 {
 }
 
-void TransferTexture::setColorMap(ColorMap colormap)
+void TransferTexture::setColorMap(std::vector<GLfloat> colormap)
 {
     m_colorMap = colormap;
     m_updateNeeded = true;
@@ -38,7 +38,7 @@ void TransferTexture::bind()
         m_transferTexture.setSize(tfn::size::NumPoints);
         m_transferTexture.allocateStorage();
         m_transferTexture.setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32,
-                                  m_colorMap.colorMapData().data());
+                                  m_colorMap.data());
 
         m_updateNeeded = false;
     }
@@ -74,17 +74,27 @@ ColorMap::ColorMap() : m_name{"Ramp Grey"}
     assert(m_colorMapData.size() == ArraySize);
 }
 
-std::vector<ColorMap> loadColorMapsFromFile()
+ColorMapStore::ColorMapStore() : m_defaultColorMap{ColorMap{}}
+{
+    loadColorMapsFromFile(":cmaps/cmaps.xml");
+    addColorMap(m_defaultColorMap);
+}
+
+void ColorMapStore::addColorMap(const ColorMap& colorMap)
+{
+    m_colorMaps.insert(colorMap.getName(), colorMap);
+}
+
+bool ColorMapStore::loadColorMapsFromFile(QString path)
 {
     // Open file for Reading
-    std::vector<ColorMap> colorMaps{};
     QDomDocument xml;
-    QFile f(":cmaps/cmaps.xml");
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
     {
         // Error:
         qDebug() << "Error while loading file";
-        return std::vector<ColorMap>{};
+        return false;
     }
     xml.setContent(&f);
     f.close();
@@ -119,14 +129,15 @@ std::vector<ColorMap> loadColorMapsFromFile()
                     auto r = child.attribute("r").toFloat();
                     auto g = child.attribute("g").toFloat();
                     auto b = child.attribute("b").toFloat();
-                    auto x = child.attribute("x").toFloat(); // Sorting parameter
-                    sortableColors.push_back(QVector4D(r,g,b,x));
+                    auto x =
+                        child.attribute("x").toFloat(); // Sorting parameter
+                    sortableColors.push_back(QVector4D(r, g, b, x));
                 }
                 child = child.nextSibling().toElement();
             }
-            std::sort(sortableColors.begin(), sortableColors.end(), [](const auto& c1, const auto& c2){
-                return c1.w() < c2.w();
-            });
+            std::sort(
+                sortableColors.begin(), sortableColors.end(),
+                [](const auto& c1, const auto& c2) { return c1.w() < c2.w(); });
             for (const auto& color : sortableColors)
             {
                 colors.push_back(color.x()); // r
@@ -135,11 +146,22 @@ std::vector<ColorMap> loadColorMapsFromFile()
             }
             assert(colors.size() == size::ArraySize);
             ColorMap cmap = ColorMap(name, colors);
-            colorMaps.push_back(cmap);
+            m_colorMaps.insert(name, cmap);
         }
         component = component.nextSibling().toElement();
     }
-
-    return colorMaps;
+    return true;
 };
+
+ColorMap ColorMapStore::colorMap(const QString& name) const
+{
+    return m_colorMaps.value(name, m_defaultColorMap);
+}
+
+std::vector<QString> ColorMapStore::availableColorMaps() const
+{
+    auto keys = m_colorMaps.keys();
+    std::vector<QString> availableKeys{keys.begin(), keys.end()};
+    return availableKeys;
+}
 } // namespace tfn

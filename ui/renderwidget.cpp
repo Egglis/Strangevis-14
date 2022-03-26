@@ -10,11 +10,11 @@
 #include <QWheelEvent>
 #include <QtMath>
 
-
 RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
                            std::shared_ptr<const ISharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_textureStore{textureStore}, m_properties{properties}
+    : QOpenGLWidget(parent, f), m_textureStore{textureStore}, m_properties{
+                                                                  properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
@@ -30,7 +30,7 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
 
     connect(&m_properties.get()->colorMap(),
             &tfn::TransferProperties::transferFunctionChanged, this,
-            &RenderWidget::updateTransferTexture);
+            [this]() { update(); });
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -106,12 +106,12 @@ void RenderWidget::initializeGL()
     // initialize geometry
     Geometry::instance();
 
-    if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, ":shaders/cube-vs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                               ":shaders/cube-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
-    if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, ":shaders/cube-fs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                               ":shaders/cube-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
     if (!m_cubeProgram.link())
@@ -215,16 +215,12 @@ void RenderWidget::updateBoxScalingMatrix()
     }
 }
 
-void RenderWidget::updateTransferTexture(tfn::ColorMap cmap)
-{
-    m_textureStore->transferFunction().setColorMap(cmap);
-    update();
-}
-
 ExtendedParameterWidget::ExtendedParameterWidget(
-    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties>& properties,
+    const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
+    QWidget* parent)
     : QWidget(parent), m_parameterWidget(properties, this),
-      m_transferWidget(properties, this), m_layout{this}
+      m_transferWidget(properties, colorMapStore, this), m_layout{this}
 {
     m_layout.addWidget(&m_transferWidget);
     m_layout.addWidget(&m_parameterWidget);

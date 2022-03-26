@@ -3,9 +3,9 @@ namespace tfn
 {
 TransferProperties::TransferProperties(){};
 
-TransferProperties::TransferProperties(ColorMap cmap) : m_colorMap{cmap} {};
+TransferProperties::TransferProperties(QString cmap) : m_colorMap{cmap} {};
 
-void TransferProperties::updateTransferTexture(ColorMap cmap)
+void TransferProperties::updateTexture(QString cmap)
 {
     m_colorMap = cmap;
     emit transferFunctionChanged(cmap);

@@ -13,15 +13,15 @@ class TransferProperties : public QObject
     Q_OBJECT
   public:
     TransferProperties();
-    TransferProperties(ColorMap cmap);
-    const ColorMap& colorMap() const { return m_colorMap; };
+    TransferProperties(QString cmap);
+    const QString& colorMap() const { return m_colorMap; };
   public slots:
-    void updateTransferTexture(ColorMap cmap);
+    void updateTexture(QString cmap);
   signals:
-    void transferFunctionChanged(ColorMap cmap);
+    void transferFunctionChanged(const QString& cmap);
 
   private:
-    ColorMap m_colorMap;
+    QString m_colorMap;
 };
 
 } // namespace tfn

@@ -15,9 +15,10 @@
 
 MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
                        std::shared_ptr<ISharedProperties> properties,
+                       std::shared_ptr<tfn::IColorMapStore> colorMapStore,
                        QWidget* parent)
     : QMainWindow(parent), m_textureStore{textureStore}, m_properties{
-                                                             properties}
+                                                             properties}, m_colorMapStore{colorMapStore}
 {
 
     QMenu* fileMenu = new QMenu("File");
@@ -31,7 +32,7 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
     RenderWidget* p_3dRenderWidget =
         new RenderWidget(m_textureStore, m_properties, this);
     ExtendedParameterWidget* p_3dToolBarWidget =
-        new ExtendedParameterWidget(m_properties, this);
+        new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
     ObliqueSliceWidget* p_2dRenderWidget =
         new ObliqueSliceWidget(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =

@@ -8,38 +8,37 @@ namespace tfn
 {
 
 TransferWidget::TransferWidget(
-    const std::shared_ptr<ISharedProperties> properties, QWidget* parent)
-    : QWidget(parent), m_properties{properties}
+    const std::shared_ptr<ISharedProperties> properties, const std::shared_ptr<const IColorMapStore> colorMapStore, QWidget* parent)
+    : QWidget(parent), m_properties{properties}, m_colorMapStore{colorMapStore}
 {
     // TODO: Check if loading of xml file fails and either reload or give user
     // warning dialog
-    m_colorMaps = loadColorMapsFromFile();
     m_layout = new QHBoxLayout();
-    m_selector = new ColorMapSelector(nullptr, m_colorMaps);
-    connect(m_selector, &ColorMapSelector::currentIndexChanged, this,
+    m_selector = new ColorMapSelector(nullptr, m_colorMapStore->availableColorMaps());
+    connect(m_selector, &ColorMapSelector::currentTextChanged, this,
             &TransferWidget::setSelectedColorMap);
     connect(this, &TransferWidget::valueChanged,
             &m_properties.get()->colorMap(),
-            &TransferProperties::transferFunctionChanged);
+            &TransferProperties::updateTexture);
     m_layout->addWidget(m_selector);
     setLayout(m_layout);
     int result = m_selector->findText("gist_gray");
     result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
 };
 
-void TransferWidget::setSelectedColorMap(int index)
+void TransferWidget::setSelectedColorMap(const QString& name)
 {
-    m_index = index;
-    emit valueChanged(m_colorMaps[m_index]);
+    m_selectedColorMap = name;
+    emit valueChanged(name);
 };
 
 ColorMapSelector::ColorMapSelector(QWidget* parent,
-                                   std::vector<ColorMap> colorMaps)
+                                   std::vector<QString> colorMaps)
     : QComboBox(parent)
 {
     for (const auto& colorMap : colorMaps)
     {
-        addItem(colorMap.getName());
+        addItem(colorMap);
     }
 }
 

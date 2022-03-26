@@ -93,12 +93,6 @@ void ObliqueSliceRenderWidget::paintGL()
     m_sliceProgram.release();
 }
 
-void ObliqueSliceRenderWidget::updateTransferTexture(tfn::ColorMap cmap)
-{
-    m_textureStore->transferFunction().setColorMap(cmap);
-    update();
-}
-
 void ObliqueSliceRenderWidget::rotate(float degrees)
 {
     QVector3D zAxis(0, 0, 1);
