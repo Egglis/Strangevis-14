@@ -17,9 +17,14 @@ void Volume::load(const QString& fileName)
             [this](QVector<unsigned short> volumeData) {
                 m_updateNeeded = true;
                 m_volumeData = volumeData;
+                emit volumeLoaded();
             });
     connect(volumeLoader, &VolumeLoader::dimensionsChanged,
-            [this](QVector3D dims) { m_dims = dims; });
+            [this](QVector3D dims) {
+                m_dims = dims;
+                emit dimensionsChanged(m_dims);
+            });
+    connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this, &Volume::loadingStartedOrStopped);
     connect(volumeLoader, &VolumeLoader::finished, volumeLoader,
             &VolumeLoader::deleteLater);
     volumeLoader->start();
@@ -40,7 +45,7 @@ void VolumeLoader::load()
         qDebug() << "Unable to open " << m_fileName << "!";
         return;
     }
-
+    emit loadingStartedOrStopped(true);
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
 
@@ -70,6 +75,7 @@ void VolumeLoader::load()
 
     emit volumeLoaded(volumeData);
     emit dimensionsChanged(QVector3D(width, height, depth));
+    emit loadingStartedOrStopped(false);
 }
 
 void Volume::bind()

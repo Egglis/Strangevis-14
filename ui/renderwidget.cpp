@@ -19,7 +19,7 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
     connect(&m_properties.get()->clippingPlane(),
-            &ClippingPlaneProperties::clippingPlaneChanged,
+            &ClippingPlaneProperties::clippingPlaneChanged, this,
             [this](Plane plane) { update(); });
     connect(&m_properties.get()->gradientMethod(),
             &GradientProperties::gradientMethodChanged,
@@ -27,6 +27,8 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
 
     connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
             &RenderWidget::updateBoxScalingMatrix);
+    connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
+            [this]() { update(); });
 
     connect(&m_properties.get()->colorMap(),
             &tfn::TransferProperties::transferFunctionChanged, this,

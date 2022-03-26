@@ -17,8 +17,8 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
                        std::shared_ptr<ISharedProperties> properties,
                        std::shared_ptr<tfn::IColorMapStore> colorMapStore,
                        QWidget* parent)
-    : QMainWindow(parent), m_textureStore{textureStore}, m_properties{
-                                                             properties}, m_colorMapStore{colorMapStore}
+    : QMainWindow(parent), m_textureStore{textureStore},
+      m_properties{properties}, m_colorMapStore{colorMapStore}
 {
 
     QMenu* fileMenu = new QMenu("File");
@@ -48,6 +48,7 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
                              p_2dRenderWidget, p_2dToolBarWidget, this);
+    connect(&textureStore->volume(), &Volume::loadingStartedOrStopped, m_mainWidget, &MainWindowWidget::toggleFileLoadingInProgressOverlay);
     setCentralWidget(m_mainWidget);
 }
 

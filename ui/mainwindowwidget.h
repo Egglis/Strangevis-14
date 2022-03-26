@@ -2,21 +2,26 @@
 #define MAINWINDOWWIDGET_H
 
 #include "renderwidget.h"
-#include "parameterwidget.h"
-#include "transferfunctionwidget.h"
 
+#include <QProgressBar>
 #include <QWidget>
 
 class QVBoxLayout;
 class QHBoxLayout;
 
-class MainWindowWidget : public QWidget {
+class MainWindowWidget : public QWidget
+{
     Q_OBJECT
 
   public:
-    MainWindowWidget(QWidget* p_3dRenderWidget, QWidget* p_3dToolBarWidget, QWidget* p_2dRenderWidget, QWidget* p_2dToolBarWidget, QWidget* parent);
+    MainWindowWidget(QWidget* p_3dRenderWidget, QWidget* p_3dToolBarWidget,
+                     QWidget* p_2dRenderWidget, QWidget* p_2dToolBarWidget,
+                     QWidget* parent);
+  public slots:
+    void toggleFileLoadingInProgressOverlay(bool state);
 
   private:
+    QProgressBar* m_progressBar;
     QVBoxLayout* create3dRenderLayout();
     QVBoxLayout* create2dRenderLayout();
 
@@ -29,6 +34,5 @@ class MainWindowWidget : public QWidget {
     QVBoxLayout* m_2dRenderLayout;
 
     QHBoxLayout* m_mainWindowLayout;
-
 };
 #endif // MAINWINDOWWIDGET_H

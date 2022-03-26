@@ -19,7 +19,9 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
     void bind();
     void release();
   signals:
+    void volumeLoaded();
     void dimensionsChanged(QVector3D dims);
+    void loadingStartedOrStopped(bool started);
 
   private:
     QVector<unsigned short> m_volumeData;
@@ -38,6 +40,8 @@ class VolumeLoader : public QThread
   signals:
     void volumeLoaded(QVector<unsigned short> m_volumeData);
     void dimensionsChanged(QVector3D dims);
+    void loadingStartedOrStopped(bool started);
+
   private:
     void load();
     QString m_fileName;
