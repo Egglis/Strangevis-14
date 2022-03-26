@@ -35,8 +35,6 @@ class TransferWidget : public QWidget {
     signals:
         void valueChanged(ColorMap cmap);
     private:
-        bool loadColorMaps();
-
         const std::shared_ptr<ISharedProperties> m_properties;
         QHBoxLayout* m_layout;
         int m_index;

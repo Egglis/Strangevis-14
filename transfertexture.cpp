@@ -32,8 +32,8 @@ void TransferTexture::bind()
         m_transferTexture.setMipLevels(0);
         m_transferTexture.setSize(256);
         m_transferTexture.allocateStorage();
-        m_transferTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32,
-                                  m_colorMap.m_colorMapData.data());
+        m_transferTexture.setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32,
+                                  m_colorMap.colorMapData().data());
 
         m_updateNeeded = false;
     }
@@ -52,10 +52,71 @@ void TransferTexture::release()
 };
 
 ColorMap::ColorMap(QString name, std::vector<GLfloat>& data)
-    : m_name{name}, m_colorMapData{data}
+std::vector<ColorMap> loadColorMapsFromFile()
 {
-};
+    // Open file for Reading
+    std::vector<ColorMap> colorMaps{};
+    QDomDocument xml;
+    QFile f(":cmaps/cmaps.xml");
+    if (!f.open(QIODevice::ReadOnly))
+    {
+        // Error:
+        qDebug() << "Error while loading file";
+        return std::vector<ColorMap>{};
+    }
+    xml.setContent(&f);
+    f.close();
 
-ColorMap::ColorMap() : m_name{"RGB"}, m_colorMapData(256*4)
+    // Extract data:
+    QDomElement root = xml.documentElement();
+    QDomElement component = root.firstChild().toElement();
+    while (!component.isNull())
+    {
+        if (component.tagName() == "ColorMap")
+        {
+            QString name = component.attribute("name");
+            QString space = component.attribute("space");
+            if (space != "RGB")
 {
+                component = component.nextSibling().toElement();
+                continue;
+            }
+
+            // Extract RGB values and alpha values
+            QDomElement child = component.firstChild().toElement();
+            std::vector<GLfloat> colors{};
+            colors.reserve(NumPoints*NumChannels);
+            std::vector<QVector4D> sortableColors{};
+            sortableColors.reserve(NumPoints);
+
+            int index = 0;
+            while (!child.isNull())
+            {
+                if (child.tagName() == "Point")
+                {
+                    auto r = child.attribute("r").toFloat();
+                    auto g = child.attribute("g").toFloat();
+                    auto b = child.attribute("b").toFloat();
+                    auto x = child.attribute("x").toFloat(); // Sorting parameter
+                    sortableColors.push_back(QVector4D(r,g,b,x));
+                }
+                child = child.nextSibling().toElement();
+            }
+            std::sort(sortableColors.begin(), sortableColors.end(), [](const auto& c1, const auto& c2){
+                return c1.w() < c2.w();
+            });
+            for (const auto& color : sortableColors)
+{
+                colors.push_back(color.x()); // r
+                colors.push_back(color.y()); // g
+                colors.push_back(color.z()); // b
+            }
+            assert(colors.size() == NumPoints * NumChannels);
+            ColorMap cmap = ColorMap(name, colors);
+            colorMaps.push_back(cmap);
+        }
+        component = component.nextSibling().toElement();
 }
+
+    return colorMaps;
+};

@@ -13,13 +13,12 @@ class ColorMap
   public:
     ColorMap();
     ColorMap(QString name, std::vector<GLfloat>& data);
-    QString getName() const { return m_name; };
-    int getSize() const { return m_size; };
-    std::vector<GLfloat> m_colorMapData;
+    const QString& getName() const { return m_name; };
+    const std::vector<GLfloat>& colorMapData() const { return m_colorMapData; };
 
   private:
+    std::vector<GLfloat> m_colorMapData;
     QString m_name;
-    int m_size;
 };
 
 class TransferTexture : public QObject
@@ -42,5 +41,6 @@ class TransferTexture : public QObject
     QOpenGLTexture m_transferTexture;
     bool m_updateNeeded;
 };
+std::vector<ColorMap> loadColorMapsFromFile();
 
 #endif
