@@ -2,12 +2,9 @@
 
 TransferTexture::TransferTexture(QObject* parent)
     : QObject(parent), m_transferTexture(QOpenGLTexture::Target1D),
-      m_updateNeeded(false)
+      m_updateNeeded{true}, m_colorMap{}
 {
-    ColorMap cmap = ColorMap();
-    m_colorMap = cmap;
-    m_updateNeeded = true;
-};
+}
 
 void TransferTexture::setColorMap(ColorMap colormap)
 {
