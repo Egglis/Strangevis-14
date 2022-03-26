@@ -2,10 +2,10 @@
 
 #include "properties/sharedproperties.h"
 #include "ui/mainwindowwidget.h"
-#include "ui/renderwidget.h"
-#include "ui/parameterwidget.h"
 #include "ui/obliqueslicewidget.h"
+#include "ui/parameterwidget.h"
 #include "ui/rectangulargridlayout.h"
+#include "ui/renderwidget.h"
 #include "ui/transferfunctionwidget.h"
 
 #include <QAction>
@@ -13,12 +13,13 @@
 #include <QMenu>
 #include <QMenuBar>
 
-
-MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
+                       std::shared_ptr<ISharedProperties> properties,
+                       std::shared_ptr<tfn::IColorMapStore> colorMapStore,
+                       QWidget* parent)
+    : QMainWindow(parent), m_textureStore{textureStore}, m_properties{
+                                                             properties}, m_colorMapStore{colorMapStore}
 {
-    m_environment = std::make_shared<Environment>();
-    m_properties = std::make_shared<SharedProperties>();
 
     QMenu* fileMenu = new QMenu("File");
 
@@ -29,16 +30,20 @@ MainWindow::MainWindow(QWidget* parent)
     menuBar()->addMenu(fileMenu);
 
     RenderWidget* p_3dRenderWidget =
-        new RenderWidget(m_environment, m_properties, this);
+        new RenderWidget(m_textureStore, m_properties, this);
     ExtendedParameterWidget* p_3dToolBarWidget =
-        new ExtendedParameterWidget(m_properties, this);
+        new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
     ObliqueSliceWidget* p_2dRenderWidget =
-        new ObliqueSliceWidget(m_environment, m_properties, this);
+        new ObliqueSliceWidget(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
         new ObliqueSliceRotationWidget(m_properties, this);
 
-    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal, p_2dRenderWidget->renderWidget(), &ObliqueSliceRenderWidget::flipHorizontal);
-    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical, p_2dRenderWidget->renderWidget(), &ObliqueSliceRenderWidget::flipVertical);
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
+            p_2dRenderWidget->renderWidget(),
+            &ObliqueSliceRenderWidget::flipHorizontal);
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical,
+            p_2dRenderWidget->renderWidget(),
+            &ObliqueSliceRenderWidget::flipVertical);
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
@@ -53,6 +58,6 @@ void MainWindow::fileOpen()
 
     if (!fileName.isEmpty())
     {
-        m_environment->volume()->load(fileName);
+        m_textureStore->volume().load(fileName);
     }
 }

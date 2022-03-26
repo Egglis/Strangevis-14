@@ -1,9 +1,7 @@
 #ifndef RENDERWIDGET_H
 #define RENDERWIDGET_H
 
-#include "../environment.h"
-#include "../properties/clippingplaneproperties.h"
-#include "../properties/gradientproperties.h"
+#include "../texturestore.h"
 #include "../properties/sharedproperties.h"
 #include "transferfunctionwidget.h"
 #include "parameterwidget.h"
@@ -22,8 +20,8 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     Q_OBJECT
 
   public:
-    RenderWidget(std::shared_ptr<Environment> env,
-                 std::shared_ptr<SharedProperties> properties,
+    RenderWidget(const std::shared_ptr<ITextureStore> textureStore,
+                 const std::shared_ptr<const ISharedProperties> properties,
                  QWidget* parent = nullptr,
                  Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -39,10 +37,9 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
   private:
     void updateModelViewMatrix();
     void updateBoxScalingMatrix();
-    void updateTransferTexture(ColorMap cmap);
 
-    std::shared_ptr<Environment> m_environment;
-    std::shared_ptr<SharedProperties> m_properties;
+    const std::shared_ptr<ITextureStore> m_textureStore;
+    const std::shared_ptr<const ISharedProperties> m_properties;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_modelViewMatrix;
@@ -58,12 +55,12 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 class ExtendedParameterWidget : public QWidget
 {
   public:
-    ExtendedParameterWidget(const std::shared_ptr<SharedProperties>& properties,
+    ExtendedParameterWidget(const std::shared_ptr<ISharedProperties>& properties, const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
                             QWidget* parent);
 
   private:
     QVBoxLayout m_layout;
-    TransferWidget m_transferWidget;
+    tfn::TransferWidget m_transferWidget;
     ParameterWidget m_parameterWidget;
 };
 #endif // RENDERWIDGET_H

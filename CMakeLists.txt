@@ -26,9 +26,10 @@ include(windeployqt)
 
 qt_add_executable(strangevis WIN32
     main.cpp
+    application.cpp
     mainwindow.cpp
     geometry.cpp
-    environment.cpp
+    texturestore.cpp
     volume.cpp
     transfertexture.cpp
     properties/sharedproperties.cpp
@@ -59,15 +60,19 @@ set(shaders_resource_files
 qt6_add_resources(strangevis "shaders"
     PREFIX
         "/shaders"
+    BASE
+        "shaders"
     FILES
-    ${shaders_resource_files}
+        ${shaders_resource_files}
 )
 
 qt6_add_resources(strangevis "cmaps"
     PREFIX
         "/cmaps"
+    BASE
+        "res"
     FILES
-    "res/cmaps.xml"
+        "res/cmaps.xml"
 )
 
 target_link_libraries(strangevis PRIVATE

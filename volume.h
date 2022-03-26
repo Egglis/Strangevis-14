@@ -13,7 +13,7 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
   public:
     explicit Volume(QObject* parent = nullptr);
     bool load(const QString& filename);
-    QVector3D getDimensions() { return QVector3D(m_width, m_height, m_depth); };
+    QVector3D getDimensions() const { return QVector3D(m_width, m_height, m_depth); };
 
     void bind();
     void release();

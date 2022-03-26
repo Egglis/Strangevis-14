@@ -3,14 +3,13 @@
 
 #include "../transfertexture.h"
 
-#include <QWidget>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QOpenGLTexture>
 #include <QSlider>
-#include <QComboBox>
+#include <QWidget>
 
-
-class SharedProperties;
+class ISharedProperties;
 /*
 TODO:
 Add DataPoints
@@ -18,32 +17,35 @@ Add Colormaps
 Add more settings
 
 */
+namespace tfn
+{
+
 class ColorMapSelector : public QComboBox
 {
-        Q_OBJECT
-    public:
-        ColorMapSelector(QWidget* parent, std::vector<ColorMap> options);
+    Q_OBJECT
+  public:
+    ColorMapSelector(QWidget* parent, std::vector<QString> options);
 };
 
+class TransferWidget : public QWidget
+{
+    Q_OBJECT
+  public:
+    TransferWidget(const std::shared_ptr<ISharedProperties> properties, const std::shared_ptr<const IColorMapStore> colorMapStore,
+                   QWidget* parent);
+  public slots:
+    void setSelectedColorMap(const QString& name);
+  signals:
+    void valueChanged(const QString& cmap);
 
-class TransferWidget : public QWidget {
-        Q_OBJECT
-    public:
-        TransferWidget(const std::shared_ptr<SharedProperties>& properties, QWidget* parent);
-    public slots:
-        void setSelectedColorMap(int index);
-    signals:
-        void valueChanged(ColorMap cmap);
-    private:
-        bool loadColorMaps();
-
-        const std::shared_ptr<SharedProperties>& m_properties;
-        QHBoxLayout* m_layout;
-        int m_index;
-        ColorMapSelector* m_selector;
-        std::vector<ColorMap> m_colorMaps;
+  private:
+    const std::shared_ptr<ISharedProperties> m_properties;
+    const std::shared_ptr<const IColorMapStore> m_colorMapStore;
+    QHBoxLayout* m_layout;
+    QString m_selectedColorMap;
+    ColorMapSelector* m_selector;
+    std::vector<ColorMap> m_colorMaps;
 };
 
-
-
+} // namespace tfn
 #endif // TRANSFERFUNCTIONWIDGET_H

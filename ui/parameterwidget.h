@@ -10,7 +10,7 @@
 #include <QWidget>
 #include <memory>
 
-class SharedProperties;
+class ISharedProperties;
 class GradientMethodWidget;
 class ClippingWidget;
 
@@ -18,15 +18,15 @@ class ParameterWidget : public QWidget
 {
     Q_OBJECT
   public:
-    ParameterWidget(const std::shared_ptr<SharedProperties>& properties,
+    ParameterWidget(const std::shared_ptr<ISharedProperties> properties,
                     QWidget* parent);
     QSize sizeHint() { return QSize{300, 200}; };
 
-    const std::shared_ptr<SharedProperties>& m_properties;
   public slots:
     void updateClippingPlane();
 
   private:
+    const std::shared_ptr<ISharedProperties> m_properties;
     QHBoxLayout m_layout;
     QVector<ClippingWidget*> m_clippingPlaneWidgets;
     GradientMethodWidget* m_gradientMethodWidget;

@@ -3,7 +3,7 @@
 
 #include "ui/renderwidget.h"
 #include "ui/parameterwidget.h"
-#include "environment.h"
+#include "texturestore.h"
 
 #include <QMainWindow>
 #include <QVector>
@@ -16,14 +16,15 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    MainWindow(QWidget* parent = nullptr);
+    MainWindow(std::shared_ptr<ITextureStore> textureStore, std::shared_ptr<ISharedProperties> properties, std::shared_ptr<tfn::IColorMapStore> colorMapStore, QWidget* parent = nullptr);
 
   public slots:
     void fileOpen();
 
   private:
-    std::shared_ptr<SharedProperties> m_properties;
+    const std::shared_ptr<ISharedProperties> m_properties;
+    const std::shared_ptr<ITextureStore> m_textureStore;
+    const std::shared_ptr<tfn::IColorMapStore> m_colorMapStore;
     MainWindowWidget* m_mainWidget;
-    std::shared_ptr<Environment> m_environment;
 };
 #endif // MAINWINDOW_H

@@ -10,11 +10,11 @@
 #include <QWheelEvent>
 #include <QtMath>
 
-
-RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
-                           std::shared_ptr<SharedProperties> properties,
+RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
+                           std::shared_ptr<const ISharedProperties> properties,
                            QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_environment{env}, m_properties{properties}
+    : QOpenGLWidget(parent, f), m_textureStore{textureStore}, m_properties{
+                                                                  properties}
 {
     m_modelViewMatrix.setToIdentity();
     m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
@@ -25,12 +25,12 @@ RenderWidget::RenderWidget(std::shared_ptr<Environment> env,
             &GradientProperties::gradientMethodChanged,
             [this](GradientMethod method) { update(); });
 
-    connect(m_environment->volume(), &Volume::dimensionsChanged, this,
+    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
             &RenderWidget::updateBoxScalingMatrix);
 
     connect(&m_properties.get()->colorMap(),
-            &TransferProperties::transferTextureChanged, this,
-            &RenderWidget::updateTransferTexture);
+            &tfn::TransferProperties::transferFunctionChanged, this,
+            [this]() { update(); });
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
@@ -106,12 +106,12 @@ void RenderWidget::initializeGL()
     // initialize geometry
     Geometry::instance();
 
-    if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, ":/shaders/shaders/cube-vs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                               ":shaders/cube-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
-    if (!m_cubeProgram.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, ":/shaders/shaders/cube-fs.glsl"))
+    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                               ":shaders/cube-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
     if (!m_cubeProgram.link())
@@ -152,7 +152,7 @@ void RenderWidget::paintGL()
     m_cubeProgram.setUniformValue(
         location, static_cast<int>(m_properties->gradientMethod().method()));
 
-    auto [width, height, depth] = m_environment->volume()->getDimensions();
+    auto [width, height, depth] = m_textureStore->volume().getDimensions();
     location = m_cubeProgram.uniformLocation("width");
     m_cubeProgram.setUniformValue(location, static_cast<int>(width));
     location = m_cubeProgram.uniformLocation("height");
@@ -162,12 +162,12 @@ void RenderWidget::paintGL()
 
     glActiveTexture(GL_TEXTURE0);
     m_cubeProgram.setUniformValue("volumeTexture", 0);
-    m_environment->volume()->bind();
+    m_textureStore->volume().bind();
 
     // Transfer Texture
     glActiveTexture(GL_TEXTURE1);
-    m_cubeProgram.setUniformValue("transferTexture", 1);
-    m_environment->transferTexture()->bind();
+    m_cubeProgram.setUniformValue("transferFunction", 1);
+    m_textureStore->transferFunction().bind();
 
     Geometry::instance().bindCube();
 
@@ -179,8 +179,8 @@ void RenderWidget::paintGL()
     Geometry::instance().drawCube();
     glActiveTexture(GL_TEXTURE0);
 
-    m_environment->transferTexture()->release();
-    m_environment->volume()->release();
+    m_textureStore->transferFunction().release();
+    m_textureStore->volume().release();
     m_cubeProgram.release();
 }
 
@@ -207,7 +207,7 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
 void RenderWidget::updateBoxScalingMatrix()
 {
     m_boxScalingMatrix.setToIdentity();
-    auto dims = m_environment->volume()->getDimensions();
+    auto dims = m_textureStore->volume().getDimensions();
     auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
     if (maxDim)
     {
@@ -215,16 +215,12 @@ void RenderWidget::updateBoxScalingMatrix()
     }
 }
 
-void RenderWidget::updateTransferTexture(ColorMap cmap)
-{
-    m_environment->transferTexture()->setColorMap(cmap);
-    update();
-}
-
 ExtendedParameterWidget::ExtendedParameterWidget(
-    const std::shared_ptr<SharedProperties>& properties, QWidget* parent)
+    const std::shared_ptr<ISharedProperties>& properties,
+    const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
+    QWidget* parent)
     : QWidget(parent), m_parameterWidget(properties, this),
-      m_transferWidget(properties, this), m_layout{this}
+      m_transferWidget(properties, colorMapStore, this), m_layout{this}
 {
     m_layout.addWidget(&m_transferWidget);
     m_layout.addWidget(&m_parameterWidget);
