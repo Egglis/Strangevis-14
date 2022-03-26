@@ -1,5 +1,5 @@
-#ifndef TRANSFER_TEXTURE_H
-#define TRANSFER_TEXTURE_H
+#ifndef TRANSFERTEXTURE_H
+#define TRANSFERTEXTURE_H
 
 #include <QColor>
 #include <QObject>
@@ -7,7 +7,14 @@
 #include <QOpenGLTexture>
 #include <vector>
 
-
+namespace tfn
+{
+namespace size
+{
+constexpr static int NumPoints = 256;
+constexpr static int NumChannels = 3;
+constexpr static int ArraySize = NumPoints * NumChannels;
+} // namespace size
 class ColorMap
 {
   public:
@@ -31,7 +38,6 @@ class TransferTexture : public QObject
     void removeColor();
     void setColorMap(ColorMap cmap);
     ColorMap getColorMap() { return m_colorMap; };
-    
 
     void bind();
     void release();
@@ -43,4 +49,5 @@ class TransferTexture : public QObject
 };
 std::vector<ColorMap> loadColorMapsFromFile();
 
-#endif
+} // namespace tfn
+#endif // TRANSFERTEXTURE_H

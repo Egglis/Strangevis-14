@@ -14,7 +14,7 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
     connect(&m_properties.get()->colorMap(),
-            &TransferProperties::transferFunctionChanged,
+            &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
 }
 
@@ -93,7 +93,7 @@ void ObliqueSliceRenderWidget::paintGL()
     m_sliceProgram.release();
 }
 
-void ObliqueSliceRenderWidget::updateTransferTexture(ColorMap cmap)
+void ObliqueSliceRenderWidget::updateTransferTexture(tfn::ColorMap cmap)
 {
     m_textureStore->transferFunction().setColorMap(cmap);
     update();

@@ -4,8 +4,8 @@
 #include "../properties/transferproperties.h"
 
 #include <QDebug>
-#include <QFile>
-#include <QtXml>
+namespace tfn
+{
 
 TransferWidget::TransferWidget(
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent)
@@ -42,3 +42,5 @@ ColorMapSelector::ColorMapSelector(QWidget* parent,
         addItem(colorMap.getName());
     }
 }
+
+} // namespace tfn

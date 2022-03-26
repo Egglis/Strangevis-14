@@ -29,7 +29,7 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
             &RenderWidget::updateBoxScalingMatrix);
 
     connect(&m_properties.get()->colorMap(),
-            &TransferProperties::transferFunctionChanged, this,
+            &tfn::TransferProperties::transferFunctionChanged, this,
             &RenderWidget::updateTransferTexture);
 }
 
@@ -215,7 +215,7 @@ void RenderWidget::updateBoxScalingMatrix()
     }
 }
 
-void RenderWidget::updateTransferTexture(ColorMap cmap)
+void RenderWidget::updateTransferTexture(tfn::ColorMap cmap)
 {
     m_textureStore->transferFunction().setColorMap(cmap);
     update();

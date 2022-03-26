@@ -37,7 +37,7 @@ class RenderWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
   private:
     void updateModelViewMatrix();
     void updateBoxScalingMatrix();
-    void updateTransferTexture(ColorMap cmap);
+    void updateTransferTexture(tfn::ColorMap cmap);
 
     const std::shared_ptr<ITextureStore> m_textureStore;
     const std::shared_ptr<const ISharedProperties> m_properties;
@@ -61,7 +61,7 @@ class ExtendedParameterWidget : public QWidget
 
   private:
     QVBoxLayout m_layout;
-    TransferWidget m_transferWidget;
+    tfn::TransferWidget m_transferWidget;
     ParameterWidget m_parameterWidget;
 };
 #endif // RENDERWIDGET_H

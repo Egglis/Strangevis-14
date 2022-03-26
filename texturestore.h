@@ -14,8 +14,8 @@ class ITextureStore
     virtual Volume& volume() = 0;
     virtual const Volume& volume() const = 0;
 
-    virtual TransferTexture& transferFunction() = 0;
-    virtual const TransferTexture& transferFunction() const = 0;
+    virtual tfn::TransferTexture& transferFunction() = 0;
+    virtual const tfn::TransferTexture& transferFunction() const = 0;
 };
 class TextureStore : public QObject, public ITextureStore
 {
@@ -26,15 +26,15 @@ class TextureStore : public QObject, public ITextureStore
     virtual Volume& volume() { return m_volume; };
     virtual const Volume& volume() const { return m_volume; };
 
-    virtual TransferTexture& transferFunction() { return m_transfertexture; };
-    virtual const TransferTexture& transferFunction() const
+    virtual tfn::TransferTexture& transferFunction() { return m_transfertexture; };
+    virtual const tfn::TransferTexture& transferFunction() const
     {
         return m_transfertexture;
     };
 
   private:
     Volume m_volume;
-    TransferTexture m_transfertexture;
+    tfn::TransferTexture m_transfertexture;
 };
 
 #endif // TEXTURESTORE_H
