@@ -8,6 +8,8 @@
 #include <QOpenGLTexture>
 #include <QSlider>
 #include <QWidget>
+#include <QGraphicsView>
+#include <QtCharts>
 
 class ISharedProperties;
 /*
@@ -19,6 +21,24 @@ Add more settings
 */
 namespace tfn
 {
+
+class ColorMapChart : public QChartView{
+    Q_OBJECT
+  public:
+    ColorMapChart(ColorMap cmap);
+    void updateChart();
+  public slots:
+    void setColorMap(ColorMap cmap); // TODO
+   private:
+    ColorMap m_currentColorMap;
+    QChart *m_chart;
+    QLineSeries *m_lineSeries;
+    QAreaSeries *m_areaSeries;
+    QScatterSeries *m_controlPointSeries;
+    QPen *m_pen;
+    QLinearGradient m_gradient;
+};
+
 
 class ColorMapSelector : public QComboBox
 {
@@ -44,7 +64,7 @@ class TransferWidget : public QWidget
     QHBoxLayout* m_layout;
     QString m_selectedColorMap;
     ColorMapSelector* m_selector;
-    std::vector<ColorMap> m_colorMaps;
+    ColorMapChart* m_colorMapChart;
 };
 
 } // namespace tfn

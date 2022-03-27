@@ -16,6 +16,7 @@ find_package(Qt6 COMPONENTS REQUIRED
     Widgets
     OpenGLWidgets
     Xml
+    Charts
     )
 
 # Set path to our custom CMAKE scripts
@@ -82,6 +83,7 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
     Qt6::Xml
+    Qt6::Charts
 )
 windeployqt(strangevis)
 
