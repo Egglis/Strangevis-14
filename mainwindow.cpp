@@ -29,8 +29,8 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
 
     menuBar()->addMenu(fileMenu);
 
-    RenderWidget* p_3dRenderWidget =
-        new RenderWidget(m_textureStore, m_properties, this);
+    RayCastingInteractor* p_3dRenderWidget =
+        new RayCastingInteractor(m_textureStore, m_properties, this);
     ExtendedParameterWidget* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
     ObliqueSliceWidget* p_2dRenderWidget =
