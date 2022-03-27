@@ -3,12 +3,10 @@
 MainWindowWidget::MainWindowWidget(QWidget* p_3dRenderWidget,
                                    QWidget* p_3dToolBarWidget,
                                    QWidget* p_2dRenderWidget,
-                                   QWidget* p_2dToolBarWidget,
-                                   QWidget* parent
-                                   )
+                                   QWidget* p_2dToolBarWidget, QWidget* parent)
     : QWidget(parent), m_3dRenderWidget{p_3dRenderWidget},
-      m_3dToolBarWidget{p_3dToolBarWidget},
-      m_2dRenderWidget{p_2dRenderWidget}, m_2dToolBarWidget{p_2dToolBarWidget}
+      m_3dToolBarWidget{p_3dToolBarWidget}, m_2dRenderWidget{p_2dRenderWidget},
+      m_2dToolBarWidget{p_2dToolBarWidget}
 {
     m_mainWindowLayout = new QHBoxLayout(this);
     m_3dRenderLayout = create3dRenderLayout();
@@ -37,4 +35,19 @@ QVBoxLayout* MainWindowWidget::create3dRenderLayout()
     vLayout->addWidget(m_3dRenderWidget, 5);
     vLayout->addWidget(m_3dToolBarWidget, 1);
     return vLayout;
+}
+
+void MainWindowWidget::toggleFileLoadingInProgressOverlay(bool state)
+{
+    if (state)
+    {
+        m_progressBar = new QProgressBar(this);
+        m_progressBar->setGeometry(16, 16, 320, 16);
+        m_progressBar->setMaximum(0);
+        m_progressBar->setMinimum(0);
+        m_progressBar->raise();
+        m_progressBar->show();
+    }
+    else
+        delete m_progressBar;
 }

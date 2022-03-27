@@ -5,21 +5,47 @@
 #include <QFile>
 
 Volume::Volume(QObject* parent)
-    : QObject(parent), m_width(0), m_height(0), m_depth(0),
+    : QObject(parent), m_dims{0, 0, 0},
       m_volumeTexture(QOpenGLTexture::Target3D), m_updateNeeded(false)
 {
 }
 
-bool Volume::load(const QString& fileName)
+void Volume::load(const QString& fileName)
 {
-    QFile file(fileName);
+    VolumeLoader* volumeLoader = new VolumeLoader(fileName, this);
+    connect(volumeLoader, &VolumeLoader::volumeLoaded,
+            [this](QVector<unsigned short> volumeData) {
+                m_updateNeeded = true;
+                m_volumeData = volumeData;
+                emit volumeLoaded();
+            });
+    connect(volumeLoader, &VolumeLoader::dimensionsChanged,
+            [this](QVector3D dims) {
+                m_dims = dims;
+                emit dimensionsChanged(m_dims);
+            });
+    connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this, &Volume::loadingStartedOrStopped);
+    connect(volumeLoader, &VolumeLoader::finished, volumeLoader,
+            &VolumeLoader::deleteLater);
+    volumeLoader->start();
+}
+
+VolumeLoader::VolumeLoader(const QString& fileName, QObject* parent)
+    : QThread{parent}, m_fileName{fileName}
+{
+}
+void VolumeLoader::run() { load(); }
+
+void VolumeLoader::load()
+{
+    QFile file(m_fileName);
 
     if (!file.open(QIODevice::ReadOnly))
     {
-        qDebug() << "Unable to open " << fileName << "!";
-        return false;
+        qDebug() << "Unable to open " << m_fileName << "!";
+        return;
     }
-
+    emit loadingStartedOrStopped(true);
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
 
@@ -30,29 +56,26 @@ bool Volume::load(const QString& fileName)
     qDebug() << "Height:" << height;
     qDebug() << "Depth:" << depth;
 
+    QVector<unsigned short> volumeData;
     int volumeSize = static_cast<int>(width) * static_cast<int>(height) *
                      static_cast<int>(depth);
-    m_volumeData.resize(volumeSize);
+    volumeData.resize(volumeSize);
 
-    if (stream.readRawData(reinterpret_cast<char*>(m_volumeData.data()),
+    if (stream.readRawData(reinterpret_cast<char*>(volumeData.data()),
                            volumeSize * sizeof(unsigned short)) !=
         volumeSize * sizeof(unsigned short))
     {
-        return false;
+        return;
     }
-
-    m_width = static_cast<int>(width);
-    m_height = static_cast<int>(height);
-    m_depth = static_cast<int>(depth);
 
     for (int i = 0; i < volumeSize; i++)
     {
-        m_volumeData[i] *= 16;
+        volumeData[i] *= 16;
     }
 
-    m_updateNeeded = true;
-    emit dimensionsChanged(QVector3D(m_width, m_height, m_depth));
-    return true;
+    emit volumeLoaded(volumeData);
+    emit dimensionsChanged(QVector3D(width, height, depth));
+    emit loadingStartedOrStopped(false);
 }
 
 void Volume::bind()
@@ -65,18 +88,17 @@ void Volume::bind()
         {
             m_volumeTexture.destroy();
         }
-
         m_volumeTexture.setBorderColor(0, 0, 0, 0);
         m_volumeTexture.setWrapMode(QOpenGLTexture::ClampToBorder);
         m_volumeTexture.setFormat(QOpenGLTexture::R16F);
         m_volumeTexture.setMinificationFilter(QOpenGLTexture::Linear);
         m_volumeTexture.setMagnificationFilter(QOpenGLTexture::Linear);
         m_volumeTexture.setAutoMipMapGenerationEnabled(false);
-        m_volumeTexture.setSize(m_width, m_height, m_depth);
+        m_volumeTexture.setSize(m_dims.x(), m_dims.y(), m_dims.z());
         m_volumeTexture.allocateStorage();
 
         void* data = reinterpret_cast<void*>(m_volumeData.data());
-        m_volumeTexture.setData(0, 0, 0, m_width, m_height, m_depth,
+        m_volumeTexture.setData(0, 0, 0, m_dims.x(), m_dims.y(), m_dims.z(),
                                 QOpenGLTexture::Red, QOpenGLTexture::UInt16,
                                 data);
         m_updateNeeded = false;
