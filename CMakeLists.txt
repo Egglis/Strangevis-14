@@ -43,6 +43,7 @@ qt_add_executable(strangevis WIN32
     ui/obliqueslicewidget.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
+    ui/transferfunctiongraph.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp

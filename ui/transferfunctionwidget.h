@@ -2,6 +2,7 @@
 #define TRANSFERFUNCTIONWIDGET_H
 
 #include "../transfertexture.h"
+#include "transferfunctiongraph.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -21,23 +22,6 @@ Add more settings
 */
 namespace tfn
 {
-
-class ColorMapChart : public QChartView{
-    Q_OBJECT
-  public:
-    ColorMapChart();
-    void updateChart();
-    void setDisplayedColorMap(ColorMap cmap);
-   private:
-    ColorMap m_currentColorMap;
-    QChart *m_chart;
-    QLineSeries *m_lineSeries;
-    QAreaSeries *m_areaSeries;
-    QScatterSeries *m_controlPointSeries;
-    QPen *m_pen;
-    QLinearGradient m_gradient;
-};
-
 
 class ColorMapSelector : public QComboBox
 {
@@ -63,7 +47,7 @@ class TransferWidget : public QWidget
     QHBoxLayout* m_layout;
     QString m_selectedColorMap;
     ColorMapSelector* m_selector;
-    ColorMapChart* m_colorMapChart;
+    TransferFunctionGraph* m_tfnGraph;
 };
 
 } // namespace tfn
