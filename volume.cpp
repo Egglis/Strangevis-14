@@ -14,7 +14,7 @@ void Volume::load(const QString& fileName)
 {
     VolumeLoader* volumeLoader = new VolumeLoader(fileName, this);
     connect(volumeLoader, &VolumeLoader::volumeLoaded,
-            [this](QVector<unsigned short> volumeData) {
+            [this](const std::vector<unsigned short>& volumeData) {
                 m_updateNeeded = true;
                 m_volumeData = volumeData;
                 emit volumeLoaded();
@@ -24,7 +24,8 @@ void Volume::load(const QString& fileName)
                 m_dims = dims;
                 emit dimensionsChanged(m_dims);
             });
-    connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this, &Volume::loadingStartedOrStopped);
+    connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this,
+            &Volume::loadingStartedOrStopped);
     connect(volumeLoader, &VolumeLoader::finished, volumeLoader,
             &VolumeLoader::deleteLater);
     volumeLoader->start();
@@ -56,23 +57,21 @@ void VolumeLoader::load()
     qDebug() << "Height:" << height;
     qDebug() << "Depth:" << depth;
 
-    QVector<unsigned short> volumeData;
+    std::vector<unsigned short> volumeData;
     int volumeSize = static_cast<int>(width) * static_cast<int>(height) *
                      static_cast<int>(depth);
     volumeData.resize(volumeSize);
-
     if (stream.readRawData(reinterpret_cast<char*>(volumeData.data()),
                            volumeSize * sizeof(unsigned short)) !=
         volumeSize * sizeof(unsigned short))
     {
+        emit loadingStartedOrStopped(false);
         return;
     }
-
     for (int i = 0; i < volumeSize; i++)
     {
         volumeData[i] *= 16;
     }
-
     emit volumeLoaded(volumeData);
     emit dimensionsChanged(QVector3D(width, height, depth));
     emit loadingStartedOrStopped(false);

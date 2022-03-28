@@ -24,7 +24,7 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
     void loadingStartedOrStopped(bool started);
 
   private:
-    QVector<unsigned short> m_volumeData;
+    std::vector<unsigned short> m_volumeData;
     QVector3D m_dims;
     QOpenGLTexture m_volumeTexture;
     bool m_updateNeeded;
@@ -38,7 +38,7 @@ class VolumeLoader : public QThread
     void run() override;
 
   signals:
-    void volumeLoaded(QVector<unsigned short> m_volumeData);
+    void volumeLoaded(const std::vector<unsigned short>& m_volumeData);
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
 
