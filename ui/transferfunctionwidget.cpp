@@ -19,18 +19,23 @@ TransferWidget::TransferWidget(
     // warning dialog
     m_layout = new QHBoxLayout();
     m_selector = new ColorMapSelector(nullptr, m_colorMapStore->availableColorMaps());
+    m_colorMapChart = new ColorMapChart();
+
 
     connect(m_selector, &ColorMapSelector::currentTextChanged, this,
             &TransferWidget::setSelectedColorMap);
     connect(this, &TransferWidget::valueChanged,
             &m_properties.get()->colorMap(),
             &TransferProperties::updateTexture);
-    
+    /*
+    connect(m_selector, &ColorMapSelector::currentTextChanged,
+            m_colorMapChart, &ColorMapChart::setSelectedColorMap);
+    */
     m_layout->addWidget(m_selector);
     int result = m_selector->findText("Oranges");
     result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
 
-    m_colorMapChart = new ColorMapChart(m_colorMapStore->colorMap(m_selectedColorMap));
+    
     m_layout->addWidget(m_colorMapChart);
     setLayout(m_layout);
 };
@@ -38,6 +43,7 @@ TransferWidget::TransferWidget(
 void TransferWidget::setSelectedColorMap(const QString& name)
 {
     m_selectedColorMap = name;
+    m_colorMapChart->setDisplayedColorMap(m_colorMapStore->colorMap(name));
     emit valueChanged(name);
 };
 
@@ -53,7 +59,7 @@ ColorMapSelector::ColorMapSelector(QWidget* parent,
 };
 
 // Color Map Chart 
-ColorMapChart::ColorMapChart(ColorMap cmap) : m_currentColorMap(cmap) {
+ColorMapChart::ColorMapChart() {
 
     m_chart = new QChart();
     m_chart->legend()->hide();
@@ -80,11 +86,9 @@ ColorMapChart::ColorMapChart(ColorMap cmap) : m_currentColorMap(cmap) {
     this->setRenderHint(QPainter::Antialiasing);
     this->setFixedSize(300, 300);
 
-    updateChart();
 };
 
-void ColorMapChart::setColorMap(ColorMap cmap){
-    qDebug() << cmap.getName();
+void ColorMapChart::setDisplayedColorMap(ColorMap cmap){
     m_currentColorMap = cmap;
     updateChart();
 };

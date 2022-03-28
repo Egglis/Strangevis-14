@@ -25,10 +25,9 @@ namespace tfn
 class ColorMapChart : public QChartView{
     Q_OBJECT
   public:
-    ColorMapChart(ColorMap cmap);
+    ColorMapChart();
     void updateChart();
-  public slots:
-    void setColorMap(ColorMap cmap); // TODO
+    void setDisplayedColorMap(ColorMap cmap);
    private:
     ColorMap m_currentColorMap;
     QChart *m_chart;
