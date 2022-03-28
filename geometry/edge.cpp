@@ -1,4 +1,5 @@
 #include "edge.h"
+#include <QMatrix4x4>
 
 Edge::Edge(QVector3D a, QVector3D b) : m_a{a}, m_b{b}
 {
@@ -41,3 +42,23 @@ QVector3D Edge::direction() const { return m_b - m_a; }
 
 QVector3D Edge::start() const { return m_a; }
 QVector3D Edge::end() const { return m_b; }
+
+void Edge::stretch(float stretch)
+{
+    QVector3D centerPoint = parameterization(0.5);
+    QMatrix4x4 transformationMatrix{};
+    transformationMatrix.translate(-centerPoint);
+    transformationMatrix.scale(stretch);
+    transformationMatrix.translate(centerPoint);
+    m_a = transformationMatrix*m_a;
+    m_b = transformationMatrix*m_b;
+}
+
+void Edge::scale(QVector3D scale)
+{
+    QVector3D centerPoint = parameterization(0.5);
+    QMatrix4x4 transformationMatrix{};
+    transformationMatrix.scale(scale);
+    m_a = transformationMatrix*m_a;
+    m_b = transformationMatrix*m_b;
+}

@@ -2,7 +2,7 @@
 
 #include "properties/sharedproperties.h"
 #include "ui/mainwindowwidget.h"
-#include "ui/obliqueslicewidget.h"
+#include "ui/obliquesliceinteractor.h"
 #include "ui/parameterwidget.h"
 #include "ui/rectangulargridlayout.h"
 #include "ui/renderwidget.h"
@@ -33,16 +33,16 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
         new RayCastingInteractor(m_textureStore, m_properties, this);
     ExtendedParameterWidget* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
-    ObliqueSliceWidget* p_2dRenderWidget =
-        new ObliqueSliceWidget(m_textureStore, m_properties, this);
+    ObliqueSliceInteractor* p_2dRenderWidget =
+        new ObliqueSliceInteractor(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
         new ObliqueSliceRotationWidget(m_properties, this);
 
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
-            p_2dRenderWidget->renderWidget(),
+            p_2dRenderWidget,
             &ObliqueSliceRenderWidget::flipHorizontal);
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical,
-            p_2dRenderWidget->renderWidget(),
+            p_2dRenderWidget,
             &ObliqueSliceRenderWidget::flipVertical);
 
     m_mainWidget =

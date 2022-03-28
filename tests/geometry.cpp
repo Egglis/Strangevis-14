@@ -97,11 +97,11 @@ TEST_CASE("Plane point and normal obey the plane equation")
 TEST_CASE("Cube-plane Intersection produces correct number of vertices")
 {
     Plane threeVertices(QVector4D(0.9, 0.9, 0.9, 1.5));  // Shaves a corner
-    CubePlaneIntersection interThree{threeVertices};
+    CubePlaneIntersection interThree{threeVertices, Box{}};
     CHECK(interThree.getVertexPositions().size() == 3);
 
     Plane fourVertices(QVector4D(0, 0, 1, 0));  // Cuts it in half
-    CubePlaneIntersection interFour{fourVertices};
+    CubePlaneIntersection interFour{fourVertices, Box{}};
     CHECK(interFour.getVertexPositions().size() == 4);
 
     // TODO: Add cases for 5 and 6 vertices.

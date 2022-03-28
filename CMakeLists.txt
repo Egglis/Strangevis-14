@@ -40,6 +40,7 @@ qt_add_executable(strangevis WIN32
     volume.cpp
     transfertexture.cpp
     renderers/raycastingwidget.cpp
+    renderers/obliqueslicewidget.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
@@ -47,7 +48,7 @@ qt_add_executable(strangevis WIN32
     ui/renderwidget.cpp
     ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
-    ui/obliqueslicewidget.cpp
+    ui/obliquesliceinteractor.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
     geometry/cubeplaneintersection.cpp
@@ -56,6 +57,7 @@ qt_add_executable(strangevis WIN32
     geometry/plane.cpp
     geometry/utils.cpp
     geometry/quad.cpp
+    geometry/box.cpp
 )
 
 set(shaders_resource_files

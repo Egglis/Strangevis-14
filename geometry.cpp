@@ -50,12 +50,16 @@ void Geometry::allocateCube()
                                    sizeof(cube.indices()[0]));
 }
 
-void Geometry::allocateObliqueSlice(const CubePlaneIntersection& intersection)
+void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
 {
     auto vertexPositions = intersection.getVertexPositions();
     auto textureCoords = intersection.getTextureCoords();
     auto sortedOrder = intersection.getConvexHullIndexOrder();
     m_sliceIndices = sortedOrder.size();
+    if (vertexPositions.size() > 0)
+    {
+        qDebug() << "Break here";
+    }
 
     if (m_sliceVertexBuffer.isCreated())
         m_sliceVertexBuffer.destroy();

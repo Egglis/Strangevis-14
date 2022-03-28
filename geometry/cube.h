@@ -9,12 +9,18 @@ class Cube
 {
   public:
     Cube();
-    constexpr const std::vector<QVector3D>& vertices() const { return m_vertices; };
+    constexpr const std::vector<QVector3D>& vertices() const
+    {
+        return m_vertices;
+    };
     constexpr const std::vector<unsigned short>& indices() const
     {
         return m_indices;
     };
     const std::vector<Edge>& edges() const { return m_edges; };
+
+  protected:
+    std::vector<Edge>& protectedEdges() { return m_edges; };
 
   private:
     void constructEdges();

@@ -5,34 +5,54 @@
 #include <QMatrix4x4>
 #include <QVector>
 
-CubePlaneIntersection::CubePlaneIntersection(Plane plane)
-    : m_cube{}, m_plane{plane}
+CubePlaneIntersection::CubePlaneIntersection(Plane plane, Box box)
+    : m_box{box}, m_plane{plane}, m_updateNeeded{true}
 {
-    changePlane(plane);
 }
 
 void CubePlaneIntersection::changePlane(Plane plane)
 {
     m_plane = plane;
-    m_textureCoords = intersectionVertices();
-
-    if (m_textureCoords.size() > 2)
-    {
-        m_vertexPositions = rotateToXYPlane(m_textureCoords);
-        m_sortedOrder = convexHullGiftWrapping(m_vertexPositions);
-    }
-    else
-    {
-        m_textureCoords = std::vector<QVector3D>{};
-        m_vertexPositions = std::vector<QVector2D>{};
-        m_sortedOrder = std::vector<unsigned short>{};
-    }
+    m_updateNeeded = true;
 }
 
-std::vector<QVector3D> CubePlaneIntersection::intersectionVertices()
+void CubePlaneIntersection::updateIfNeeded()
+{
+    if (m_updateNeeded)
+    {
+        m_textureCoords = textureIntersectionVertices();
+
+        if (m_textureCoords.size() > 2)
+        {
+            m_vertexPositions = rotateToXYPlane(vertexIntersectionVertices());
+            m_sortedOrder = convexHullGiftWrapping(m_vertexPositions);
+        }
+        else
+        {
+            m_textureCoords = std::vector<QVector3D>{};
+            m_vertexPositions = std::vector<QVector2D>{};
+            m_sortedOrder = std::vector<unsigned short>{};
+        }
+    }
+    m_updateNeeded = false;
+}
+
+std::vector<QVector3D> CubePlaneIntersection::textureIntersectionVertices()
 {
     std::vector<QVector3D> intersectionPoints{};
-    for (const auto& edge : m_cube.edges())
+    for (const auto& edge : m_box.cube().edges())
+    {
+        if (hasLinePlaneIntersection(edge))
+        {
+            intersectionPoints.push_back(linePlaneIntersectionPoint(edge));
+        }
+    }
+    return std::move(intersectionPoints);
+}
+std::vector<QVector3D> CubePlaneIntersection::vertexIntersectionVertices()
+{
+    std::vector<QVector3D> intersectionPoints{};
+    for (const auto& edge : m_box.edges())
     {
         if (hasLinePlaneIntersection(edge))
         {
@@ -73,4 +93,10 @@ QVector3D CubePlaneIntersection::linePlaneIntersectionPoint(Edge e) const
         QVector3D::dotProduct(m_plane.point() - e.start(), m_plane.normal()) /
         denominator;
     return e.parameterization(t);
+}
+
+void CubePlaneIntersection::changeScaling(QVector3D dims)
+{
+    m_box = Box(dims);
+    m_updateNeeded = true;
 }

@@ -25,7 +25,7 @@ class Geometry
     void bindObliqueSliceTexCoord();
     void drawObliqueSlice();
 
-    void allocateObliqueSlice(const CubePlaneIntersection& intersection);
+    void allocateObliqueSlice(CubePlaneIntersection& intersection);
 
   private:
     void allocateQuad();
