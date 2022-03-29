@@ -22,6 +22,7 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
     void volumeLoaded();
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
+    void gridSpacingChanged(QVector3D dims);
 
   private:
     std::vector<unsigned short> m_volumeData;
@@ -41,10 +42,13 @@ class VolumeLoader : public QThread
     void volumeLoaded(const std::vector<unsigned short>& m_volumeData);
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
+    void gridSpacingChanged(QVector3D dims);
 
   private:
+    void loadIni();
     void load();
     QString m_fileName;
+    constexpr static QVector3D UNIFORM_GRID_DIMENSIONS{1,1,1};
 };
 
 #endif // VOLUME_H
