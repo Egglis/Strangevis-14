@@ -7,7 +7,8 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
                                    QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
-      m_clippingPlaneEquation{initialRenderProperties.clippingPlaneEquation},
+      m_clippingPlane{initialRenderProperties.clippingPlane},
+      m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_projectionMode{initialRenderProperties.projectionMode}
 {
     m_modelViewMatrix.setToIdentity();
@@ -81,7 +82,7 @@ void RayCastingWidget::paintGL()
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
-    m_cubeProgram.setUniformValue(location, m_clippingPlaneEquation);
+    m_cubeProgram.setUniformValue(location, m_clippingPlane.equation());
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
@@ -112,6 +113,17 @@ void RayCastingWidget::paintGL()
                                      sizeof(QVector3D));
 
     Geometry::instance().drawCube();
+
+    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
+
+    Geometry::instance().bindObliqueSliceIntersectionCoords();
+
+    location = m_cubeProgram.attributeLocation("vertexPosition");
+    m_cubeProgram.enableAttributeArray(location);
+    m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
+                                     sizeof(QVector3D));
+
+    Geometry::instance().drawObliqueSlice();
     glActiveTexture(GL_TEXTURE0);
 
     m_textureStore->transferFunction().release();
@@ -130,9 +142,10 @@ void RayCastingWidget::updateBoxScalingMatrix(QVector3D dims)
     update();
 }
 
-void RayCastingWidget::updateClippingPlane(QVector4D clippingPlaneEquation)
+void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
 {
-    m_clippingPlaneEquation = clippingPlaneEquation;
+    m_clippingPlane = clippingPlane;
+    m_cubePlaneIntersection.changePlane(clippingPlane);
     update();
 }
 

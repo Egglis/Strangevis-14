@@ -2,6 +2,7 @@
 #define RAYCASTINGWIDGET_H
 
 #include "../geometry/plane.h"
+#include "../geometry/cubeplaneintersection.h"
 #include "../properties/gradientproperties.h"
 #include "../texturestore.h"
 
@@ -15,7 +16,7 @@ struct RenderProperties
 {
     float zoomFactor;
     QString transferFunction;
-    QVector4D clippingPlaneEquation;
+    Plane clippingPlane;
     GradientMethod gradientMethod;
     Projection projectionMode;
 };
@@ -36,7 +37,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
   protected slots:
     void rotateCamera(qreal angle, QVector3D axis);
     void zoomCamera(float zoomFactor);
-    void updateClippingPlane(QVector4D clippingPlaneEquation);
+    void updateClippingPlane(Plane clippingPlane);
     void changeProjectionMode(Projection projectionMode);
     void changeGradientMethod(GradientMethod method);
     void changeTransferFunction(QString transferFunctionName);
@@ -51,7 +52,8 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     GradientMethod m_gradientMethod;
     Projection m_projectionMode;
     QString m_transferFunctionName;
-    QVector4D m_clippingPlaneEquation;
+    Plane m_clippingPlane;
+    CubePlaneIntersection m_cubePlaneIntersection;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
