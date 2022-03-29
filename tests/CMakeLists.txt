@@ -6,7 +6,6 @@ add_executable(geometryTest
     ../geometry/plane.cpp
     ../geometry/cubeplaneintersection.cpp
     ../geometry/utils.cpp
-    ../geometry/box.cpp
 )
 target_link_libraries(geometryTest PRIVATE
     OpenGL32

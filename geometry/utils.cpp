@@ -67,7 +67,8 @@ convexHullGiftWrapping(const std::vector<QVector2D>& input)
     return std::move(output);
 }
 
-std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
+std::pair<QMatrix4x4, std::vector<QVector2D>>
+rotateToXYPlane(const std::vector<QVector3D>& input)
 {
     assert(input.size() > 2);
     Plane plane = Plane(input[0], input[1], input[2]);
@@ -82,15 +83,15 @@ std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
     // QMatrix4x4 uses degrees
     float angle = qRadiansToDegrees(std::acos(normal.z()));
 
-    QMatrix4x4 tranformationMatrix{};
-    tranformationMatrix.translate(-plane.d() * QVector3D(0, 0, 1));
-    tranformationMatrix.rotate(angle, rotVec);
+    QMatrix4x4 transformationMatrix{};
+    transformationMatrix.translate(-plane.d() * QVector3D(0, 0, 1));
+    transformationMatrix.rotate(angle, rotVec);
 
     std::transform(input.begin(), input.end(), vertexPositions.begin(),
-                   [&tranformationMatrix](QVector3D texCoord) {
-                       auto newVertexPosition = tranformationMatrix * texCoord;
+                   [&transformationMatrix](QVector3D texCoord) {
+                       auto newVertexPosition = transformationMatrix * texCoord;
                        assert(std::abs(newVertexPosition.z()) < 0.001);
                        return QVector2D(newVertexPosition);
                    });
-    return std::move(vertexPositions);
+    return std::pair(transformationMatrix, vertexPositions);
 }

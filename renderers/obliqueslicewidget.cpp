@@ -1,7 +1,6 @@
 #include "obliqueslicewidget.h"
 
 #include "../geometry.h"
-#include "../geometry/box.h"
 
 #include <QVector3D>
 
@@ -11,18 +10,10 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f),
       m_textureStore(textureStore), m_properties{properties},
-      m_cubePlaneIntersection{m_properties->clippingPlane().plane(),
-                              Box(m_textureStore->volume().getDimensions())},
+      m_cubePlaneIntersection{m_properties->clippingPlane().plane()},
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
-    connect(&m_properties.get()->colorMap(),
-            &tfn::TransferProperties::transferFunctionChanged,
-            [this]() { update(); });
-    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
-            [this](QVector3D dims) {
-                m_cubePlaneIntersection.changeScaling(dims);
-            });
 }
 
 void ObliqueSliceRenderWidget::initializeGL()
@@ -53,6 +44,10 @@ void ObliqueSliceRenderWidget::initializeGL()
                 updateObliqueSlice();
                 update();
             });
+    connect(&m_properties.get()->colorMap(),
+            &tfn::TransferProperties::transferFunctionChanged,
+            [this]() { update(); });
+    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);
     updateObliqueSlice();
 }
 
@@ -64,7 +59,9 @@ void ObliqueSliceRenderWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_sliceProgram.bind();
-    QMatrix4x4 modelViewMatrix = m_aspectRatioMatrix * m_modelViewMatrix;
+    QMatrix4x4 modelViewMatrix =
+        m_aspectRatioMatrix * m_modelViewMatrix *
+        m_cubePlaneIntersection.getModelRotationMatrix() * m_boxScalingMatrix;
     m_sliceProgram.setUniformValue("modelViewMatrix", modelViewMatrix);
 
     glActiveTexture(GL_TEXTURE0);
@@ -75,18 +72,10 @@ void ObliqueSliceRenderWidget::paintGL()
     glActiveTexture(GL_TEXTURE1);
     m_sliceProgram.setUniformValue("transferFunction", 1);
     m_textureStore->transferFunction().bind();
-    Geometry::instance().bindObliqueSliceVertex();
 
+    Geometry::instance().bindObliqueSliceIntersectionCoords();
     {
-        int location = m_sliceProgram.attributeLocation("vertexPosition");
-        m_sliceProgram.enableAttributeArray(location);
-        m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 2,
-                                          sizeof(QVector2D));
-    }
-
-    Geometry::instance().bindObliqueSliceTexCoord();
-    {
-        int location = m_sliceProgram.attributeLocation("texCoord");
+        int location = m_sliceProgram.attributeLocation("intersectionCoords");
         m_sliceProgram.enableAttributeArray(location);
         m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
                                           sizeof(QVector3D));
@@ -144,4 +133,12 @@ void ObliqueSliceRenderWidget::zoomCamera(float zoomFactor)
 {
     m_modelViewMatrix.scale(zoomFactor);
     update();
+}
+
+void ObliqueSliceRenderWidget::updateBoxScaling(QVector3D dims)
+{
+    m_boxScalingMatrix.setToIdentity();
+    auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    m_boxScalingMatrix.scale(2 * dims / (minDim + maxDim));
 }

@@ -8,6 +8,6 @@
 std::vector<unsigned short>
 convexHullGiftWrapping(const std::vector<QVector2D>& input);
 
-std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input);
+std::pair<QMatrix4x4, std::vector<QVector2D>> rotateToXYPlane(const std::vector<QVector3D>& input);
 
 #endif // UTILS_H

@@ -57,7 +57,6 @@ qt_add_executable(strangevis WIN32
     geometry/plane.cpp
     geometry/utils.cpp
     geometry/quad.cpp
-    geometry/box.cpp
 )
 
 set(shaders_resource_files
