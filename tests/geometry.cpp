@@ -6,7 +6,7 @@
 #include "../geometry/plane.h"
 #include "../geometry/cubeplaneintersection.h"
 
-#include "doctest.h"
+#include "../vendor/doctest/doctest.h"
 
 TEST_CASE("Constructed edge is independent of vertex order")
 {
