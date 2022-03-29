@@ -15,6 +15,8 @@ class Edge
     QVector3D direction() const;
     QVector3D start() const;
     QVector3D end() const;
+    void stretch(float stretch);
+    void scale(QVector3D scale);
 
   private:
     QVector3D m_a;

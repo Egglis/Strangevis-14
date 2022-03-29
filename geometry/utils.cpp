@@ -10,15 +10,16 @@
 // Returns the indexes of input that form a convex hull over the points in
 // input.
 std::vector<unsigned short>
-convexHullGiftWrapping(const std::vector<QVector2D>& input)
+convexHullGiftWrapping(const std::vector<QVector3D>& input)
 {
 
     if (input.size() < 3)
     {
         return {};
     }
+    std::vector<QVector2D> rotatedInput = rotateToXYPlane(input);
     std::vector<unsigned short> output{};
-    output.reserve(input.size());
+    output.reserve(rotatedInput.size());
 
     int startingVertex = 0;
 
@@ -36,7 +37,7 @@ convexHullGiftWrapping(const std::vector<QVector2D>& input)
         return orient < 0 ? Orientation::CounterClockwise
                           : Orientation::Clockwise;
     };
-    int n = input.size();
+    int n = rotatedInput.size();
     // Start from any point guaranteed on the hull, keep moving counterclockwise
     // until reach the start point again.  This loop runs O(h)
     // times where h is number of points in result or output.
@@ -55,7 +56,7 @@ convexHullGiftWrapping(const std::vector<QVector2D>& input)
         {
             // If i is more counterclockwise than current q, then
             // update q
-            if (orientation(input[p], input[i], input[q]) ==
+            if (orientation(rotatedInput[p], rotatedInput[i], rotatedInput[q]) ==
                 Orientation::CounterClockwise)
                 q = i;
         }
@@ -64,16 +65,15 @@ convexHullGiftWrapping(const std::vector<QVector2D>& input)
         // result 'hull'
         p = q;
     } while (p != startingVertex); // While we don't come to first point
-    return std::move(output);
+    return output;
 }
 
-std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
+QMatrix4x4
+rotateToXYPlaneRotationMatrix(const std::vector<QVector3D>& input)
 {
     assert(input.size() > 2);
     Plane plane = Plane(input[0], input[1], input[2]);
     QVector3D normal{plane.normal().normalized()};
-
-    std::vector<QVector2D> vertexPositions{input.size()};
 
     // Vector of rotation is orthogonal to plane-normal and (0,0,1)
     QVector3D rotVec = QVector3D::crossProduct(normal, QVector3D(0, 0, 1));
@@ -82,15 +82,25 @@ std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
     // QMatrix4x4 uses degrees
     float angle = qRadiansToDegrees(std::acos(normal.z()));
 
-    QMatrix4x4 tranformationMatrix{};
-    tranformationMatrix.translate(-plane.d() * QVector3D(0, 0, 1));
-    tranformationMatrix.rotate(angle, rotVec);
+    QMatrix4x4 transformationMatrix{};
+    transformationMatrix.translate(-plane.d() * QVector3D(0, 0, 1));
+    transformationMatrix.rotate(angle, rotVec);
+
+    return transformationMatrix;
+}
+
+std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
+{
+    QMatrix4x4 transformationMatrix = rotateToXYPlaneRotationMatrix(input);
+    std::vector<QVector2D> vertexPositions{};
+    vertexPositions.resize(input.size());
 
     std::transform(input.begin(), input.end(), vertexPositions.begin(),
-                   [&tranformationMatrix](QVector3D texCoord) {
-                       auto newVertexPosition = tranformationMatrix * texCoord;
+                   [&transformationMatrix](QVector3D texCoord) {
+                       auto newVertexPosition = transformationMatrix * texCoord;
                        assert(std::abs(newVertexPosition.z()) < 0.001);
                        return QVector2D(newVertexPosition);
                    });
-    return std::move(vertexPositions);
+
+    return vertexPositions;
 }
