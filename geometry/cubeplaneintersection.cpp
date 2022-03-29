@@ -8,6 +8,7 @@
 CubePlaneIntersection::CubePlaneIntersection(Plane plane)
     : m_cube{}, m_plane{plane}
 {
+    updateIntersections();
 }
 
 void CubePlaneIntersection::changePlane(Plane plane)
@@ -22,10 +23,10 @@ void CubePlaneIntersection::updateIntersections()
 
     if (m_cubeIntersections.size() > 2)
     {
-        auto [rotationMatrix, vertexPositions] =
-            rotateToXYPlane(m_cubeIntersections);
+        auto rotationMatrix =
+            rotateToXYPlaneRotationMatrix(m_cubeIntersections);
         m_modelRotationMatrix = rotationMatrix;
-        m_sortedOrder = convexHullGiftWrapping(m_cubeIntersections, rotationMatrix);
+        m_sortedOrder = convexHullGiftWrapping(m_cubeIntersections);
     }
     else
     {
