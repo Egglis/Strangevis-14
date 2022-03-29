@@ -28,7 +28,7 @@ RayCastingInteractor::RayCastingInteractor(
     Qt::WindowFlags f)
     : RayCastingWidget(
           RenderProperties{1.0, properties->colorMap().colorMap(),
-                           properties->clippingPlane().plane().equation(),
+                           properties->clippingPlane().plane(),
                            properties->gradientMethod().method(),
                            Projection::Orthographic},
           textureStore, parent, f),
@@ -37,7 +37,7 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged, this,
             [this](const Plane& plane){
-                updateClippingPlane(plane.equation());
+                updateClippingPlane(plane);
             });
 
     connect(&m_properties.get()->gradientMethod(),
