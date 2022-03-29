@@ -34,6 +34,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     virtual void zoomCamera(float zoomFactor);
   private slots:
     void updateBoxScaling(QVector3D dims);
+    void updateGridSpacing(QVector3D dims);
   private:
     void correctQuadForAspectRatio(int w, int h);
     void updateTransferTexture(tfn::ColorMap cmap);
@@ -44,6 +45,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     QMatrix4x4 m_modelViewMatrix;
     QMatrix4x4 m_aspectRatioMatrix;
     QMatrix4x4 m_boxScalingMatrix;
+    QMatrix4x4 m_gridSpacingMatrix;
     float m_prevRotation;
     bool m_horizontalFlipped;
     bool m_verticalFlipped;
