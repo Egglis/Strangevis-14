@@ -58,6 +58,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
     qreal m_fov = 60.0;
+    constexpr static QVector4D DISABLED_CLIPPING_EQUATION = QVector4D{0,0,1,1000};
 };
 
 #endif // RAYCASTINGWIDGET_H

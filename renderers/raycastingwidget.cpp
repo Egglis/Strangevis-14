@@ -114,6 +114,9 @@ void RayCastingWidget::paintGL()
 
     Geometry::instance().drawCube();
 
+    location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
+    m_cubeProgram.setUniformValue(location, DISABLED_CLIPPING_EQUATION);
+
     Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
 
     Geometry::instance().bindObliqueSliceIntersectionCoords();
