@@ -37,7 +37,7 @@ void TransferTexture::bind()
         m_transferTexture.setMipLevels(0);
         m_transferTexture.setSize(tfn::size::NumPoints);
         m_transferTexture.allocateStorage();
-        m_transferTexture.setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32,
+        m_transferTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32,
                                   m_colorMap.data());
 
         m_updateNeeded = false;
@@ -143,6 +143,7 @@ bool ColorMapStore::loadColorMapsFromFile(QString path)
                 colors.push_back(color.x()); // r
                 colors.push_back(color.y()); // g
                 colors.push_back(color.z()); // b
+                colors.push_back(color.w()); // a 
             }
             assert(colors.size() == size::ArraySize);
             ColorMap cmap = ColorMap(name, colors);
