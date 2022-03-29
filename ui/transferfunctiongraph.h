@@ -2,6 +2,9 @@
 #define TRANSFERFUNCTIONGRAPH_H
 
 #include "../transfertexture.h"
+#include "../transferfunction.h"
+#include "../properties/sharedproperties.h"
+
 
 #include <QGraphicsView>
 #include <QtCharts>
@@ -11,7 +14,7 @@ class TransferFunctionGraph : public QChartView
 {
         Q_OBJECT
     public:
-        TransferFunctionGraph();
+        TransferFunctionGraph(const std::shared_ptr<ISharedProperties> properties);
         void updateGraph();
         void setDisplayedColorMap(ColorMap cmap);
     public slots:
@@ -20,9 +23,12 @@ class TransferFunctionGraph : public QChartView
     protected:
         void mouseReleaseEvent(QMouseEvent* event);
         void mouseMoveEvent(QMouseEvent* event);
+    signals:
+        void transferFunctionAltered(ColorMap cmap);
+        void transferFunctionChanged(TransferFunction tfn);
     private:
-        // Adds new control point at appropriate index
-        bool addControllPoint(QPointF pos);
+        const std::shared_ptr<ISharedProperties> m_properties;
+
         // Maps local coords to chart coords
         QPointF mapLocalToChartPos(QPointF localPos);
 
@@ -45,13 +51,14 @@ class TransferFunctionGraph : public QChartView
         // Qwidgets
         ColorMap m_cmap;
         QChart *m_chart;
-        QList<QPointF> m_controllPoints;
+        TransferFunction m_tfn;
         QLineSeries *m_lineSeries;
         QAreaSeries *m_areaSeries;
         QAreaSeries *m_boundingBox;
         QScatterSeries *m_scatterSeries;
         QPen *m_pen;
         QLinearGradient m_gradient;
+
 };
 }
 

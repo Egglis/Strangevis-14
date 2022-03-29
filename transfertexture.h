@@ -1,15 +1,18 @@
 #ifndef TRANSFERTEXTURE_H
 #define TRANSFERTEXTURE_H
 
+
 #include <QColor>
 #include <QObject>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
 #include <QMap>
 #include <vector>
+#include "transferfunction.h"
 
 namespace tfn
 {
+
 namespace size
 {
 constexpr static int NumPoints = 256;
@@ -44,9 +47,11 @@ class TransferTexture : public QObject
 
   public slots:
     void setColorMap(std::vector<GLfloat> cmap);
+    void setTransferFunction(TransferFunction tfn);
 
   private:
     std::vector<GLfloat> m_colorMap;
+    TransferFunction m_tfn;
     QOpenGLTexture m_transferTexture;
     bool m_updateNeeded;
 };

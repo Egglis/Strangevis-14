@@ -3,11 +3,17 @@ namespace tfn
 {
 TransferProperties::TransferProperties(){};
 
-TransferProperties::TransferProperties(QString cmap) : m_colorMap{cmap} {};
+TransferProperties::TransferProperties(QString cmap, TransferFunction tfn) : m_colorMap{cmap}, m_tfn{tfn} {};
 
-void TransferProperties::updateTexture(QString cmap)
+void TransferProperties::updateColorMap(QString cmap)
 {
     m_colorMap = cmap;
-    emit transferFunctionChanged(cmap);
-}
+    emit colorMapChanged(cmap);
+};
+
+void TransferProperties::updateTransferFunction(TransferFunction tfn){
+    m_tfn = tfn;
+    emit transferFunctionChanged(tfn);
+};
+
 } // namespace tfn

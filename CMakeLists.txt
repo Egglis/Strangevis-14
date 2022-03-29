@@ -32,6 +32,7 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     texturestore.cpp
     volume.cpp
+    transferfunction.cpp
     transfertexture.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp

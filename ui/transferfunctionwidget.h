@@ -40,7 +40,6 @@ class TransferWidget : public QWidget
     void setSelectedColorMap(const QString& name);
   signals:
     void valueChanged(const QString& cmap);
-
   private:
     const std::shared_ptr<ISharedProperties> m_properties;
     const std::shared_ptr<const IColorMapStore> m_colorMapStore;

@@ -30,8 +30,8 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
     connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
             [this]() { update(); });
 
-    connect(&m_properties.get()->colorMap(),
-            &tfn::TransferProperties::transferFunctionChanged, this,
+    connect(&m_properties.get()->transferFunction(),
+            &tfn::TransferProperties::colorMapChanged, this,
             [this]() { update(); });
 }
 

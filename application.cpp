@@ -1,4 +1,5 @@
 #include "application.h"
+#include "transferfunction.h"
 
 StrangevisVisualizerApplication::StrangevisVisualizerApplication(int argc,
                                                                  char* argv[])
@@ -16,11 +17,19 @@ StrangevisVisualizerApplication::StrangevisVisualizerApplication(int argc,
     format.setOption(QSurfaceFormat::DeprecatedFunctions, true);
     QSurfaceFormat::setDefaultFormat(format);
 
-    connect(&m_properties->colorMap(),
-            &tfn::TransferProperties::transferFunctionChanged,
+    connect(&m_properties->transferFunction(),
+            &tfn::TransferProperties::colorMapChanged,
             this,
             [this](const QString& cmap)
             {
                 m_textureStore->transferFunction().setColorMap(m_colorMapStore->colorMap(cmap).colorMapData());
+            });
+    
+    connect(&m_properties->transferFunction(),
+            &tfn::TransferProperties::transferFunctionChanged,
+            this,
+            [this](const auto& tfn)
+            {
+                m_textureStore->transferFunction().setTransferFunction(tfn);
             });
 }

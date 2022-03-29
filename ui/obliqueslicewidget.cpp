@@ -13,8 +13,8 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
-    connect(&m_properties.get()->colorMap(),
-            &tfn::TransferProperties::transferFunctionChanged,
+    connect(&m_properties.get()->transferFunction(),
+            &tfn::TransferProperties::colorMapChanged,
             [this]() { update(); });
 }
 

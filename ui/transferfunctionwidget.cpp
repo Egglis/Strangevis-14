@@ -16,15 +16,15 @@ TransferWidget::TransferWidget(
 
     m_layout = new QHBoxLayout();
     m_selector = new ColorMapSelector(nullptr, m_colorMapStore->availableColorMaps());
-    m_tfnGraph = new TransferFunctionGraph();
+    m_tfnGraph = new TransferFunctionGraph(properties);
 
 
     connect(m_selector, &ColorMapSelector::currentTextChanged, this,
             &TransferWidget::setSelectedColorMap);
     connect(this, &TransferWidget::valueChanged,
-            &m_properties.get()->colorMap(),
-            &TransferProperties::updateTexture);
-
+            &m_properties.get()->transferFunction(),
+            &TransferProperties::updateColorMap);
+    
     m_layout->addWidget(m_selector);
     int result = m_selector->findText("Oranges");
     result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
@@ -40,6 +40,7 @@ void TransferWidget::setSelectedColorMap(const QString& name)
     m_tfnGraph->setDisplayedColorMap(m_colorMapStore->colorMap(name));
     emit valueChanged(name);
 };
+
 
 // Color Map Selector 
 ColorMapSelector::ColorMapSelector(QWidget* parent,

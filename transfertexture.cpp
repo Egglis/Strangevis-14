@@ -19,6 +19,12 @@ void TransferTexture::setColorMap(std::vector<GLfloat> colormap)
     m_updateNeeded = true;
 };
 
+void TransferTexture::setTransferFunction(TransferFunction tfn)
+{
+    m_tfn = tfn;
+    m_updateNeeded = true;
+}
+
 void TransferTexture::bind()
 {
     if (m_updateNeeded)
@@ -38,7 +44,7 @@ void TransferTexture::bind()
         m_transferTexture.setSize(tfn::size::NumPoints);
         m_transferTexture.allocateStorage();
         m_transferTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32,
-                                  m_colorMap.data());
+                                  m_tfn.applyTransferFunction(m_colorMap).data());
 
         m_updateNeeded = false;
     }
