@@ -47,7 +47,7 @@ void ObliqueSliceRenderWidget::initializeGL()
                 updateObliqueSlice();
                 update();
             });
-    connect(&m_properties.get()->colorMap(),
+    connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
     connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);
