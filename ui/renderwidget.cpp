@@ -33,6 +33,10 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             [this]() { update(); });
+
+    connect(&m_properties.get()->transferFunction(),
+            &tfn::TransferProperties::transferFunctionChanged, this,
+            [this]() { update(); });
 }
 
 void RenderWidget::mousePressEvent(QMouseEvent* p_event)
