@@ -8,8 +8,9 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
     const std::shared_ptr<ITextureStore> textureStore,
     const std::shared_ptr<const ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_textureStore(textureStore), m_properties{properties},
-      m_cubePlaneIntersection(m_properties->clippingPlane().plane()),
+    : QOpenGLWidget(parent, f),
+      m_textureStore(textureStore), m_properties{properties},
+      m_cubePlaneIntersection{m_properties->clippingPlane().plane()},
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
@@ -24,12 +25,12 @@ void ObliqueSliceRenderWidget::initializeGL()
     // initialize geometry
     Geometry::instance();
 
-    if (!m_sliceProgram.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, ":shaders/slice-vs.glsl"))
+    if (!m_sliceProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                                ":shaders/slice-vs.glsl"))
         qDebug() << "Could not load vertex shader!";
 
-    if (!m_sliceProgram.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, ":shaders/slice-fs.glsl"))
+    if (!m_sliceProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                                ":shaders/slice-fs.glsl"))
         qDebug() << "Could not load fragment shader!";
 
     if (!m_sliceProgram.link())
@@ -37,6 +38,8 @@ void ObliqueSliceRenderWidget::initializeGL()
     auto updateObliqueSlice = [this]() {
         Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
     };
+    connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
+            [this]() { update(); });
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged,
             [this, updateObliqueSlice](const Plane& plane) {
@@ -44,6 +47,11 @@ void ObliqueSliceRenderWidget::initializeGL()
                 updateObliqueSlice();
                 update();
             });
+    connect(&m_properties.get()->colorMap(),
+            &tfn::TransferProperties::transferFunctionChanged,
+            [this]() { update(); });
+    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);
+    connect(&m_textureStore->volume(), &Volume::gridSpacingChanged, this, &ObliqueSliceRenderWidget::updateGridSpacing);
     updateObliqueSlice();
 }
 
@@ -55,8 +63,12 @@ void ObliqueSliceRenderWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_sliceProgram.bind();
+    QMatrix4x4 modelViewMatrix =
+        m_aspectRatioMatrix * m_modelViewMatrix *
+        m_cubePlaneIntersection.getModelRotationMatrix() * m_boxScalingMatrix;
+    m_sliceProgram.setUniformValue("modelViewMatrix", modelViewMatrix);
 
-    m_sliceProgram.setUniformValue("modelViewMatrix", m_modelViewMatrix);
+    m_sliceProgram.setUniformValue("gridSpacingMatrix", m_gridSpacingMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     m_sliceProgram.setUniformValue("volumeTexture", 0);
@@ -66,18 +78,10 @@ void ObliqueSliceRenderWidget::paintGL()
     glActiveTexture(GL_TEXTURE1);
     m_sliceProgram.setUniformValue("transferFunction", 1);
     m_textureStore->transferFunction().bind();
-    Geometry::instance().bindObliqueSliceVertex();
 
+    Geometry::instance().bindObliqueSliceIntersectionCoords();
     {
-        int location = m_sliceProgram.attributeLocation("vertexPosition");
-        m_sliceProgram.enableAttributeArray(location);
-        m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 2,
-                                          sizeof(QVector2D));
-    }
-
-    Geometry::instance().bindObliqueSliceTexCoord();
-    {
-        int location = m_sliceProgram.attributeLocation("texCoord");
+        int location = m_sliceProgram.attributeLocation("intersectionCoords");
         m_sliceProgram.enableAttributeArray(location);
         m_sliceProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
                                           sizeof(QVector3D));
@@ -93,6 +97,17 @@ void ObliqueSliceRenderWidget::paintGL()
     m_sliceProgram.release();
 }
 
+void ObliqueSliceRenderWidget::resizeGL(int w, int h)
+{
+    correctQuadForAspectRatio(w, h);
+}
+
+void ObliqueSliceRenderWidget::correctQuadForAspectRatio(int w, int h)
+{
+    m_aspectRatioMatrix.setToIdentity();
+    float aspectRatio = w / static_cast<float>(h);
+    m_aspectRatioMatrix.scale(1 / aspectRatio, 1, 1);
+}
 void ObliqueSliceRenderWidget::rotate(float degrees)
 {
     QVector3D zAxis(0, 0, 1);
@@ -119,46 +134,24 @@ void ObliqueSliceRenderWidget::flipVertical(bool flip)
     m_verticalFlipped = flip;
     rotate(prevRotation);
 }
-ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
-    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
-    : m_flipHorizontalCheckbox{tr("Flip Horizontal")},
-      m_flipVerticalCheckbox{tr("Flip Vertical")}, m_layout{this},
-      m_parameterWidget(properties, this)
+
+void ObliqueSliceRenderWidget::zoomCamera(float zoomFactor)
 {
-    connect(&m_flipHorizontalCheckbox, &QCheckBox::stateChanged, this,
-            &ObliqueSliceRotationWidget::flipHorizontal);
-    connect(&m_flipVerticalCheckbox, &QCheckBox::stateChanged, this,
-            &ObliqueSliceRotationWidget::flipVertical);
-    QHBoxLayout* checkboxLayout = new QHBoxLayout();
-    checkboxLayout->addWidget(&m_flipHorizontalCheckbox);
-    checkboxLayout->addWidget(&m_flipVerticalCheckbox);
-    m_layout.addLayout(checkboxLayout);
-    m_layout.addWidget(&m_parameterWidget);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    m_modelViewMatrix.scale(zoomFactor);
+    update();
 }
 
-ObliqueSliceWidget::ObliqueSliceWidget(
-    const std::shared_ptr<ITextureStore>& textureStore,
-    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent,
-    Qt::WindowFlags f)
-    : QWidget(parent)
+void ObliqueSliceRenderWidget::updateBoxScaling(QVector3D dims)
 {
-    m_renderWidget = new ObliqueSliceRenderWidget(textureStore, properties, this, f);
-    m_dial = new QDial(this);
-    QHBoxLayout* hl = new QHBoxLayout();
-    QVBoxLayout* vl = new QVBoxLayout();
-    vl->addStretch(4);
-    vl->addWidget(m_dial, 1);
-    hl->addStretch(4);
-    hl->addLayout(vl, 1);
-    QWidget* w = new QWidget();
-    w->setLayout(hl);
-    m_layout = new QStackedLayout(this);
-    m_layout->setStackingMode(QStackedLayout::StackAll);
-    m_layout->addWidget(w);
-    m_layout->addWidget(m_renderWidget);
+    m_boxScalingMatrix.setToIdentity();
+    auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    m_boxScalingMatrix.scale(2 * dims / (minDim + maxDim));
+}
 
-    m_dial->setRange(0, 359);
-    connect(m_dial, &QDial::valueChanged, m_renderWidget,
-            &ObliqueSliceRenderWidget::rotate);
+void ObliqueSliceRenderWidget::updateGridSpacing(QVector3D dims)
+{
+    m_gridSpacingMatrix.setToIdentity();
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    m_gridSpacingMatrix.scale(dims / maxDim);
 }

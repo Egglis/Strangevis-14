@@ -8,8 +8,7 @@ Geometry::Geometry()
       m_quadIndexBuffer(QOpenGLBuffer::IndexBuffer),
       m_cubeVertexBuffer(QOpenGLBuffer::VertexBuffer),
       m_cubeIndexBuffer(QOpenGLBuffer::IndexBuffer),
-      m_sliceVertexBuffer(QOpenGLBuffer::VertexBuffer),
-      m_sliceTextureCoordBuffer(QOpenGLBuffer::VertexBuffer),
+      m_sliceCubeIntersectionCoordBuffer(QOpenGLBuffer::VertexBuffer),
       m_sliceIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
     allocateQuad();
@@ -50,27 +49,18 @@ void Geometry::allocateCube()
                                    sizeof(cube.indices()[0]));
 }
 
-void Geometry::allocateObliqueSlice(const CubePlaneIntersection& intersection)
+void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
 {
-    auto vertexPositions = intersection.getVertexPositions();
-    auto textureCoords = intersection.getTextureCoords();
+    auto cubeIntersectionCoords = intersection.getCubeIntersections();
     auto sortedOrder = intersection.getConvexHullIndexOrder();
     m_sliceIndices = sortedOrder.size();
 
-    if (m_sliceVertexBuffer.isCreated())
-        m_sliceVertexBuffer.destroy();
-    m_sliceVertexBuffer.create();
-    m_sliceVertexBuffer.bind();
-    m_sliceVertexBuffer.allocate(vertexPositions.data(),
-                                 vertexPositions.size() *
-                                     sizeof(vertexPositions[0]));
-
-    if (m_sliceTextureCoordBuffer.isCreated())
-        m_sliceTextureCoordBuffer.destroy();
-    m_sliceTextureCoordBuffer.create();
-    m_sliceTextureCoordBuffer.bind();
-    m_sliceTextureCoordBuffer.allocate(
-        textureCoords.data(), textureCoords.size() * sizeof(textureCoords[0]));
+    if (m_sliceCubeIntersectionCoordBuffer.isCreated())
+        m_sliceCubeIntersectionCoordBuffer.destroy();
+    m_sliceCubeIntersectionCoordBuffer.create();
+    m_sliceCubeIntersectionCoordBuffer.bind();
+    m_sliceCubeIntersectionCoordBuffer.allocate(
+        cubeIntersectionCoords.data(), cubeIntersectionCoords.size() * sizeof(cubeIntersectionCoords[0]));
 
     if (m_sliceIndexBuffer.isCreated())
         m_sliceIndexBuffer.destroy();
@@ -102,15 +92,9 @@ void Geometry::drawCube()
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, nullptr);
 }
 
-void Geometry::bindObliqueSliceVertex()
+void Geometry::bindObliqueSliceIntersectionCoords()
 {
-    m_sliceVertexBuffer.bind();
-    m_sliceIndexBuffer.bind();
-}
-
-void Geometry::bindObliqueSliceTexCoord()
-{
-    m_sliceTextureCoordBuffer.bind();
+    m_sliceCubeIntersectionCoordBuffer.bind();
     m_sliceIndexBuffer.bind();
 }
 

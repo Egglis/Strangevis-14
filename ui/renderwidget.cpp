@@ -10,25 +10,39 @@
 #include <QWheelEvent>
 #include <QtMath>
 
-RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
-                           std::shared_ptr<const ISharedProperties> properties,
-                           QWidget* parent, Qt::WindowFlags f)
-    : QOpenGLWidget(parent, f), m_textureStore{textureStore}, m_properties{
-                                                                  properties}
+ExtendedParameterWidget::ExtendedParameterWidget(
+    const std::shared_ptr<ISharedProperties>& properties,
+    const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
+    QWidget* parent)
+    : QWidget(parent), m_parameterWidget(properties, this),
+      m_transferWidget(properties, colorMapStore, this), m_layout{this}
 {
-    m_modelViewMatrix.setToIdentity();
-    m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
+    m_layout.addWidget(&m_transferWidget);
+    m_layout.addWidget(&m_parameterWidget);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+}
+
+RayCastingInteractor::RayCastingInteractor(
+    const std::shared_ptr<ITextureStore> textureStore,
+    const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
+    : RayCastingWidget(
+          RenderProperties{1.0, properties->colorMap().colorMap(),
+                           properties->clippingPlane().plane(),
+                           properties->gradientMethod().method(),
+                           Projection::Orthographic},
+          textureStore, parent, f),
+      m_properties{properties}
+{
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged, this,
-            [this](Plane plane) { update(); });
-    connect(&m_properties.get()->gradientMethod(),
-            &GradientProperties::gradientMethodChanged,
-            [this](GradientMethod method) { update(); });
+            [this](const Plane& plane){
+                updateClippingPlane(plane);
+            });
 
-    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
-            &RenderWidget::updateBoxScalingMatrix);
-    connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
-            [this]() { update(); });
+    connect(&m_properties.get()->gradientMethod(),
+            &GradientProperties::gradientMethodChanged, this,
+            &RayCastingInteractor::changeGradientMethod);
 
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
@@ -36,10 +50,10 @@ RenderWidget::RenderWidget(std::shared_ptr<ITextureStore> textureStore,
 
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged, this,
-            [this]() { update(); });
+            &RayCastingInteractor::changeTransferFunction);
 }
 
-void RenderWidget::mousePressEvent(QMouseEvent* p_event)
+void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
 {
     m_currentX = static_cast<qreal>(p_event->x());
     m_currentY = static_cast<qreal>(p_event->y());
@@ -48,7 +62,7 @@ void RenderWidget::mousePressEvent(QMouseEvent* p_event)
     m_previousY = m_currentY;
 }
 
-void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
+void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
 {
     m_currentX = static_cast<qreal>(p_event->x());
     m_currentY = static_cast<qreal>(p_event->y());
@@ -57,17 +71,15 @@ void RenderWidget::mouseMoveEvent(QMouseEvent* p_event)
     {
         if (m_currentX != m_previousX || m_currentY != m_previousY)
         {
-            updateModelViewMatrix();
+            rotateCamera();
         }
     }
     m_previousX = m_currentX;
     m_previousY = m_currentY;
-
-    update();
 }
 
 // Scrolling wheel event
-void RenderWidget::wheelEvent(QWheelEvent* p_event)
+void RayCastingInteractor::wheelEvent(QWheelEvent* p_event)
 {
     QPoint deg = p_event->angleDelta();
     float zoomScale = 1.0;
@@ -80,13 +92,10 @@ void RenderWidget::wheelEvent(QWheelEvent* p_event)
     {
         zoomScale = zoomScale * 1.1;
     }
-
-    m_modelViewMatrix.scale(zoomScale);
-
-    update();
+    zoomCamera(zoomScale);
 }
 
-void RenderWidget::updateModelViewMatrix()
+void RayCastingInteractor::rotateCamera()
 {
     QVector3D va = arcballVector(m_previousX, m_previousY);
     QVector3D vb = arcballVector(m_currentX, m_currentY);
@@ -97,100 +106,11 @@ void RenderWidget::updateModelViewMatrix()
             acos(qMax(-1.0f, qMin(1.0f, QVector3D::dotProduct(va, vb))));
         QVector3D axis = QVector3D::crossProduct(va, vb);
 
-        QMatrix4x4 inverseModelViewMatrix = m_modelViewMatrix.inverted();
-        QVector4D transformedAxis =
-            inverseModelViewMatrix * QVector4D(axis, 0.0f);
-        m_modelViewMatrix.rotate(qRadiansToDegrees(angle),
-                                 transformedAxis.toVector3D());
+        RayCastingWidget::rotateCamera(angle, axis);
     }
 }
 
-void RenderWidget::initializeGL()
-{
-    initializeOpenGLFunctions();
-    glEnable(GL_CLIP_DISTANCE0);
-    // initialize geometry
-    Geometry::instance();
-
-    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                               ":shaders/cube-vs.glsl"))
-        qDebug() << "Could not load vertex shader!";
-
-    if (!m_cubeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                               ":shaders/cube-fs.glsl"))
-        qDebug() << "Could not load fragment shader!";
-
-    if (!m_cubeProgram.link())
-        qDebug() << "Could not link shader program!";
-}
-
-void RenderWidget::resizeGL(int w, int h)
-{
-    qreal aspectRatio = static_cast<qreal>(w) / static_cast<qreal>(h);
-
-    m_projectionMatrix.setToIdentity();
-    m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane, m_farPlane);
-}
-
-void RenderWidget::paintGL()
-{
-    int location = -1;
-
-    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    QVector4D planeEquation = {
-        m_properties->clippingPlane().plane().normal().normalized(),
-        m_properties->clippingPlane().plane().d()};
-
-    QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;
-
-    m_cubeProgram.bind();
-    location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
-    m_cubeProgram.setUniformValue(location, planeEquation);
-    location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
-    m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
-    location = m_cubeProgram.uniformLocation("gradientMethod");
-    m_cubeProgram.setUniformValue(
-        location, static_cast<int>(m_properties->gradientMethod().method()));
-
-    auto [width, height, depth] = m_textureStore->volume().getDimensions();
-    location = m_cubeProgram.uniformLocation("width");
-    m_cubeProgram.setUniformValue(location, static_cast<int>(width));
-    location = m_cubeProgram.uniformLocation("height");
-    m_cubeProgram.setUniformValue(location, static_cast<int>(height));
-    location = m_cubeProgram.uniformLocation("depth");
-    m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
-
-    glActiveTexture(GL_TEXTURE0);
-    m_cubeProgram.setUniformValue("volumeTexture", 0);
-    m_textureStore->volume().bind();
-
-    // Transfer Texture
-    glActiveTexture(GL_TEXTURE1);
-    m_cubeProgram.setUniformValue("transferFunction", 1);
-    m_textureStore->transferFunction().bind();
-
-    Geometry::instance().bindCube();
-
-    location = m_cubeProgram.attributeLocation("vertexPosition");
-    m_cubeProgram.enableAttributeArray(location);
-    m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
-                                     sizeof(QVector3D));
-
-    Geometry::instance().drawCube();
-    glActiveTexture(GL_TEXTURE0);
-
-    m_textureStore->transferFunction().release();
-    m_textureStore->volume().release();
-    m_cubeProgram.release();
-}
-
-QVector3D RenderWidget::arcballVector(qreal x, qreal y)
+QVector3D RayCastingInteractor::arcballVector(qreal x, qreal y)
 {
     QVector3D p = QVector3D(
         2.0f * static_cast<float>(x) / static_cast<float>(this->width()) - 1.0f,
@@ -209,26 +129,4 @@ QVector3D RenderWidget::arcballVector(qreal x, qreal y)
         p.normalize();
     }
     return p;
-}
-void RenderWidget::updateBoxScalingMatrix()
-{
-    m_boxScalingMatrix.setToIdentity();
-    auto dims = m_textureStore->volume().getDimensions();
-    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    if (maxDim)
-    {
-        m_boxScalingMatrix.scale(dims / maxDim);
-    }
-}
-
-ExtendedParameterWidget::ExtendedParameterWidget(
-    const std::shared_ptr<ISharedProperties>& properties,
-    const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
-    QWidget* parent)
-    : QWidget(parent), m_parameterWidget(properties, this),
-      m_transferWidget(properties, colorMapStore, this), m_layout{this}
-{
-    m_layout.addWidget(&m_transferWidget);
-    m_layout.addWidget(&m_parameterWidget);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }

@@ -21,19 +21,17 @@ class Geometry
     void bindCube();
     void drawCube();
 
-    void bindObliqueSliceVertex();
-    void bindObliqueSliceTexCoord();
+    void bindObliqueSliceIntersectionCoords();
     void drawObliqueSlice();
 
-    void allocateObliqueSlice(const CubePlaneIntersection& intersection);
+    void allocateObliqueSlice(CubePlaneIntersection& intersection);
 
   private:
     void allocateQuad();
     void allocateCube();
 
     unsigned short m_sliceIndices;
-    QOpenGLBuffer m_sliceVertexBuffer;
-    QOpenGLBuffer m_sliceTextureCoordBuffer;
+    QOpenGLBuffer m_sliceCubeIntersectionCoordBuffer;
     QOpenGLBuffer m_sliceIndexBuffer;
 
     QOpenGLBuffer m_quadVertexBuffer;

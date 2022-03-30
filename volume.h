@@ -22,9 +22,10 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
     void volumeLoaded();
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
+    void gridSpacingChanged(QVector3D dims);
 
   private:
-    QVector<unsigned short> m_volumeData;
+    std::vector<unsigned short> m_volumeData;
     QVector3D m_dims;
     QOpenGLTexture m_volumeTexture;
     bool m_updateNeeded;
@@ -38,13 +39,16 @@ class VolumeLoader : public QThread
     void run() override;
 
   signals:
-    void volumeLoaded(QVector<unsigned short> m_volumeData);
+    void volumeLoaded(const std::vector<unsigned short>& m_volumeData);
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
+    void gridSpacingChanged(QVector3D dims);
 
   private:
+    void loadIni();
     void load();
     QString m_fileName;
+    constexpr static QVector3D UNIFORM_GRID_DIMENSIONS{1,1,1};
 };
 
 #endif // VOLUME_H

@@ -6,7 +6,7 @@
 #include "../geometry/plane.h"
 #include "../geometry/cubeplaneintersection.h"
 
-#include "doctest.h"
+#include "../vendor/doctest/doctest.h"
 
 TEST_CASE("Constructed edge is independent of vertex order")
 {
@@ -98,11 +98,11 @@ TEST_CASE("Cube-plane Intersection produces correct number of vertices")
 {
     Plane threeVertices(QVector4D(0.9, 0.9, 0.9, 1.5));  // Shaves a corner
     CubePlaneIntersection interThree{threeVertices};
-    CHECK(interThree.getVertexPositions().size() == 3);
+    CHECK(interThree.getCubeIntersections().size() == 3);
 
     Plane fourVertices(QVector4D(0, 0, 1, 0));  // Cuts it in half
     CubePlaneIntersection interFour{fourVertices};
-    CHECK(interFour.getVertexPositions().size() == 4);
+    CHECK(interFour.getCubeIntersections().size() == 4);
 
     // TODO: Add cases for 5 and 6 vertices.
 }

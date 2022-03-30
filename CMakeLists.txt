@@ -18,6 +18,13 @@ find_package(Qt6 COMPONENTS REQUIRED
     Xml
     Charts
     )
+# if (MSVC)
+#     # warning level 4 and all warnings as errors
+#     add_compile_options(/Qpar /Qpar-report:2 /Qvec-report:1)
+# else()
+#     # lots of warnings and all warnings as errors
+#     add_compile_options(-Wall -Wextra -pedantic -Werror)
+# endif()
 
 # Set path to our custom CMAKE scripts
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -34,6 +41,8 @@ qt_add_executable(strangevis WIN32
     volume.cpp
     transferfunction.cpp
     transfertexture.cpp
+    renderers/raycastingwidget.cpp
+    renderers/obliqueslicewidget.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp
@@ -41,7 +50,7 @@ qt_add_executable(strangevis WIN32
     ui/renderwidget.cpp
     ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
-    ui/obliqueslicewidget.cpp
+    ui/obliquesliceinteractor.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
     ui/transferfunctiongraph.cpp
