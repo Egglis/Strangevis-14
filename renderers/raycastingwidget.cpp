@@ -17,6 +17,8 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
 
     connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
             &RayCastingWidget::updateBoxScalingMatrix);
+    connect(&m_textureStore->volume(), &Volume::gridSpacingChanged, this,
+            &RayCastingWidget::updateGridSpacingMatrix);
     connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
             [this]() { update(); });
 }
@@ -85,6 +87,8 @@ void RayCastingWidget::paintGL()
     m_cubeProgram.setUniformValue(location, m_clippingPlane.equation());
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
+    location = m_cubeProgram.uniformLocation("gridSpacingMatrix");
+    m_cubeProgram.setUniformValue(location, m_gridSpacingMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
     m_cubeProgram.setUniformValue(location, static_cast<int>(m_gradientMethod));
 
@@ -137,12 +141,22 @@ void RayCastingWidget::paintGL()
 void RayCastingWidget::updateBoxScalingMatrix(QVector3D dims)
 {
     m_boxScalingMatrix.setToIdentity();
+    auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
     auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
     if (maxDim)
     {
-        m_boxScalingMatrix.scale(dims / maxDim);
+        m_boxScalingMatrix.scale(2* dims / (maxDim + minDim));
     }
-    update();
+}
+
+void RayCastingWidget::updateGridSpacingMatrix(QVector3D dims)
+{
+    m_gridSpacingMatrix.setToIdentity();
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    if (maxDim)
+    {
+        m_gridSpacingMatrix.scale(dims / maxDim);
+    }
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)

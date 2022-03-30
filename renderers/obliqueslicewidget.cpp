@@ -48,6 +48,7 @@ void ObliqueSliceRenderWidget::initializeGL()
             &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
     connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);
+    connect(&m_textureStore->volume(), &Volume::gridSpacingChanged, this, &ObliqueSliceRenderWidget::updateGridSpacing);
     updateObliqueSlice();
 }
 
@@ -63,6 +64,8 @@ void ObliqueSliceRenderWidget::paintGL()
         m_aspectRatioMatrix * m_modelViewMatrix *
         m_cubePlaneIntersection.getModelRotationMatrix() * m_boxScalingMatrix;
     m_sliceProgram.setUniformValue("modelViewMatrix", modelViewMatrix);
+
+    m_sliceProgram.setUniformValue("gridSpacingMatrix", m_gridSpacingMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     m_sliceProgram.setUniformValue("volumeTexture", 0);
@@ -141,4 +144,11 @@ void ObliqueSliceRenderWidget::updateBoxScaling(QVector3D dims)
     auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
     auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
     m_boxScalingMatrix.scale(2 * dims / (minDim + maxDim));
+}
+
+void ObliqueSliceRenderWidget::updateGridSpacing(QVector3D dims)
+{
+    m_gridSpacingMatrix.setToIdentity();
+    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
+    m_gridSpacingMatrix.scale(dims / maxDim);
 }
