@@ -26,7 +26,7 @@ TransferWidget::TransferWidget(
             &TransferProperties::updateColorMap);
     
     m_layout->addWidget(m_selector);
-    int result = m_selector->findText("Oranges");
+    int result = m_selector->findText("gist_grey");
     result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
 
     
