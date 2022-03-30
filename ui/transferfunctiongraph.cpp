@@ -72,9 +72,15 @@ void TransferFunctionGraph::updateGraph()
     m_chart->removeSeries(m_boundingBox);
 
     m_lineSeries->clear();
+    // TODO Hack to get graph to not auto scale to max values in m_lineSeries and m_scatterSeries
+    m_lineSeries->append(QPointF(0, 0));
+    m_lineSeries->append(QPointF(0, 1));
     m_lineSeries->append(m_tfn.getControlPoints());
 
     m_scatterSeries->clear();
+    // TODO Hack to get graph to not auto scale to max values in m_lineSeries and m_scatterSeries
+    m_scatterSeries->append(QPointF(0, 0));
+    m_scatterSeries->append(QPointF(0, 1));
     m_scatterSeries->append(m_tfn.getControlPoints());
 
     m_areaSeries->setUpperSeries(m_lineSeries);
@@ -160,7 +166,6 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
             graphPoint =
                 QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
                         graphPoint.y());
-            qDebug() << m_tfn.getControlPoints();
         }
         m_currentClickedIndex =
             m_tfn.replace(m_currentClickedIndex, outOfBoundsCheck(graphPoint));
