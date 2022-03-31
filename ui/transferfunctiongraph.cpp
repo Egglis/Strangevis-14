@@ -70,25 +70,21 @@ TransferFunctionGraph::TransferFunctionGraph(
 
 void TransferFunctionGraph::updateGraph()
 {
-    qDebug() << m_tfn.getControlPoints()[m_tfn.getControlPoints().size()-1];
-    // TODO only update Sereies instead of remove/replace
-    // Remove series, and replace with new one from control points
+    updatePlotSeries();
+    updateGradient();
+    this->update();
+    emit transferFunctionChanged(m_tfn);
+};
+
+void TransferFunctionGraph::updatePlotSeries(){
     m_chart->removeSeries(m_areaSeries);
     m_chart->removeSeries(m_scatterSeries);
     m_chart->removeSeries(m_boundingBox);
 
     m_lineSeries->clear();
-    // TODO Hack to get graph to not auto scale to max values in m_lineSeries
-    // and m_scatterSeries
-    // m_lineSeries->append(QPointF(0, 0));
-    // m_lineSeries->append(QPointF(0, 1));
     m_lineSeries->append(m_tfn.getControlPoints());
 
     m_scatterSeries->clear();
-    // TODO Hack to get graph to not auto scale to max values in m_lineSeries
-    // and m_scatterSeries
-    // m_scatterSeries->append(QPointF(0, 0));
-    // m_scatterSeries->append(QPointF(0, 1));
     m_scatterSeries->append(m_tfn.getControlPoints());
 
     m_areaSeries->setUpperSeries(m_lineSeries);
@@ -97,8 +93,17 @@ void TransferFunctionGraph::updateGraph()
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
 
+    m_scatterSeries->attachAxis(m_chart->axisX());
+    m_scatterSeries->attachAxis(m_chart->axisY());
+    m_lineSeries->attachAxis(m_chart->axisX());
+    m_lineSeries->attachAxis(m_chart->axisY());
+    m_areaSeries->attachAxis(m_chart->axisX());
+    m_areaSeries->attachAxis(m_chart->axisY());
+};
+
+void TransferFunctionGraph::updateGradient(){
     /* Useless to update graident each time,
-    but will be usefull when you can change colors later*/
+    but will be usefull when you can change colors later */
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
@@ -115,8 +120,6 @@ void TransferFunctionGraph::updateGraph()
     }
 
     m_areaSeries->setBrush(m_gradient);
-    this->update();
-    emit transferFunctionChanged(m_tfn);
 };
 
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
@@ -131,7 +134,7 @@ QPointF TransferFunctionGraph::mapLocalToChartPos(QPointF localpos)
     auto scenePos = mapToScene(
         QPoint(static_cast<int>(localpos.x()), static_cast<int>(localpos.y())));
     auto chartItemPos = chart()->mapFromScene(scenePos);
-    auto chartPos = chart()->mapToValue(chartItemPos);
+    auto chartPos = m_chart->mapToValue(chartItemPos, m_boundingBox);
     return chartPos;
 };
 
@@ -169,10 +172,7 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
-            graphPoint =
-                QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
-                        qMax(qMin(tfn::points::END_POINT.y(), graphPoint.y()),
-                             tfn::points::START_POINT.y()));
+            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),qMax(qMin(tfn::points::END_POINT.y(), graphPoint.y()), tfn::points::START_POINT.y()));
             m_tfn.replace(m_currentClickedIndex, graphPoint);
         } else {
             m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
@@ -198,6 +198,8 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
                 QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
                         qMax(qMin(tfn::points::END_POINT.y(), graphPoint.y()),
                              tfn::points::START_POINT.y()));
+            
+            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(), graphPoint.y());
             m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, graphPoint);
         } else {
             m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));

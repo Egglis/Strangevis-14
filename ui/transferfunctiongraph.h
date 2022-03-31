@@ -19,6 +19,7 @@ class TransferFunctionGraph : public QChartView
   public:
     TransferFunctionGraph(const std::shared_ptr<ISharedProperties> properties);
     void updateGraph();
+
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
     void updateClickedIndex(const QPointF& point);
@@ -36,6 +37,8 @@ class TransferFunctionGraph : public QChartView
     QPointF mapLocalToChartPos(QPointF localPos);
     // Checks if point is out of bounds and returns max x/y pointF
     QPointF clampToDomain(QPointF point);
+    void updateGradient();
+    void updatePlotSeries();
 
     int m_currentClickedIndex = -1;
 
