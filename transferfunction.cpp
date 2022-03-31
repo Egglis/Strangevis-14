@@ -1,14 +1,15 @@
 #include "transferfunction.h"
 
 #include "transfertexture.h"
+#include <exception> 
 
 namespace tfn
 {
 
-TransferFunction::TransferFunction() : m_type("LINEAR")
+TransferFunction::TransferFunction()
 {
-    m_controlPoints.push_back(QPointF(0, 0));
-    m_controlPoints.push_back(QPointF(255, 1));
+    m_controlPoints.push_back(points::START_POINT);
+    m_controlPoints.push_back(points::END_POINT);
 };
 
 bool TransferFunction::addControlPoint(QPointF pos)
@@ -32,29 +33,26 @@ bool TransferFunction::addControlPoint(QPointF pos)
 void TransferFunction::reset()
 {
     m_controlPoints.clear();
-    m_controlPoints.push_back(QPointF(0, 0));
-    m_controlPoints.push_back(QPointF(255, 1));
+    m_controlPoints.push_back(tfn::points::START_POINT);
+    m_controlPoints.push_back(tfn::points::END_POINT);
 };
 
-/*
-Applies the transfer function on colormap: cmap
-*/
 std::vector<GLfloat>
-TransferFunction::applyTransferFunction(std::vector<GLfloat> cmap)
+TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 {
     std::vector<GLfloat> new_cmap{};
-    new_cmap.reserve(size::ArraySize);
+    new_cmap.reserve(tfn::size::ARRAY_SIZE);
 
-    int from_x = 0; // From x
+    int from_x = 0;
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
-        int target_x = (int)m_controlPoints[i + 1].x(); // Target x
+        int target_x = static_cast<int>(m_controlPoints[i + 1].x());
         for (int t = from_x; t <= target_x; t++)
         {
-            auto r = cmap[t * size::NumChannels];
-            auto g = cmap[(t * size::NumChannels) + 1];
-            auto b = cmap[(t * size::NumChannels) + 2];
-            auto a = solveLineEquation(m_controlPoints[i],
+            auto r = cmap[t * tfn::size::NUM_CHANNELS];
+            auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
+            auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
+            auto a = getInterpolatedValueBetweenPoints(m_controlPoints[i],
                                        m_controlPoints[i + 1], t);
             new_cmap.push_back(r);
             new_cmap.push_back(g);
@@ -63,14 +61,17 @@ TransferFunction::applyTransferFunction(std::vector<GLfloat> cmap)
         }
         from_x = target_x + 1;
     }
-    assert(new_cmap.size() == size::ArraySize);
+    assert(new_cmap.size() == tfn::size::ARRAY_SIZE);
     return new_cmap;
 }
 
-float TransferFunction::solveLineEquation(QPointF p0, QPointF p1, int t)
+constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0, QPointF p1, int t)
 {
-    float m = (p1.y() - p0.y()) / (p1.x() - p0.x());
-    return m * (t - p0.x()) + p0.y();
+    float a = (p1.y() - p0.y());
+    float b = (p1.x() - p0.x());
+    assert(b > 0 || b < 0);
+    float m = a / b;
+    return  m * (t - p0.x()) + p0.y();
 };
 
 int TransferFunction::replace(int index, QPointF point)

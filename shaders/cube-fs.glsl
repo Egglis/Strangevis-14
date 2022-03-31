@@ -17,7 +17,6 @@ void main(void)
     vec3 gradient = calculateGradient();
     float volumeValue = texture(volumeTexture, vec3(volumePosition.xyz)).r;
     vec4 color = texture(transferFunction, volumeValue);
-    //fragmentColor = vec4(color.rgb, length(gradient));
     fragmentColor = color;
 }
 

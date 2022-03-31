@@ -44,9 +44,6 @@ RayCastingInteractor::RayCastingInteractor(
             &GradientProperties::gradientMethodChanged, this,
             &RayCastingInteractor::changeGradientMethod);
 
-    connect(&m_properties.get()->transferFunction(),
-            &tfn::TransferProperties::colorMapChanged, this,
-            [this]() { update(); });
 
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged, this,

@@ -21,8 +21,8 @@ class TransferFunctionGraph : public QChartView
     void updateGraph();
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
-    void pointPressed(const QPointF& point);
-    void graphClicked(const QPointF& point);
+    void updateClickedIndex(const QPointF& point);
+    void addNewControlPoint(const QPointF& point);
   protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
@@ -35,18 +35,17 @@ class TransferFunctionGraph : public QChartView
     // Maps local coords to chart coords
     QPointF mapLocalToChartPos(QPointF localPos);
     // Checks if point is out of bounds and returns max x/y pointF
-    QPointF outOfBoundsCheck(QPointF point);
+    QPointF clampToDomain(QPointF point);
 
     int m_currentClickedIndex = -1;
 
     // Styling options
-    int POINT_SIZE = 15;
-    int LINE_WIDTH = 3;
-    QColor POINT_BORDER_COLOR = QColor(0, 0, 0);
-    QColor POINT_COLOR = QColor(150, 150, 150, 0.4);
-    QColor LINE_COLOR = QColor(165, 165, 164);
+    constexpr static int POINT_SIZE = 15;
+    constexpr static int LINE_WIDTH = 3;
+    constexpr static QColor POINT_BORDER_COLOR = QColor(0, 0, 0);
+    constexpr static QColor POINT_COLOR = QColor(150, 150, 150, 0.4);
+    constexpr static QColor LINE_COLOR = QColor(165, 165, 164);
 
-    // Qwidgets
     ColorMap m_cmap;
     QChart* m_chart;
     TransferFunction m_tfn;

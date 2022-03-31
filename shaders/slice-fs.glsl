@@ -10,6 +10,5 @@ void main(void)
 {
     float volumeValue = texture(volumeTexture, texCoords).r;
     vec4 color = texture(transferFunction, volumeValue);
-    // fragmentColor = vec4(color, 1.0);
     fragmentColor = color;
 }

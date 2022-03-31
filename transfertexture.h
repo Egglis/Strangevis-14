@@ -15,9 +15,9 @@ namespace tfn
 
 namespace size
 {
-constexpr static int NumPoints = 256;
-constexpr static int NumChannels = 4;
-constexpr static int ArraySize = NumPoints * NumChannels;
+constexpr static int NUM_POINTS = 256;
+constexpr static int NUM_CHANNELS = 4;
+constexpr static int ARRAY_SIZE = NUM_POINTS * NUM_CHANNELS;
 } // namespace size
 class ColorMap
 {

@@ -26,7 +26,7 @@ TransferWidget::TransferWidget(
             &TransferProperties::updateColorMap);
     
     m_layout->addWidget(m_selector);
-    int result = m_selector->findText("gist_grey");
+    int result = m_selector->findText("gist_gray");
     result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
 
     
@@ -42,7 +42,6 @@ void TransferWidget::setSelectedColorMap(const QString& name)
 };
 
 
-// Color Map Selector 
 ColorMapSelector::ColorMapSelector(QWidget* parent,
                                    std::vector<QString> colorMaps)
     : QComboBox(parent)
