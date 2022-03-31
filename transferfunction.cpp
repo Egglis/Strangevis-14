@@ -14,7 +14,7 @@ TransferFunction::TransferFunction()
 
 bool TransferFunction::addControlPoint(QPointF pos)
 {
-    if (pos.x() <= 0 || pos.x() >= 255 || pos.y() <= 0 || pos.y() >= 1)
+    if (pos.x() <= tfn::points::START_POINT.x() || pos.x() >= tfn::points::END_POINT.x() || pos.y() <= tfn::points::START_POINT.y() || pos.y() >= tfn::points::END_POINT.y())
     {
         return false;
     }
@@ -42,11 +42,11 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 {
     std::vector<GLfloat> new_cmap{};
     new_cmap.reserve(tfn::size::ARRAY_SIZE);
-
     int from_x = 0;
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
-        int target_x = static_cast<int>(m_controlPoints[i + 1].x());
+        auto norm = m_controlPoints[i + 1].x()/tfn::points::END_POINT.x();
+        int target_x = static_cast<int>(norm*(tfn::size::NUM_POINTS-1));
         for (int t = from_x; t <= target_x; t++)
         {
             auto r = cmap[t * tfn::size::NUM_CHANNELS];

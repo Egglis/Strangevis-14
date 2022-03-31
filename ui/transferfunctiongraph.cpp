@@ -35,10 +35,10 @@ TransferFunctionGraph::TransferFunctionGraph(
 
     // Bounding box for hit detection
     QLineSeries* lines = new QLineSeries();
-    lines->append(QPointF(0, 0));
-    lines->append(QPointF(0, 1));
-    lines->append(QPointF(255, 1));
-    lines->append(QPointF(255, 0));
+    lines->append(QPointF(tfn::points::START_POINT.x(), tfn::points::START_POINT.y()));
+    lines->append(QPointF(tfn::points::START_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(QPointF(tfn::points::END_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
     m_boundingBox = new QAreaSeries(lines);
     m_boundingBox->setColor(QColor(0, 0, 0, 0));
 
@@ -47,8 +47,8 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_scatterSeries);
     m_chart->createDefaultAxes();
     auto axes = m_chart->axes();
-    axes[0]->setRange(0, 255);
-    axes[1]->setRange(0, 1);
+    axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
+    axes[1]->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
 
     m_chart->setTitle("TransferFunction");
 

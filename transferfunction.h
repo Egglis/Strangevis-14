@@ -11,7 +11,7 @@ namespace tfn
 namespace points
 {
 constexpr static QPointF START_POINT = QPointF(0, 0);
-constexpr static QPointF END_POINT = QPointF(255,1);
+constexpr static QPointF END_POINT = QPointF(4095,1);
 }; // namespace points
 
 class TransferFunction
