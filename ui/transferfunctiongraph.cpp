@@ -142,7 +142,7 @@ QPointF TransferFunctionGraph::clampToDomain(QPointF point)
 {
     QPointF max = tfn::points::END_POINT;
     QPointF min = tfn::points::START_POINT;
-    return QPointF(qMax(qMin(max.x() - 0.001, point.x()), min.x() + 0.001),
+    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
                    qMax(qMin(max.y(), point.y()), min.y()));
 };
 
@@ -164,19 +164,17 @@ void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
 // When draggins a point is finished replace point with new location
 void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
 {
-    QChartView::mouseReleaseEvent(event);
-
-    QPointF graphPoint = mapLocalToChartPos(event->localPos());
     if (m_currentClickedIndex != -1)
     {
+        QChartView::mouseReleaseEvent(event);
+        QPointF graphPoint = mapLocalToChartPos(event->localPos());
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
-            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),qMax(qMin(tfn::points::END_POINT.y(), graphPoint.y()), tfn::points::START_POINT.y()));
-            m_tfn.replace(m_currentClickedIndex, graphPoint);
-        } else {
-            m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
+            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(), graphPoint.y());
         }
+
+        m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
         updateGraph();
         m_currentClickedIndex = -1;
     }
@@ -185,25 +183,17 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
 // Mouse event for handeling dragging of a point
 void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
 {
-    QChartView::mouseMoveEvent(event);
-
-    QPointF graphPoint = mapLocalToChartPos(event->localPos());
     if (m_currentClickedIndex != -1)
     {
+        QChartView::mouseMoveEvent(event);
+        QPointF graphPoint = mapLocalToChartPos(event->localPos());
         // First point or last point click only able to move in y-direction.
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
-            graphPoint =
-                QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
-                        qMax(qMin(tfn::points::END_POINT.y(), graphPoint.y()),
-                             tfn::points::START_POINT.y()));
-            
             graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(), graphPoint.y());
-            m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, graphPoint);
-        } else {
-            m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
         }
+        m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
         updateGraph();
     }
 };
