@@ -7,48 +7,42 @@ TransferFunctionGraph::TransferFunctionGraph(
     const std::shared_ptr<ISharedProperties> properties)
     : m_properties{properties}
 {
-    m_tfn = TransferFunction();
-
-    m_chart = new QChart();
     m_chart->legend()->hide();
-
-    m_pen = new QPen(LINE_COLOR);
     m_pen->setWidth(LINE_WIDTH);
 
     // Linear gradient for areaSeries
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
-    m_lineSeries = new QLineSeries();
-
     // Used to display control points as scatterplot
-    m_scatterSeries = new QScatterSeries();
     m_scatterSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
     m_scatterSeries->setMarkerSize(POINT_SIZE);
     m_scatterSeries->setBorderColor(POINT_BORDER_COLOR);
     m_scatterSeries->setColor(POINT_COLOR);
 
     // Used to display gradient below the line
-    m_areaSeries = new QAreaSeries();
     m_areaSeries->setName("Gradient Display");
     m_areaSeries->setPen(*m_pen);
 
     // Bounding box for hit detection
     QLineSeries* lines = new QLineSeries();
-    lines->append(QPointF(tfn::points::START_POINT.x(), tfn::points::START_POINT.y()));
-    lines->append(QPointF(tfn::points::START_POINT.x(), tfn::points::END_POINT.y()));
-    lines->append(QPointF(tfn::points::END_POINT.x(), tfn::points::END_POINT.y()));
-    lines->append(QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::START_POINT.x(), tfn::points::START_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::START_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::END_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
     m_boundingBox = new QAreaSeries(lines);
     m_boundingBox->setColor(QColor(0, 0, 0, 0));
 
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_scatterSeries);
-    m_chart->createDefaultAxes();
-    auto axes = m_chart->axes();
-    axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
-    axes[1]->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
+
+    m_axisX->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
+    m_axisY->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
 
     m_chart->setTitle("TransferFunction");
 
@@ -76,7 +70,8 @@ void TransferFunctionGraph::updateGraph()
     emit transferFunctionChanged(m_tfn);
 };
 
-void TransferFunctionGraph::updatePlotSeries(){
+void TransferFunctionGraph::updatePlotSeries()
+{
     m_chart->removeSeries(m_areaSeries);
     m_chart->removeSeries(m_scatterSeries);
     m_chart->removeSeries(m_boundingBox);
@@ -93,15 +88,16 @@ void TransferFunctionGraph::updatePlotSeries(){
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
 
-    m_scatterSeries->attachAxis(m_chart->axisX());
-    m_scatterSeries->attachAxis(m_chart->axisY());
-    m_lineSeries->attachAxis(m_chart->axisX());
-    m_lineSeries->attachAxis(m_chart->axisY());
-    m_areaSeries->attachAxis(m_chart->axisX());
-    m_areaSeries->attachAxis(m_chart->axisY());
+    m_scatterSeries->attachAxis(m_axisX);
+    m_scatterSeries->attachAxis(m_axisY);
+    m_lineSeries->attachAxis(m_axisX);
+    m_lineSeries->attachAxis(m_axisY);
+    m_areaSeries->attachAxis(m_axisX);
+    m_areaSeries->attachAxis(m_axisY);
 };
 
-void TransferFunctionGraph::updateGradient(){
+void TransferFunctionGraph::updateGradient()
+{
     /* Useless to update graident each time,
     but will be usefull when you can change colors later */
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
@@ -171,7 +167,9 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
-            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(), graphPoint.y());
+            graphPoint =
+                QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
+                        graphPoint.y());
         }
 
         m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
@@ -191,9 +189,12 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
-            graphPoint = QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(), graphPoint.y());
+            graphPoint =
+                QPointF(m_tfn.getControlPoints()[m_currentClickedIndex].x(),
+                        graphPoint.y());
         }
-        m_currentClickedIndex = m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
+        m_currentClickedIndex =
+            m_tfn.replace(m_currentClickedIndex, clampToDomain(graphPoint));
         updateGraph();
     }
 };

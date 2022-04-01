@@ -24,6 +24,7 @@ class TransferFunctionGraph : public QChartView
   public slots:
     void updateClickedIndex(const QPointF& point);
     void addNewControlPoint(const QPointF& point);
+
   protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
@@ -49,14 +50,18 @@ class TransferFunctionGraph : public QChartView
     constexpr static QColor POINT_COLOR = QColor(150, 150, 150, 0.4);
     constexpr static QColor LINE_COLOR = QColor(165, 165, 164);
 
+    TransferFunction m_tfn = TransferFunction();
     ColorMap m_cmap;
-    QChart* m_chart;
-    TransferFunction m_tfn;
-    QLineSeries* m_lineSeries;
-    QAreaSeries* m_areaSeries;
+
+    QChart* m_chart = new QChart();
+    QValueAxis* m_axisX = new QValueAxis();
+    QValueAxis* m_axisY = new QValueAxis();
+    QLineSeries* m_lineSeries = new QLineSeries();
+    QAreaSeries* m_areaSeries = new QAreaSeries();
+    QScatterSeries* m_scatterSeries = new QScatterSeries();
     QAreaSeries* m_boundingBox;
-    QScatterSeries* m_scatterSeries;
-    QPen* m_pen;
+    QPen* m_pen = new QPen(LINE_COLOR);
+    ;
     QLinearGradient m_gradient;
 };
 } // namespace tfn
