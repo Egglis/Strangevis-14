@@ -54,14 +54,11 @@ class TransferFunctionGraph : public QChartView
     ColorMap m_cmap;
 
     QChart* m_chart = new QChart();
-    QValueAxis* m_axisX = new QValueAxis();
-    QValueAxis* m_axisY = new QValueAxis();
     QLineSeries* m_lineSeries = new QLineSeries();
     QAreaSeries* m_areaSeries = new QAreaSeries();
     QScatterSeries* m_scatterSeries = new QScatterSeries();
     QAreaSeries* m_boundingBox;
     QPen* m_pen = new QPen(LINE_COLOR);
-    ;
     QLinearGradient m_gradient;
 };
 } // namespace tfn

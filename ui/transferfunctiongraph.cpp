@@ -40,9 +40,13 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_scatterSeries);
+    m_chart->createDefaultAxes();
+    auto axes = m_chart->axes();
+    axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
+    axes[1]->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
+    axes[0]->setLabelsVisible(false);
+    axes[1]->setLabelsVisible(false);
 
-    m_axisX->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
-    m_axisY->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
 
     m_chart->setTitle("TransferFunction");
 
@@ -88,12 +92,13 @@ void TransferFunctionGraph::updatePlotSeries()
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
 
-    m_scatterSeries->attachAxis(m_axisX);
-    m_scatterSeries->attachAxis(m_axisY);
-    m_lineSeries->attachAxis(m_axisX);
-    m_lineSeries->attachAxis(m_axisY);
-    m_areaSeries->attachAxis(m_axisX);
-    m_areaSeries->attachAxis(m_axisY);
+    m_scatterSeries->attachAxis(m_chart->axisX());
+    m_scatterSeries->attachAxis(m_chart->axisY());
+    m_lineSeries->attachAxis(m_chart->axisX());
+    m_lineSeries->attachAxis(m_chart->axisY());
+    m_areaSeries->attachAxis(m_chart->axisX());
+    m_areaSeries->attachAxis(m_chart->axisY());
+
 };
 
 void TransferFunctionGraph::updateGradient()
