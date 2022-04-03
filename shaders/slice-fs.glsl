@@ -9,6 +9,6 @@ layout(location = 1) uniform sampler1D transferFunction;
 void main(void)
 {
     float volumeValue = texture(volumeTexture, texCoords).r;
-    vec3 color = texture(transferFunction, volumeValue).rgb;
-    fragmentColor = vec4(color, 1.0);
+    vec4 color = texture(transferFunction, volumeValue);
+    fragmentColor = color;
 }

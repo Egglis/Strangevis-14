@@ -19,6 +19,12 @@ void TransferTexture::setColorMap(std::vector<GLfloat> colormap)
     m_updateNeeded = true;
 };
 
+void TransferTexture::setTransferFunction(TransferFunction tfn)
+{
+    m_tfn = tfn;
+    m_updateNeeded = true;
+}
+
 void TransferTexture::bind()
 {
     if (m_updateNeeded)
@@ -35,10 +41,10 @@ void TransferTexture::bind()
         m_transferTexture.setMagnificationFilter(QOpenGLTexture::Nearest);
         m_transferTexture.setAutoMipMapGenerationEnabled(false);
         m_transferTexture.setMipLevels(0);
-        m_transferTexture.setSize(tfn::size::NumPoints);
+        m_transferTexture.setSize(tfn::size::NUM_POINTS);
         m_transferTexture.allocateStorage();
-        m_transferTexture.setData(QOpenGLTexture::RGB, QOpenGLTexture::Float32,
-                                  m_colorMap.data());
+        m_transferTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32,
+                                  m_tfn.applyTransferFunction(m_colorMap).data());
 
         m_updateNeeded = false;
     }
@@ -61,17 +67,17 @@ ColorMap::ColorMap(QString name, std::vector<GLfloat>& data)
 
 ColorMap::ColorMap() : m_name{"Ramp Grey"}
 {
-    using namespace size;
-    m_colorMapData.reserve(ArraySize);
-    for (int i = 0; i < ArraySize; i += NumChannels)
+    using namespace tfn::size;
+    m_colorMapData.reserve(ARRAY_SIZE);
+    for (int i = 0; i < ARRAY_SIZE; i += NUM_CHANNELS)
     {
-        for (int j = 0; j < NumChannels; j++)
+        for (int j = 0; j < NUM_CHANNELS; j++)
         {
-            m_colorMapData.push_back((i / NumChannels) /
-                                     static_cast<GLfloat>(NumPoints - 1));
+            m_colorMapData.push_back((i / NUM_CHANNELS) /
+                                     static_cast<GLfloat>(NUM_POINTS - 1));
         }
     }
-    assert(m_colorMapData.size() == ArraySize);
+    assert(m_colorMapData.size() == ARRAY_SIZE);
 }
 
 ColorMapStore::ColorMapStore() : m_defaultColorMap{ColorMap{}}
@@ -117,9 +123,9 @@ bool ColorMapStore::loadColorMapsFromFile(QString path)
             // Extract RGB values and alpha values
             QDomElement child = component.firstChild().toElement();
             std::vector<GLfloat> colors{};
-            colors.reserve(size::ArraySize);
+            colors.reserve(tfn::size::ARRAY_SIZE);
             std::vector<QVector4D> sortableColors{};
-            sortableColors.reserve(size::NumPoints);
+            sortableColors.reserve(tfn::size::NUM_POINTS);
 
             int index = 0;
             while (!child.isNull())
@@ -143,8 +149,9 @@ bool ColorMapStore::loadColorMapsFromFile(QString path)
                 colors.push_back(color.x()); // r
                 colors.push_back(color.y()); // g
                 colors.push_back(color.z()); // b
+                colors.push_back(color.w()); // a 
             }
-            assert(colors.size() == size::ArraySize);
+            assert(colors.size() == tfn::size::ARRAY_SIZE);
             ColorMap cmap = ColorMap(name, colors);
             m_colorMaps.insert(name, cmap);
         }

@@ -27,7 +27,7 @@ RayCastingInteractor::RayCastingInteractor(
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : RayCastingWidget(
-          RenderProperties{1.0, properties->colorMap().colorMap(),
+          RenderProperties{1.0, properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->gradientMethod().method(),
                            Projection::Orthographic},
@@ -44,8 +44,13 @@ RayCastingInteractor::RayCastingInteractor(
             &GradientProperties::gradientMethodChanged, this,
             &RayCastingInteractor::changeGradientMethod);
 
-    connect(&m_properties.get()->colorMap(),
+
+    connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged, this,
+            [this]() { update(); });
+
+    connect(&m_properties.get()->transferFunction(),
+            &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
 }
 

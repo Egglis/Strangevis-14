@@ -2,12 +2,15 @@
 #define TRANSFERFUNCTIONWIDGET_H
 
 #include "../transfertexture.h"
+#include "transferfunctiongraph.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QOpenGLTexture>
 #include <QSlider>
 #include <QWidget>
+#include <QGraphicsView>
+#include <QtCharts>
 
 class ISharedProperties;
 /*
@@ -37,14 +40,13 @@ class TransferWidget : public QWidget
     void setSelectedColorMap(const QString& name);
   signals:
     void valueChanged(const QString& cmap);
-
   private:
     const std::shared_ptr<ISharedProperties> m_properties;
     const std::shared_ptr<const IColorMapStore> m_colorMapStore;
     QHBoxLayout* m_layout;
     QString m_selectedColorMap;
     ColorMapSelector* m_selector;
-    std::vector<ColorMap> m_colorMaps;
+    TransferFunctionGraph* m_tfnGraph;
 };
 
 } // namespace tfn

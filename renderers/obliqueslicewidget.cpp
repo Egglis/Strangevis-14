@@ -14,6 +14,9 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
     m_modelViewMatrix.scale(1 / sqrt(3.0));
+    connect(&m_properties.get()->transferFunction(),
+            &tfn::TransferProperties::colorMapChanged,
+            [this]() { update(); });
 }
 
 void ObliqueSliceRenderWidget::initializeGL()
@@ -44,7 +47,7 @@ void ObliqueSliceRenderWidget::initializeGL()
                 updateObliqueSlice();
                 update();
             });
-    connect(&m_properties.get()->colorMap(),
+    connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
     connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);

@@ -16,6 +16,7 @@ find_package(Qt6 COMPONENTS REQUIRED
     Widgets
     OpenGLWidgets
     Xml
+    Charts
     )
 # if (MSVC)
 #     # warning level 4 and all warnings as errors
@@ -38,6 +39,7 @@ qt_add_executable(strangevis WIN32
     geometry.cpp
     texturestore.cpp
     volume.cpp
+    transferfunction.cpp
     transfertexture.cpp
     renderers/raycastingwidget.cpp
     renderers/obliqueslicewidget.cpp
@@ -51,6 +53,7 @@ qt_add_executable(strangevis WIN32
     ui/obliquesliceinteractor.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
+    ui/transferfunctiongraph.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp
@@ -91,6 +94,7 @@ target_link_libraries(strangevis PRIVATE
     Qt6::Widgets
     Qt6::OpenGLWidgets
     Qt6::Xml
+    Qt6::Charts
 )
 windeployqt(strangevis)
 
