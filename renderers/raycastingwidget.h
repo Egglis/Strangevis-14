@@ -44,17 +44,11 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void changeGradientMethod(GradientMethod method);
     void changeTransferFunction(QString transferFunctionName);
 
-  private slots:
-    void updateBoxScalingMatrix(QVector3D dims);
-    void updateGridSpacingMatrix(QVector3D dims);
-
   private:
     const std::shared_ptr<ITextureStore> m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
-    QMatrix4x4 m_modelViewMatrix;
-    QMatrix4x4 m_boxScalingMatrix;
-    QMatrix4x4 m_gridSpacingMatrix;
+    QMatrix4x4 m_viewMatrix;
     GradientMethod m_gradientMethod;
     Projection m_projectionMode;
     QString m_transferFunctionName;

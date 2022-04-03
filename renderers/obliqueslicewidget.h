@@ -32,9 +32,6 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
     virtual void zoomCamera(float zoomFactor);
-  private slots:
-    void updateBoxScaling(QVector3D dims);
-    void updateGridSpacing(QVector3D dims);
   private:
     void correctQuadForAspectRatio(int w, int h);
     void updateTransferTexture(tfn::ColorMap cmap);
@@ -42,10 +39,8 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     const std::shared_ptr<const ISharedProperties> m_properties;
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;
-    QMatrix4x4 m_modelViewMatrix;
+    QMatrix4x4 m_viewMatrix;
     QMatrix4x4 m_aspectRatioMatrix;
-    QMatrix4x4 m_boxScalingMatrix;
-    QMatrix4x4 m_gridSpacingMatrix;
     float m_prevRotation;
     bool m_horizontalFlipped;
     bool m_verticalFlipped;
