@@ -1,41 +1,93 @@
 #version 450
 
-in vec3 volumePosition;
 out vec4 fragmentColor;
 
 layout(location = 0) uniform sampler3D volumeTexture;
 layout(location = 1) uniform sampler1D transferFunction;
+
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+uniform vec2 viewportSize;
+uniform float aspectRatio;
+uniform float focalLength;
+uniform vec3 rayOrigin;
+
 uniform int gradientMethod;
 uniform int width;
 uniform int height;
 uniform int depth;
 
+float stepLength = 0.01;
+
 struct Ray
 {
     vec3 origin;
     vec3 direction;
-    vec3 invDirection;
 } ray;
 
-struct Box
+struct AABB
 {
-    vec3 minCorner; // -1,-1,-1
-    vec3 maxCorner; //  1, 1, 1
+    vec3 top;
+    vec3 bottom;
 } box;
 
-vec3 calculateGradient();
-Ray generateRay(vec3 origin, vec3 direction);
-bool rayCubeIntersection(Ray ray, Box box, out float tmin, out float tmax);
+vec3 calculateGradient(vec3 volumePosition);
+
+// Slab-intersection method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
+void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
+{
+    vec3 invDirection = 1.0 / ray.direction;
+    vec3 tTop = invDirection * (box.top - ray.origin);
+    vec3 tBottom = invDirection * (box.bottom - ray.origin);
+    vec3 tMin = min(tTop, tBottom);
+    vec2 t = max(tMin.xx, tMin.yz);
+    tmin = max(0.0, max(t.x, t.y));
+    vec3 tMax = max(tTop, tBottom);
+    t = min(tMax.xx, tMax.yz);
+    tmax = min(t.x, t.y);
+}
 
 void main(void)
 {
-    vec3 gradient = calculateGradient();
-    float volumeValue = texture(volumeTexture, vec3(volumePosition.xyz)).r;
-    vec4 color = texture(transferFunction, volumeValue);
+    // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
+    vec3 rayDirection;
+    rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
+    rayDirection.x *= aspectRatio;
+    rayDirection.z = -focalLength;
+    rayDirection = (vec4(rayDirection, 0) * viewMatrix).xyz;
+
+    float tmin, tmax;
+    Ray castingRay = Ray(rayOrigin, rayDirection);
+    vec3 top = vec3(modelMatrix * vec4(1, 1, 1, 0));
+    vec3 bottom = vec3(modelMatrix * vec4(-1, -1, -1, 0));
+    AABB boundingBox = AABB(top, bottom);
+    rayBoxIntersection(castingRay, boundingBox, tmin, tmax);
+
+    vec3 rayStart = (rayOrigin + rayDirection * tmin - bottom) / (top - bottom);
+    vec3 rayEnd = (rayOrigin + rayDirection * tmax - bottom) / (top - bottom);
+
+    vec3 ray = rayEnd - rayStart;
+    float rayLength = length(ray);
+    vec3 stepVector = stepLength * ray / rayLength;
+
+    vec3 position = rayStart;
+
+    float maxIntensity = 0.0f;
+    while (rayLength > 0)
+    {
+
+        float intensity = texture(volumeTexture, position).r;
+        maxIntensity = max(intensity, maxIntensity);
+
+        rayLength -= stepLength;
+        position += stepVector;
+    }
+
+    vec4 color = texture(transferFunction, maxIntensity);
     fragmentColor = color;
 }
 
-vec3 calculateGradient()
+vec3 calculateGradient(vec3 volumePosition)
 {
     vec3 gradient = vec3(0.0f);
     if (width == 0 || height == 0 || depth == 0)
@@ -87,42 +139,4 @@ vec3 calculateGradient()
                       texture(volumeTexture, vec3(x, y, z - dz)).r);
     }
     return gradient;
-}
-
-// Pre-calculate the inverse direction so intersection tests don't recalculate
-// this
-Ray generateRay(vec3 origin, vec3 direction)
-{
-    Ray ray;
-    ray.origin = origin;
-    ray.direction = direction;
-    ray.invDirection = 1.0f/direction;
-    return ray;
-}
-
-// Slab method for intersection
-// We know the axis-aligned bounding box is cornered at -1..1
-// If it returns true, it intersected the box entering at tmin and exiting at
-// tmax
-bool rayCubeIntersection(Ray ray, Box box, out float tmin, out float tmax)
-{
-    float tx0 = ray.invDirection.x*(box.minCorner.x - ray.origin.x);
-    float tx1 = ray.invDirection.x*(box.maxCorner.x - ray.origin.x);
-
-    tmin = min(tx0, tx1);
-    tmax = max(tx0, tx1);
-
-    float ty0 = ray.invDirection.y*(box.minCorner.y - ray.origin.y);
-    float ty1 = ray.invDirection.y*(box.maxCorner.y - ray.origin.y);
-
-    tmin = max(tmin, min(ty0, ty1));
-    tmax = min(tmax, max(ty0, ty1));
-
-    float tz0 = ray.invDirection.z*(box.minCorner.z - ray.origin.z);
-    float tz1 = ray.invDirection.z*(box.maxCorner.z - ray.origin.z);
-
-    tmin = max(tmin, min(tz0, ty1));
-    tmax = min(tmax, max(tz0, tz1));
-
-    return tmin <= tmax;
 }

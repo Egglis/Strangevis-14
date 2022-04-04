@@ -30,7 +30,7 @@ RayCastingInteractor::RayCastingInteractor(
           RenderProperties{1.0, properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->gradientMethod().method(),
-                           Projection::Orthographic},
+                           Projection::Perspective},
           textureStore, parent, f),
       m_properties{properties}
 {

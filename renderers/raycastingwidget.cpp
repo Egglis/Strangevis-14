@@ -36,7 +36,7 @@ void RayCastingWidget::zoomCamera(float zoomFactor)
 void RayCastingWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    glEnable(GL_CLIP_DISTANCE0);
+    glEnable(GL_DEPTH_TEST);
     // initialize geometry
     Geometry::instance();
 
@@ -78,13 +78,28 @@ void RayCastingWidget::paintGL()
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_viewMatrix * m_textureStore->volume().modelMatrix();
 
+    QVector3D rayOrigin = m_viewMatrix.inverted()*QVector3D(0,0,0);
+
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
     m_cubeProgram.setUniformValue(location, m_clippingPlane.equation());
+    location = m_cubeProgram.uniformLocation("rayOrigin");
+    m_cubeProgram.setUniformValue(location, rayOrigin);
+    location = m_cubeProgram.uniformLocation("viewMatrix");
+    m_cubeProgram.setUniformValue(location, m_viewMatrix);
+    location = m_cubeProgram.uniformLocation("modelMatrix");
+    m_cubeProgram.setUniformValue(location, m_textureStore->volume().modelMatrix());
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
     m_cubeProgram.setUniformValue(location, static_cast<int>(m_gradientMethod));
+
+    location = m_cubeProgram.uniformLocation("focalLength");
+    m_cubeProgram.setUniformValue(location, m_focalLength);
+    location = m_cubeProgram.uniformLocation("viewportSize");
+    m_cubeProgram.setUniformValue(location, QVector2D{static_cast<float>(width()), static_cast<float>(height())});
+    location = m_cubeProgram.uniformLocation("aspectRatio");
+    m_cubeProgram.setUniformValue(location, static_cast<float>(width())/height());
 
     auto [width, height, depth] = m_textureStore->volume().getDimensions();
     location = m_cubeProgram.uniformLocation("width");
@@ -112,19 +127,6 @@ void RayCastingWidget::paintGL()
 
     Geometry::instance().drawCube();
 
-    location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
-    m_cubeProgram.setUniformValue(location, DISABLED_CLIPPING_EQUATION);
-
-    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
-
-    Geometry::instance().bindObliqueSliceIntersectionCoords();
-
-    location = m_cubeProgram.attributeLocation("vertexPosition");
-    m_cubeProgram.enableAttributeArray(location);
-    m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
-                                     sizeof(QVector3D));
-
-    Geometry::instance().drawObliqueSlice();
     glActiveTexture(GL_TEXTURE0);
 
     m_textureStore->transferFunction().release();
