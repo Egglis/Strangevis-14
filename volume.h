@@ -22,6 +22,7 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
   signals:
     void volumeLoaded();
     void loadingStartedOrStopped(bool started);
+    void histogramCalculated(std::vector<float> histogramData);
 
   private:
     QVector3D scaleFactor() const;
@@ -44,6 +45,7 @@ class VolumeLoader : public QThread
     void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
     void gridSpacingChanged(QVector3D dims);
+    void histogramCalculated(std::vector<float> histogramData);
 
   private:
     void loadIni();
