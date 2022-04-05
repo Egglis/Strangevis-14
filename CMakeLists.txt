@@ -47,6 +47,7 @@ qt_add_executable(strangevis WIN32
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
     ui/transferfunctiongraph.cpp
+    ui/histogramwidget.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp
