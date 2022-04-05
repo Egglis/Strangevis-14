@@ -7,6 +7,7 @@
 #include "ui/rectangulargridlayout.h"
 #include "ui/renderwidget.h"
 #include "ui/transferfunctionwidget.h"
+#include "ui/histogramwidget.h"
 
 #include <QAction>
 #include <QFileDialog>
@@ -26,6 +27,12 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
     QAction* fileOpenAction = new QAction("Open", this);
     connect(fileOpenAction, &QAction::triggered, this, &MainWindow::fileOpen);
     fileMenu->addAction(fileOpenAction);
+
+
+    createHistogramWidget();
+    QAction* openHistogramAction = new QAction("Open Histogram", this);
+    connect(openHistogramAction, &QAction::triggered, this, &MainWindow::openHistogram);
+    fileMenu->addAction(openHistogramAction);
 
     menuBar()->addMenu(fileMenu);
 
@@ -61,4 +68,16 @@ void MainWindow::fileOpen()
     {
         m_textureStore->volume().load(fileName);
     }
+}
+
+void MainWindow::createHistogramWidget()
+{
+    m_histogramWidget = new HistogramWidget();
+    connect(&m_textureStore->volume(), &Volume::histogramCalculated, m_histogramWidget, &HistogramWidget::histogramChanged);
+    m_histogramWidget->setAttribute(Qt::WA_QuitOnClose, false);
+}
+
+void MainWindow::openHistogram()
+{
+    m_histogramWidget->show();
 }
