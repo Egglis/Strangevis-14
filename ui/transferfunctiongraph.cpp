@@ -94,8 +94,8 @@ void TransferFunctionGraph::updatePlotSeries()
 
     m_scatterSeries->attachAxis(m_chart->axisX());
     m_scatterSeries->attachAxis(m_chart->axisY());
-    m_lineSeries->attachAxis(m_chart->axisX());
-    m_lineSeries->attachAxis(m_chart->axisY());
+    // m_lineSeries->attachAxis(m_chart->axisX());
+    // m_lineSeries->attachAxis(m_chart->axisY());
     m_areaSeries->attachAxis(m_chart->axisX());
     m_areaSeries->attachAxis(m_chart->axisY());
 

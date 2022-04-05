@@ -1,7 +1,7 @@
 #include "transferfunction.h"
 
 #include "transfertexture.h"
-#include <exception> 
+#include <exception>
 
 namespace tfn
 {
@@ -52,7 +52,6 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
             auto r = cmap[t * tfn::size::NUM_CHANNELS];
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
-            qDebug() << m_controlPoints[i].x();
             auto a = getInterpolatedValueBetweenPoints(m_controlPoints[i], m_controlPoints[i + 1], t);
             new_cmap.push_back(r);
             new_cmap.push_back(g);
@@ -91,7 +90,7 @@ int TransferFunction::replace(int index, QPointF point)
         // Checks if reordering is necassary and sorts controllpoints and returns new index
         QPointF n0 = m_controlPoints[index - 1];
         QPointF n1 = m_controlPoints[index + 1];
-        if (n0.x() > point.x() || n1.x() < point.x()) 
+        if (n0.x() > point.x() || n1.x() < point.x())
         {
             m_controlPoints.replace(index, point);
             std::sort(
