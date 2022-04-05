@@ -5,12 +5,13 @@
 #include "transferfunctiongraph.h"
 
 #include <QComboBox>
+#include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QOpenGLTexture>
 #include <QSlider>
 #include <QWidget>
-#include <QGraphicsView>
 #include <QtCharts>
+
 
 class ISharedProperties;
 /*
@@ -34,12 +35,14 @@ class TransferWidget : public QWidget
 {
     Q_OBJECT
   public:
-    TransferWidget(const std::shared_ptr<ISharedProperties> properties, const std::shared_ptr<const IColorMapStore> colorMapStore,
+    TransferWidget(const std::shared_ptr<ISharedProperties> properties,
+                   const std::shared_ptr<const IColorMapStore> colorMapStore,
                    QWidget* parent);
   public slots:
     void setSelectedColorMap(const QString& name);
   signals:
     void valueChanged(const QString& cmap);
+
   private:
     const std::shared_ptr<ISharedProperties> m_properties;
     const std::shared_ptr<const IColorMapStore> m_colorMapStore;

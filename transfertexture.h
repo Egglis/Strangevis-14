@@ -1,14 +1,14 @@
 #ifndef TRANSFERTEXTURE_H
 #define TRANSFERTEXTURE_H
 
+#include "transferfunction.h"
 
 #include <QColor>
+#include <QMap>
 #include <QObject>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
-#include <QMap>
 #include <vector>
-#include "transferfunction.h"
 
 namespace tfn
 {
@@ -40,7 +40,6 @@ class TransferTexture : public QObject
 
     void addColor();
     void removeColor();
-    // std::vector<GLfloat> getColorMap() { return m_colorMap; };
 
     void bind();
     void release();
@@ -59,11 +58,11 @@ class TransferTexture : public QObject
 class IColorMapStore
 {
   public:
-  virtual ~IColorMapStore(){}
-  virtual bool loadColorMapsFromFile(QString path) = 0;
-  virtual ColorMap colorMap(const QString& name) const = 0;
-  virtual std::vector<QString> availableColorMaps() const = 0;
-  virtual void addColorMap(const ColorMap& colorMap) = 0;
+    virtual ~IColorMapStore() {}
+    virtual bool loadColorMapsFromFile(QString path) = 0;
+    virtual ColorMap colorMap(const QString& name) const = 0;
+    virtual std::vector<QString> availableColorMaps() const = 0;
+    virtual void addColorMap(const ColorMap& colorMap) = 0;
 };
 class ColorMapStore : public IColorMapStore
 {
@@ -73,6 +72,7 @@ class ColorMapStore : public IColorMapStore
     virtual ColorMap colorMap(const QString& name) const;
     virtual void addColorMap(const ColorMap& colorMap);
     virtual std::vector<QString> availableColorMaps() const;
+
   private:
     QMap<QString, ColorMap> m_colorMaps;
     ColorMap m_defaultColorMap;

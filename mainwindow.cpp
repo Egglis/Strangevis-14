@@ -39,16 +39,16 @@ MainWindow::MainWindow(std::shared_ptr<ITextureStore> textureStore,
         new ObliqueSliceRotationWidget(m_properties, this);
 
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
-            p_2dRenderWidget,
-            &ObliqueSliceRenderWidget::flipHorizontal);
+            p_2dRenderWidget, &ObliqueSliceRenderWidget::flipHorizontal);
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical,
-            p_2dRenderWidget,
-            &ObliqueSliceRenderWidget::flipVertical);
+            p_2dRenderWidget, &ObliqueSliceRenderWidget::flipVertical);
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
                              p_2dRenderWidget, p_2dToolBarWidget, this);
-    connect(&textureStore->volume(), &Volume::loadingStartedOrStopped, m_mainWidget, &MainWindowWidget::toggleFileLoadingInProgressOverlay);
+    connect(&textureStore->volume(), &Volume::loadingStartedOrStopped,
+            m_mainWidget,
+            &MainWindowWidget::toggleFileLoadingInProgressOverlay);
     setCentralWidget(m_mainWidget);
 }
 

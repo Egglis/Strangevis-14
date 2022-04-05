@@ -1,6 +1,7 @@
 #include "transferfunction.h"
 
 #include "transfertexture.h"
+
 #include <exception>
 
 namespace tfn
@@ -14,7 +15,10 @@ TransferFunction::TransferFunction()
 
 bool TransferFunction::addControlPoint(QPointF pos)
 {
-    if (pos.x() <= tfn::points::START_POINT.x() || pos.x() >= tfn::points::END_POINT.x() || pos.y() <= tfn::points::START_POINT.y() || pos.y() >= tfn::points::END_POINT.y())
+    if (pos.x() <= tfn::points::START_POINT.x() ||
+        pos.x() >= tfn::points::END_POINT.x() ||
+        pos.y() <= tfn::points::START_POINT.y() ||
+        pos.y() >= tfn::points::END_POINT.y())
     {
         return false;
     }
@@ -45,14 +49,15 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
     int from_x = 0;
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
-        auto norm = m_controlPoints[i + 1].x()/tfn::points::END_POINT.x();
-        int target_x = static_cast<int>(norm*(tfn::size::NUM_POINTS-1));
+        auto norm = m_controlPoints[i + 1].x() / tfn::points::END_POINT.x();
+        int target_x = static_cast<int>(norm * (tfn::size::NUM_POINTS - 1));
         for (int t = from_x; t <= target_x; t++)
         {
             auto r = cmap[t * tfn::size::NUM_CHANNELS];
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
-            auto a = getInterpolatedValueBetweenPoints(m_controlPoints[i], m_controlPoints[i + 1], t);
+            auto a = getInterpolatedValueBetweenPoints(
+                m_controlPoints[i], m_controlPoints[i + 1], t);
             new_cmap.push_back(r);
             new_cmap.push_back(g);
             new_cmap.push_back(b);
@@ -64,16 +69,19 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
     return new_cmap;
 }
 
-constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0, QPointF p1, int t)
+constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
+                                                                    QPointF p1,
+                                                                    int t)
 {
-    if(p0.x() == p1.x()) {
+    if (p0.x() == p1.x())
+    {
         return qMax(p0.y(), p1.y());
     }
     float a = (p1.y() - p0.y());
     float b = (p1.x() - p0.x());
     assert(b > 0 || b < 0);
     float m = a / b;
-    return  m * (t - p0.x()) + p0.y();
+    return m * (t - p0.x()) + p0.y();
 };
 
 int TransferFunction::replace(int index, QPointF point)
@@ -87,7 +95,8 @@ int TransferFunction::replace(int index, QPointF point)
     }
     else
     {
-        // Checks if reordering is necassary and sorts controllpoints and returns new index
+        // Checks if reordering is necassary and sorts controllpoints and
+        // returns new index
         QPointF n0 = m_controlPoints[index - 1];
         QPointF n1 = m_controlPoints[index + 1];
         if (n0.x() > point.x() || n1.x() < point.x())

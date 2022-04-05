@@ -26,7 +26,10 @@ class TextureStore : public QObject, public ITextureStore
     virtual Volume& volume() { return m_volume; };
     virtual const Volume& volume() const { return m_volume; };
 
-    virtual tfn::TransferTexture& transferFunction() { return m_transfertexture; };
+    virtual tfn::TransferTexture& transferFunction()
+    {
+        return m_transfertexture;
+    };
     virtual const tfn::TransferTexture& transferFunction() const
     {
         return m_transfertexture;

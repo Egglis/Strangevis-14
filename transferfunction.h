@@ -11,7 +11,7 @@ namespace tfn
 namespace points
 {
 constexpr static QPointF START_POINT = QPointF(0, 0);
-constexpr static QPointF END_POINT = QPointF(4095,1);
+constexpr static QPointF END_POINT = QPointF(4095, 1);
 }; // namespace points
 
 class TransferFunction
@@ -27,8 +27,10 @@ class TransferFunction
     void reset();
 
   private:
-    // Uses the line equation y = mx + b to interpolate alpha values between points
-    constexpr static float getInterpolatedValueBetweenPoints(QPointF p0, QPointF p1, int t);
+    // Uses the line equation y = mx + b to interpolate alpha values between
+    // points
+    constexpr static float getInterpolatedValueBetweenPoints(QPointF p0,
+                                                             QPointF p1, int t);
 
     QList<QPointF> m_controlPoints;
 };

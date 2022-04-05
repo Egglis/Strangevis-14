@@ -48,7 +48,7 @@ class VolumeLoader : public QThread
     void loadIni();
     void load();
     QString m_fileName;
-    constexpr static QVector3D UNIFORM_GRID_DIMENSIONS{1,1,1};
+    constexpr static QVector3D UNIFORM_GRID_DIMENSIONS{1, 1, 1};
 };
 
 #endif // VOLUME_H

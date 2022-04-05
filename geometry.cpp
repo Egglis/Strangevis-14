@@ -60,7 +60,8 @@ void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
     m_sliceCubeIntersectionCoordBuffer.create();
     m_sliceCubeIntersectionCoordBuffer.bind();
     m_sliceCubeIntersectionCoordBuffer.allocate(
-        cubeIntersectionCoords.data(), cubeIntersectionCoords.size() * sizeof(cubeIntersectionCoords[0]));
+        cubeIntersectionCoords.data(),
+        cubeIntersectionCoords.size() * sizeof(cubeIntersectionCoords[0]));
 
     if (m_sliceIndexBuffer.isCreated())
         m_sliceIndexBuffer.destroy();

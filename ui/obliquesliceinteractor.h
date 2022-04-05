@@ -9,7 +9,6 @@
 #include <QHBoxLayout>
 #include <QWheelEvent>
 
-
 class ObliqueSliceInteractor : public ObliqueSliceRenderWidget
 {
     Q_OBJECT
