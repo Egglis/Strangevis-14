@@ -1,8 +1,6 @@
 #include "volume.h"
 
-#pragma warning(push, 0)
 #include "vendor/inireader/INIReader.h"
-#pragma warning(pop)
 
 #include <QDataStream>
 #include <QDebug>
