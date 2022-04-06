@@ -5,7 +5,6 @@
 #include <QMatrix4x4>
 #include <QVector>
 
-
 CubePlaneIntersection::CubePlaneIntersection(Plane plane)
     : m_cube{}, m_plane{plane}
 {

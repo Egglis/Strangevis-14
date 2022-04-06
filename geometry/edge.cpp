@@ -50,8 +50,8 @@ void Edge::stretch(float stretch)
     transformationMatrix.translate(-centerPoint);
     transformationMatrix.scale(stretch);
     transformationMatrix.translate(centerPoint);
-    m_a = transformationMatrix*m_a;
-    m_b = transformationMatrix*m_b;
+    m_a = transformationMatrix.map(m_a);
+    m_b = transformationMatrix.map(m_b);
 }
 
 void Edge::scale(QVector3D scale)
@@ -59,6 +59,6 @@ void Edge::scale(QVector3D scale)
     QVector3D centerPoint = parameterization(0.5);
     QMatrix4x4 transformationMatrix{};
     transformationMatrix.scale(scale);
-    m_a = transformationMatrix*m_a;
-    m_b = transformationMatrix*m_b;
+    m_a = transformationMatrix.map(m_a);
+    m_b = transformationMatrix.map(m_b);
 }

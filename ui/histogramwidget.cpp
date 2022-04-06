@@ -8,12 +8,12 @@ HistogramWidget::HistogramWidget(QWidget* parent) : QChartView(parent)
     QValueAxis* axisX = new QValueAxis();
     axisX->setRange(0, 4096);
     axisX->setLabelsVisible(false);
-    m_chart->setAxisX(axisX);
+    m_chart->addAxis(axisX, Qt::AlignBottom);
 
     QValueAxis* axisY = new QValueAxis();
     axisY->setRange(0,1);
     axisY->setLabelsVisible(false);
-    m_chart->setAxisY(axisY);
+    m_chart->addAxis(axisY, Qt::AlignLeft);
 
     m_chart->legend()->hide();
     m_chart->addSeries(m_series);
@@ -27,8 +27,8 @@ void HistogramWidget::histogramChanged(std::vector<float> normalizedHistogramDat
 
     m_series->append(dataAsList(normalizedHistogramData));
     m_chart->addSeries(m_series);
-    m_series->attachAxis(m_chart->axisX());
-    m_series->attachAxis(m_chart->axisY());
+    m_series->attachAxis(m_chart->axes(Qt::Horizontal)[0]);
+    m_series->attachAxis(m_chart->axes(Qt::Vertical)[0]);
 
     update();
 }

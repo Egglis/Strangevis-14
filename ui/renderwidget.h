@@ -30,8 +30,8 @@ class RayCastingInteractor : public RayCastingWidget
   private:
     void rotateCamera();
     const std::shared_ptr<ISharedProperties> m_properties;
-    qreal m_currentX, m_currentY;
-    qreal m_previousX, m_previousY;
+    QPointF m_currentPosition;
+    QPointF m_previousPosition;
 };
 
 class ExtendedParameterWidget : public QWidget

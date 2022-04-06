@@ -78,7 +78,7 @@ void RayCastingWidget::paintGL()
     QMatrix4x4 modelViewProjectionMatrix =
         m_projectionMatrix * m_viewMatrix * m_textureStore->volume().modelMatrix();
 
-    QVector3D rayOrigin = m_viewMatrix.inverted()*QVector3D(0,0,0);
+    QVector3D rayOrigin = m_viewMatrix.inverted().map(QVector3D(0,0,0));
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
