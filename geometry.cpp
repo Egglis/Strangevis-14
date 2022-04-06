@@ -21,15 +21,15 @@ void Geometry::allocateQuad()
 
     m_quadVertexBuffer.create();
     m_quadVertexBuffer.bind();
-    m_quadVertexBuffer.allocate(quad.vertices().data(),
-                                quad.vertices().size() *
-                                    sizeof(quad.vertices()[0]));
+    m_quadVertexBuffer.allocate(
+        quad.vertices().data(),
+        static_cast<int>(quad.vertices().size() * sizeof(quad.vertices()[0])));
 
     m_quadIndexBuffer.create();
     m_quadIndexBuffer.bind();
-    m_quadIndexBuffer.allocate(quad.indices().data(),
-                               quad.indices().size() *
-                                   sizeof(quad.indices()[0]));
+    m_quadIndexBuffer.allocate(
+        quad.indices().data(),
+        static_cast<int>(quad.indices().size() * sizeof(quad.indices()[0])));
 }
 
 void Geometry::allocateCube()
@@ -38,22 +38,22 @@ void Geometry::allocateCube()
 
     m_cubeVertexBuffer.create();
     m_cubeVertexBuffer.bind();
-    m_cubeVertexBuffer.allocate(cube.vertices().data(),
-                                cube.vertices().size() *
-                                    sizeof(cube.vertices()[0]));
+    m_cubeVertexBuffer.allocate(
+        cube.vertices().data(),
+        static_cast<int>(cube.vertices().size() * sizeof(cube.vertices()[0])));
 
     m_cubeIndexBuffer.create();
     m_cubeIndexBuffer.bind();
-    m_cubeIndexBuffer.allocate(cube.indices().data(),
-                               cube.indices().size() *
-                                   sizeof(cube.indices()[0]));
+    m_cubeIndexBuffer.allocate(
+        cube.indices().data(),
+        static_cast<int>(cube.indices().size() * sizeof(cube.indices()[0])));
 }
 
 void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
 {
     auto cubeIntersectionCoords = intersection.getCubeIntersections();
     auto sortedOrder = intersection.getConvexHullIndexOrder();
-    m_sliceIndices = sortedOrder.size();
+    m_sliceIndices = static_cast<GLsizei>(sortedOrder.size());
 
     if (m_sliceCubeIntersectionCoordBuffer.isCreated())
         m_sliceCubeIntersectionCoordBuffer.destroy();
@@ -61,14 +61,16 @@ void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
     m_sliceCubeIntersectionCoordBuffer.bind();
     m_sliceCubeIntersectionCoordBuffer.allocate(
         cubeIntersectionCoords.data(),
-        cubeIntersectionCoords.size() * sizeof(cubeIntersectionCoords[0]));
+        static_cast<int>(cubeIntersectionCoords.size() *
+                         sizeof(cubeIntersectionCoords[0])));
 
     if (m_sliceIndexBuffer.isCreated())
         m_sliceIndexBuffer.destroy();
     m_sliceIndexBuffer.create();
     m_sliceIndexBuffer.bind();
-    m_sliceIndexBuffer.allocate(sortedOrder.data(),
-                                sortedOrder.size() * sizeof(sortedOrder[0]));
+    m_sliceIndexBuffer.allocate(
+        sortedOrder.data(),
+        static_cast<int>(sortedOrder.size() * sizeof(sortedOrder[0])));
 }
 
 void Geometry::bindQuad()

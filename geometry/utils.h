@@ -5,6 +5,7 @@
 #include <QVector3D>
 #include <vector>
 
+
 std::vector<unsigned short>
 convexHullGiftWrapping(const std::vector<QVector3D>& input);
 

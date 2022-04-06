@@ -4,7 +4,6 @@
 
 #include <QMatrix4x4>
 
-
 // Adapted from
 // https://iq.opengenus.org/gift-wrap-jarvis-march-algorithm-convex-hull/
 // Returns the indexes of input that form a convex hull over the points in
@@ -37,12 +36,12 @@ convexHullGiftWrapping(const std::vector<QVector3D>& input)
         return orient < 0 ? Orientation::CounterClockwise
                           : Orientation::Clockwise;
     };
-    int n = rotatedInput.size();
+    unsigned short n = static_cast<unsigned short>(rotatedInput.size());
     // Start from any point guaranteed on the hull, keep moving counterclockwise
     // until reach the start point again.  This loop runs O(h)
     // times where h is number of points in result or output.
-    int p = startingVertex;
-    int q;
+    unsigned short p = startingVertex;
+    unsigned short q;
     do
     {
         output.push_back(p);
@@ -52,12 +51,12 @@ convexHullGiftWrapping(const std::vector<QVector3D>& input)
         // wise point in q. If any point 'i' is more counterclock-
         // wise than q, then update q.
         q = (p + 1) % n;
-        for (int i = 0; i < n; i++)
+        for (unsigned short i = 0; i < n; i++)
         {
             // If i is more counterclockwise than current q, then
             // update q
-            if (orientation(rotatedInput[p], rotatedInput[i], rotatedInput[q]) ==
-                Orientation::CounterClockwise)
+            if (orientation(rotatedInput[p], rotatedInput[i],
+                            rotatedInput[q]) == Orientation::CounterClockwise)
                 q = i;
         }
         // Now q is the most counterclockwise with respect to p
@@ -68,8 +67,7 @@ convexHullGiftWrapping(const std::vector<QVector3D>& input)
     return output;
 }
 
-QMatrix4x4
-rotateToXYPlaneRotationMatrix(const std::vector<QVector3D>& input)
+QMatrix4x4 rotateToXYPlaneRotationMatrix(const std::vector<QVector3D>& input)
 {
     assert(input.size() > 2);
     Plane plane = Plane(input[0], input[1], input[2]);
