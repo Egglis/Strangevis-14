@@ -46,7 +46,7 @@ void ObliqueSliceInteractor::wheelEvent(QWheelEvent* event)
 
 ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
     const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
-    : m_flipHorizontalCheckbox{tr("Flip Horizontal")},
+    : QWidget(parent), m_flipHorizontalCheckbox{tr("Flip Horizontal")},
       m_flipVerticalCheckbox{tr("Flip Vertical")}, m_layout{this},
       m_parameterWidget(properties, this)
 {
