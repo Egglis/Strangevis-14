@@ -15,18 +15,19 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
     explicit Volume(QObject* parent = nullptr);
     void load(const QString& filename);
     const QVector3D& getDimensions() const { return m_dims; };
+    QMatrix4x4 modelMatrix() const;
 
     void bind();
     void release();
   signals:
     void volumeLoaded();
-    void dimensionsChanged(QVector3D dims);
     void loadingStartedOrStopped(bool started);
-    void gridSpacingChanged(QVector3D dims);
 
   private:
+    QVector3D scaleFactor() const;
     std::vector<unsigned short> m_volumeData;
     QVector3D m_dims;
+    QVector3D m_spacing;
     QOpenGLTexture m_volumeTexture;
     bool m_updateNeeded;
 };

@@ -13,7 +13,7 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
       m_cubePlaneIntersection{m_properties->clippingPlane().plane()},
       m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
 {
-    m_modelViewMatrix.scale(1 / sqrt(3.0));
+    m_viewMatrix.scale(1 / sqrt(3.0));
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged,
             [this]() { update(); });
@@ -50,8 +50,6 @@ void ObliqueSliceRenderWidget::initializeGL()
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
-    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this, &ObliqueSliceRenderWidget::updateBoxScaling);
-    connect(&m_textureStore->volume(), &Volume::gridSpacingChanged, this, &ObliqueSliceRenderWidget::updateGridSpacing);
     updateObliqueSlice();
 }
 
@@ -64,11 +62,9 @@ void ObliqueSliceRenderWidget::paintGL()
 
     m_sliceProgram.bind();
     QMatrix4x4 modelViewMatrix =
-        m_aspectRatioMatrix * m_modelViewMatrix *
-        m_cubePlaneIntersection.getModelRotationMatrix() * m_boxScalingMatrix;
+        m_aspectRatioMatrix * m_viewMatrix *
+        m_cubePlaneIntersection.getModelRotationMatrix() * m_textureStore->volume().modelMatrix();
     m_sliceProgram.setUniformValue("modelViewMatrix", modelViewMatrix);
-
-    m_sliceProgram.setUniformValue("gridSpacingMatrix", m_gridSpacingMatrix);
 
     glActiveTexture(GL_TEXTURE0);
     m_sliceProgram.setUniformValue("volumeTexture", 0);
@@ -111,8 +107,8 @@ void ObliqueSliceRenderWidget::correctQuadForAspectRatio(int w, int h)
 void ObliqueSliceRenderWidget::rotate(float degrees)
 {
     QVector3D zAxis(0, 0, 1);
-    m_modelViewMatrix.rotate(m_prevRotation, zAxis);
-    m_modelViewMatrix.rotate(-degrees, zAxis);
+    m_viewMatrix.rotate(m_prevRotation, zAxis);
+    m_viewMatrix.rotate(-degrees, zAxis);
     m_prevRotation = degrees;
     update();
 }
@@ -121,7 +117,7 @@ void ObliqueSliceRenderWidget::flipHorizontal(bool flip)
     int scale = flip != m_horizontalFlipped ? -1 : 1;
     float prevRotation = m_prevRotation;
     rotate(0);
-    m_modelViewMatrix.scale(scale, 1);
+    m_viewMatrix.scale(scale, 1);
     m_horizontalFlipped = flip;
     rotate(prevRotation);
 }
@@ -130,28 +126,13 @@ void ObliqueSliceRenderWidget::flipVertical(bool flip)
     int scale = flip != m_verticalFlipped ? -1 : 1;
     float prevRotation = m_prevRotation;
     rotate(0);
-    m_modelViewMatrix.scale(1, scale);
+    m_viewMatrix.scale(1, scale);
     m_verticalFlipped = flip;
     rotate(prevRotation);
 }
 
 void ObliqueSliceRenderWidget::zoomCamera(float zoomFactor)
 {
-    m_modelViewMatrix.scale(zoomFactor);
+    m_viewMatrix.scale(zoomFactor);
     update();
-}
-
-void ObliqueSliceRenderWidget::updateBoxScaling(QVector3D dims)
-{
-    m_boxScalingMatrix.setToIdentity();
-    auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
-    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    m_boxScalingMatrix.scale(2 * dims / (minDim + maxDim));
-}
-
-void ObliqueSliceRenderWidget::updateGridSpacing(QVector3D dims)
-{
-    m_gridSpacingMatrix.setToIdentity();
-    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    m_gridSpacingMatrix.scale(dims / maxDim);
 }

@@ -11,36 +11,32 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_projectionMode{initialRenderProperties.projectionMode}
 {
-    m_modelViewMatrix.setToIdentity();
-    m_modelViewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
+    m_viewMatrix.setToIdentity();
+    m_viewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
     zoomCamera(initialRenderProperties.zoomFactor);
 
-    connect(&m_textureStore->volume(), &Volume::dimensionsChanged, this,
-            &RayCastingWidget::updateBoxScalingMatrix);
-    connect(&m_textureStore->volume(), &Volume::gridSpacingChanged, this,
-            &RayCastingWidget::updateGridSpacingMatrix);
     connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
             [this]() { update(); });
 }
 
 void RayCastingWidget::rotateCamera(qreal angle, QVector3D axis)
 {
-    QMatrix4x4 inverseModelViewMatrix = m_modelViewMatrix.inverted();
+    QMatrix4x4 inverseModelViewMatrix = m_viewMatrix.inverted();
     QVector4D transformedAxis = inverseModelViewMatrix * QVector4D(axis, 0.0f);
-    m_modelViewMatrix.rotate(qRadiansToDegrees(angle),
+    m_viewMatrix.rotate(qRadiansToDegrees(angle),
                              transformedAxis.toVector3D());
     update();
 }
 void RayCastingWidget::zoomCamera(float zoomFactor)
 {
-    m_modelViewMatrix.scale(zoomFactor);
+    m_viewMatrix.scale(zoomFactor);
     update();
 }
 
 void RayCastingWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    glEnable(GL_CLIP_DISTANCE0);
+    glEnable(GL_DEPTH_TEST);
     // initialize geometry
     Geometry::instance();
 
@@ -80,17 +76,30 @@ void RayCastingWidget::paintGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * m_modelViewMatrix * m_boxScalingMatrix;
+        m_projectionMatrix * m_viewMatrix * m_textureStore->volume().modelMatrix();
+
+    QVector3D rayOrigin = m_viewMatrix.inverted()*QVector3D(0,0,0);
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
     m_cubeProgram.setUniformValue(location, m_clippingPlane.equation());
+    location = m_cubeProgram.uniformLocation("rayOrigin");
+    m_cubeProgram.setUniformValue(location, rayOrigin);
+    location = m_cubeProgram.uniformLocation("viewMatrix");
+    m_cubeProgram.setUniformValue(location, m_viewMatrix);
+    location = m_cubeProgram.uniformLocation("modelMatrix");
+    m_cubeProgram.setUniformValue(location, m_textureStore->volume().modelMatrix());
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
-    location = m_cubeProgram.uniformLocation("gridSpacingMatrix");
-    m_cubeProgram.setUniformValue(location, m_gridSpacingMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
     m_cubeProgram.setUniformValue(location, static_cast<int>(m_gradientMethod));
+
+    location = m_cubeProgram.uniformLocation("focalLength");
+    m_cubeProgram.setUniformValue(location, m_focalLength);
+    location = m_cubeProgram.uniformLocation("viewportSize");
+    m_cubeProgram.setUniformValue(location, QVector2D{static_cast<float>(width()), static_cast<float>(height())});
+    location = m_cubeProgram.uniformLocation("aspectRatio");
+    m_cubeProgram.setUniformValue(location, static_cast<float>(width())/height());
 
     auto [width, height, depth] = m_textureStore->volume().getDimensions();
     location = m_cubeProgram.uniformLocation("width");
@@ -118,45 +127,11 @@ void RayCastingWidget::paintGL()
 
     Geometry::instance().drawCube();
 
-    location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
-    m_cubeProgram.setUniformValue(location, DISABLED_CLIPPING_EQUATION);
-
-    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
-
-    Geometry::instance().bindObliqueSliceIntersectionCoords();
-
-    location = m_cubeProgram.attributeLocation("vertexPosition");
-    m_cubeProgram.enableAttributeArray(location);
-    m_cubeProgram.setAttributeBuffer(location, GL_FLOAT, 0, 3,
-                                     sizeof(QVector3D));
-
-    Geometry::instance().drawObliqueSlice();
     glActiveTexture(GL_TEXTURE0);
 
     m_textureStore->transferFunction().release();
     m_textureStore->volume().release();
     m_cubeProgram.release();
-}
-
-void RayCastingWidget::updateBoxScalingMatrix(QVector3D dims)
-{
-    m_boxScalingMatrix.setToIdentity();
-    auto minDim = std::min(dims.x(), std::min(dims.y(), dims.z()));
-    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    if (maxDim)
-    {
-        m_boxScalingMatrix.scale(2* dims / (maxDim + minDim));
-    }
-}
-
-void RayCastingWidget::updateGridSpacingMatrix(QVector3D dims)
-{
-    m_gridSpacingMatrix.setToIdentity();
-    auto maxDim = std::max(dims.x(), std::max(dims.y(), dims.z()));
-    if (maxDim)
-    {
-        m_gridSpacingMatrix.scale(dims / maxDim);
-    }
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)

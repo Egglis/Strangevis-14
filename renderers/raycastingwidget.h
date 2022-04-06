@@ -44,17 +44,11 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void changeGradientMethod(GradientMethod method);
     void changeTransferFunction(QString transferFunctionName);
 
-  private slots:
-    void updateBoxScalingMatrix(QVector3D dims);
-    void updateGridSpacingMatrix(QVector3D dims);
-
   private:
     const std::shared_ptr<ITextureStore> m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
-    QMatrix4x4 m_modelViewMatrix;
-    QMatrix4x4 m_boxScalingMatrix;
-    QMatrix4x4 m_gridSpacingMatrix;
+    QMatrix4x4 m_viewMatrix;
     GradientMethod m_gradientMethod;
     Projection m_projectionMode;
     QString m_transferFunctionName;
@@ -64,6 +58,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
     qreal m_fov = 60.0;
+    const GLfloat m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0);
     constexpr static QVector4D DISABLED_CLIPPING_EQUATION =
         QVector4D{0, 0, 1, 1000};
 };

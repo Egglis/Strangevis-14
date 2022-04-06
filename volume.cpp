@@ -5,11 +5,13 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QFile>
+#include <QMatrix4x4>
 #include <execution>
 
+
 Volume::Volume(QObject* parent)
-    : QObject(parent), m_dims{0, 0, 0},
-      m_volumeTexture(QOpenGLTexture::Target3D), m_updateNeeded(false)
+    : QObject(parent), m_volumeTexture(QOpenGLTexture::Target3D),
+      m_updateNeeded(false), m_dims{1.0, 1.0, 1.0}, m_spacing{1.0, 1.0, 1.0}
 {
 }
 
@@ -23,17 +25,28 @@ void Volume::load(const QString& fileName)
                 emit volumeLoaded();
             });
     connect(volumeLoader, &VolumeLoader::dimensionsChanged,
-            [this](QVector3D dims) {
-                m_dims = dims;
-                emit dimensionsChanged(m_dims);
-            });
+            [this](QVector3D dims) { m_dims = dims; });
     connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this,
             &Volume::loadingStartedOrStopped);
     connect(volumeLoader, &VolumeLoader::finished, volumeLoader,
             &VolumeLoader::deleteLater);
     connect(volumeLoader, &VolumeLoader::gridSpacingChanged, this,
-            &Volume::gridSpacingChanged);
+            [this](QVector3D spacing) { m_spacing = spacing; });
     volumeLoader->start();
+}
+
+QMatrix4x4 Volume::modelMatrix() const
+{
+    QMatrix4x4 modelMatrix{};
+    modelMatrix.scale(scaleFactor());
+    return modelMatrix;
+}
+
+QVector3D Volume::scaleFactor() const
+{
+    QVector3D factor = m_dims * m_spacing;
+    factor /= std::max({factor.x(), factor.y(), factor.z()});
+    return factor;
 }
 
 VolumeLoader::VolumeLoader(const QString& fileName, QObject* parent)
