@@ -5,7 +5,7 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QFile>
-
+#include <execution>
 
 Volume::Volume(QObject* parent)
     : QObject(parent), m_dims{0, 0, 0},
@@ -31,7 +31,8 @@ void Volume::load(const QString& fileName)
             &Volume::loadingStartedOrStopped);
     connect(volumeLoader, &VolumeLoader::finished, volumeLoader,
             &VolumeLoader::deleteLater);
-    connect(volumeLoader, &VolumeLoader::gridSpacingChanged, this, &Volume::gridSpacingChanged);
+    connect(volumeLoader, &VolumeLoader::gridSpacingChanged, this,
+            &Volume::gridSpacingChanged);
     volumeLoader->start();
 }
 
@@ -61,8 +62,7 @@ void VolumeLoader::loadIni()
     float y = reader.GetFloat("DatFile", "oldDat Spacing Y", 1);
     float z = reader.GetFloat("DatFile", "oldDat Spacing Z", 1);
     qDebug() << "X:" << x << "Y:" << y << "Z:" << z;
-    emit gridSpacingChanged(QVector3D(x,y,z));
-
+    emit gridSpacingChanged(QVector3D(x, y, z));
 }
 
 void VolumeLoader::load()
@@ -96,10 +96,8 @@ void VolumeLoader::load()
         emit loadingStartedOrStopped(false);
         return;
     }
-    for (int i = 0; i < volumeSize; i++)
-    {
-        volumeData[i] *= 16;
-    }
+    std::for_each(std::execution::par_unseq, volumeData.begin(),
+                  volumeData.end(), [](auto& elem) { elem *= 16; });
     emit volumeLoaded(volumeData);
     emit dimensionsChanged(QVector3D(width, height, depth));
     emit loadingStartedOrStopped(false);

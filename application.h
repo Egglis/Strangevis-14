@@ -26,7 +26,10 @@ class StrangevisVisualizerApplication : public QApplication
     {
         return m_colorMapStore;
     };
-    std::shared_ptr<tfn::IColorMapStore> colorMapStore() { return m_colorMapStore; };
+    std::shared_ptr<tfn::IColorMapStore> colorMapStore()
+    {
+        return m_colorMapStore;
+    };
 
   private:
     std::shared_ptr<ISharedProperties> m_properties;

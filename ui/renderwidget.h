@@ -1,27 +1,25 @@
 #ifndef RENDERWIDGET_H
 #define RENDERWIDGET_H
 
-#include "../texturestore.h"
 #include "../properties/sharedproperties.h"
-#include "transferfunctionwidget.h"
-#include "parameterwidget.h"
 #include "../renderers/raycastingwidget.h"
+#include "../texturestore.h"
+#include "parameterwidget.h"
+#include "transferfunctionwidget.h"
 
 #include <QMatrix4x4>
 #include <QVBoxLayout>
 #include <memory>
 
-
-class RayCastingInteractor
- : public RayCastingWidget
+class RayCastingInteractor : public RayCastingWidget
 {
     Q_OBJECT
 
   public:
     RayCastingInteractor(const std::shared_ptr<ITextureStore> textureStore,
-                 const std::shared_ptr<ISharedProperties> properties,
-                 QWidget* parent = nullptr,
-                 Qt::WindowFlags f = Qt::WindowFlags());
+                         const std::shared_ptr<ISharedProperties> properties,
+                         QWidget* parent = nullptr,
+                         Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
     virtual void mousePressEvent(QMouseEvent* p_event);
@@ -36,12 +34,13 @@ class RayCastingInteractor
     qreal m_previousX, m_previousY;
 };
 
-
 class ExtendedParameterWidget : public QWidget
 {
   public:
-    ExtendedParameterWidget(const std::shared_ptr<ISharedProperties>& properties, const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
-                            QWidget* parent);
+    ExtendedParameterWidget(
+        const std::shared_ptr<ISharedProperties>& properties,
+        const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
+        QWidget* parent);
 
   private:
     QVBoxLayout m_layout;

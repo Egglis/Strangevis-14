@@ -1,8 +1,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "geometry/cubeplaneintersection.h"
 #include "geometry/cube.h"
+#include "geometry/cubeplaneintersection.h"
 #include "geometry/quad.h"
 
 #include <QOpenGLBuffer>

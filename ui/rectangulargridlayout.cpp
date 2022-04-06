@@ -5,7 +5,7 @@
 RectangularGridLayout::RectangularGridLayout(QWidget* parent)
     : QVBoxLayout(parent)
 {
-    if(appendOnRow)
+    if (appendOnRow)
         addRow();
 }
 
@@ -66,7 +66,8 @@ void RectangularGridLayout::addRow()
 int RectangularGridLayout::widgetCount()
 {
     int count = 0;
-    for (auto& row:rows){
+    for (auto& row : rows)
+    {
         count += row->count();
     }
     return count;

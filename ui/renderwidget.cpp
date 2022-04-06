@@ -36,14 +36,11 @@ RayCastingInteractor::RayCastingInteractor(
 {
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged, this,
-            [this](const Plane& plane){
-                updateClippingPlane(plane);
-            });
+            [this](const Plane& plane) { updateClippingPlane(plane); });
 
     connect(&m_properties.get()->gradientMethod(),
             &GradientProperties::gradientMethodChanged, this,
             &RayCastingInteractor::changeGradientMethod);
-
 
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged, this,
