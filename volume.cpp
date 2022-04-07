@@ -111,7 +111,7 @@ void VolumeLoader::load()
         emit loadingStartedOrStopped(false);
         return;
     }
-    std::vector<unsigned long long> histogramData(4096, 0);
+    std::array<std::atomic<unsigned long long>, 4096> histogramData{};
     std::for_each(std::execution::par_unseq, volumeData.begin(),
                   volumeData.end(), [&histogramData](auto& elem) {
                       histogramData[elem]++;
