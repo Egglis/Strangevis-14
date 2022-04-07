@@ -3,7 +3,7 @@
 #include "../geometry.h"
 
 RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
-                                   std::shared_ptr<ITextureStore> textureStore,
+                                   std::unique_ptr<ITextureStore>& textureStore,
                                    QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
@@ -23,8 +23,7 @@ void RayCastingWidget::rotateCamera(qreal angle, QVector3D axis)
 {
     QMatrix4x4 inverseModelViewMatrix = m_viewMatrix.inverted();
     QVector4D transformedAxis = inverseModelViewMatrix * QVector4D(axis, 0.0f);
-    m_viewMatrix.rotate(qRadiansToDegrees(angle),
-                             transformedAxis.toVector3D());
+    m_viewMatrix.rotate(qRadiansToDegrees(angle), transformedAxis.toVector3D());
     update();
 }
 void RayCastingWidget::zoomCamera(float zoomFactor)
@@ -61,8 +60,8 @@ void RayCastingWidget::resizeGL(int w, int h)
         m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane,
                                        m_farPlane);
     if (m_projectionMode == Projection::Orthographic)
-        m_projectionMatrix.ortho(-aspectRatio, aspectRatio, -1, 1,
-                                 m_nearPlane, m_farPlane);
+        m_projectionMatrix.ortho(-aspectRatio, aspectRatio, -1, 1, m_nearPlane,
+                                 m_farPlane);
 }
 
 void RayCastingWidget::paintGL()
@@ -76,9 +75,10 @@ void RayCastingWidget::paintGL()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * m_viewMatrix * m_textureStore->volume().modelMatrix();
+        m_projectionMatrix * m_viewMatrix *
+        m_textureStore->volume().modelMatrix();
 
-    QVector3D rayOrigin = m_viewMatrix.inverted().map(QVector3D(0,0,0));
+    QVector3D rayOrigin = m_viewMatrix.inverted().map(QVector3D(0, 0, 0));
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
@@ -88,7 +88,8 @@ void RayCastingWidget::paintGL()
     location = m_cubeProgram.uniformLocation("viewMatrix");
     m_cubeProgram.setUniformValue(location, m_viewMatrix);
     location = m_cubeProgram.uniformLocation("modelMatrix");
-    m_cubeProgram.setUniformValue(location, m_textureStore->volume().modelMatrix());
+    m_cubeProgram.setUniformValue(location,
+                                  m_textureStore->volume().modelMatrix());
     location = m_cubeProgram.uniformLocation("modelViewProjectionMatrix");
     m_cubeProgram.setUniformValue(location, modelViewProjectionMatrix);
     location = m_cubeProgram.uniformLocation("gradientMethod");
@@ -97,9 +98,12 @@ void RayCastingWidget::paintGL()
     location = m_cubeProgram.uniformLocation("focalLength");
     m_cubeProgram.setUniformValue(location, m_focalLength);
     location = m_cubeProgram.uniformLocation("viewportSize");
-    m_cubeProgram.setUniformValue(location, QVector2D{static_cast<float>(width()), static_cast<float>(height())});
+    m_cubeProgram.setUniformValue(
+        location,
+        QVector2D{static_cast<float>(width()), static_cast<float>(height())});
     location = m_cubeProgram.uniformLocation("aspectRatio");
-    m_cubeProgram.setUniformValue(location, static_cast<float>(width())/height());
+    m_cubeProgram.setUniformValue(location,
+                                  static_cast<float>(width()) / height());
 
     auto [width, height, depth] = m_textureStore->volume().getDimensions();
     location = m_cubeProgram.uniformLocation("width");

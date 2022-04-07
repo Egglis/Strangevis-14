@@ -1,7 +1,7 @@
 #include "obliquesliceinteractor.h"
 
 ObliqueSliceInteractor::ObliqueSliceInteractor(
-    const std::shared_ptr<ITextureStore> textureStore,
+    std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : ObliqueSliceRenderWidget{textureStore, properties, parent, f},

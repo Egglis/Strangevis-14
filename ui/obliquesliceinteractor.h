@@ -13,7 +13,7 @@ class ObliqueSliceInteractor : public ObliqueSliceRenderWidget
 {
     Q_OBJECT
   public:
-    ObliqueSliceInteractor(const std::shared_ptr<ITextureStore> textureStore,
+    ObliqueSliceInteractor(std::unique_ptr<ITextureStore>& textureStore,
                            const std::shared_ptr<ISharedProperties> properties,
                            QWidget* parent = nullptr,
                            Qt::WindowFlags f = Qt::WindowFlags());

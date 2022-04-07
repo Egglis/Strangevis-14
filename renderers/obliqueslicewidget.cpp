@@ -5,7 +5,7 @@
 #include <QVector3D>
 
 ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
-    const std::shared_ptr<ITextureStore> textureStore,
+    std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<const ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f),
@@ -15,8 +15,7 @@ ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
 {
     m_viewMatrix.scale(1 / sqrt(3.0));
     connect(&m_properties.get()->transferFunction(),
-            &tfn::TransferProperties::colorMapChanged,
-            [this]() { update(); });
+            &tfn::TransferProperties::colorMapChanged, [this]() { update(); });
 }
 
 void ObliqueSliceRenderWidget::initializeGL()
@@ -63,7 +62,8 @@ void ObliqueSliceRenderWidget::paintGL()
     m_sliceProgram.bind();
     QMatrix4x4 modelViewMatrix =
         m_aspectRatioMatrix * m_viewMatrix *
-        m_cubePlaneIntersection.getModelRotationMatrix() * m_textureStore->volume().modelMatrix();
+        m_cubePlaneIntersection.getModelRotationMatrix() *
+        m_textureStore->volume().modelMatrix();
     m_sliceProgram.setUniformValue("modelViewMatrix", modelViewMatrix);
 
     glActiveTexture(GL_TEXTURE0);

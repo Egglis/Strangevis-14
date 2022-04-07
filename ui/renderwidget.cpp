@@ -23,7 +23,7 @@ ExtendedParameterWidget::ExtendedParameterWidget(
 }
 
 RayCastingInteractor::RayCastingInteractor(
-    const std::shared_ptr<ITextureStore> textureStore,
+    std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : RayCastingWidget(

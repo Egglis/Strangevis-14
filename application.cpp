@@ -7,7 +7,6 @@ StrangevisVisualizerApplication::StrangevisVisualizerApplication(int argc,
     : QApplication{argc, argv}
 {
     m_properties = std::make_shared<SharedProperties>();
-    m_textureStore = std::make_shared<TextureStore>();
     m_colorMapStore = std::make_shared<tfn::ColorMapStore>();
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();
@@ -18,16 +17,4 @@ StrangevisVisualizerApplication::StrangevisVisualizerApplication(int argc,
     format.setOption(QSurfaceFormat::DeprecatedFunctions, true);
     QSurfaceFormat::setDefaultFormat(format);
 
-    connect(&m_properties->transferFunction(),
-            &tfn::TransferProperties::colorMapChanged, this,
-            [this](const QString& cmap) {
-                m_textureStore->transferFunction().setColorMap(
-                    m_colorMapStore->colorMap(cmap).colorMapData());
-            });
-
-    connect(&m_properties->transferFunction(),
-            &tfn::TransferProperties::transferFunctionChanged, this,
-            [this](const auto& tfn) {
-                m_textureStore->transferFunction().setTransferFunction(tfn);
-            });
 }

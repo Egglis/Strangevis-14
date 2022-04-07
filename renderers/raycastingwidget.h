@@ -10,7 +10,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 
-
 enum class Projection { Orthographic, Perspective };
 
 struct RenderProperties
@@ -28,7 +27,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
   public:
     RayCastingWidget(RenderProperties initialProperties,
-                     const std::shared_ptr<ITextureStore> textureStore,
+                     std::unique_ptr<ITextureStore>& textureStore,
                      QWidget* parent = nullptr,
                      Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -45,7 +44,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void changeTransferFunction(QString transferFunctionName);
 
   private:
-    const std::shared_ptr<ITextureStore> m_textureStore;
+    std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
