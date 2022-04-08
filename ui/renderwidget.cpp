@@ -23,7 +23,7 @@ ExtendedParameterWidget::ExtendedParameterWidget(
 }
 
 RayCastingInteractor::RayCastingInteractor(
-    const std::shared_ptr<ITextureStore> textureStore,
+    std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : RayCastingWidget(
@@ -53,27 +53,23 @@ RayCastingInteractor::RayCastingInteractor(
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
 {
-    m_currentX = static_cast<qreal>(p_event->x());
-    m_currentY = static_cast<qreal>(p_event->y());
+    m_currentPosition = p_event->position();
 
-    m_previousX = m_currentX;
-    m_previousY = m_currentY;
+    m_previousPosition = m_currentPosition;
 }
 
 void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
 {
-    m_currentX = static_cast<qreal>(p_event->x());
-    m_currentY = static_cast<qreal>(p_event->y());
+    m_currentPosition = p_event->position();
 
     if (p_event->buttons() & Qt::LeftButton)
     {
-        if (m_currentX != m_previousX || m_currentY != m_previousY)
+        if (m_currentPosition != m_previousPosition)
         {
             rotateCamera();
         }
     }
-    m_previousX = m_currentX;
-    m_previousY = m_currentY;
+    m_previousPosition = m_currentPosition;
 }
 
 // Scrolling wheel event
@@ -95,8 +91,8 @@ void RayCastingInteractor::wheelEvent(QWheelEvent* p_event)
 
 void RayCastingInteractor::rotateCamera()
 {
-    QVector3D va = arcballVector(m_previousX, m_previousY);
-    QVector3D vb = arcballVector(m_currentX, m_currentY);
+    QVector3D va = arcballVector(m_previousPosition.x(), m_previousPosition.y());
+    QVector3D vb = arcballVector(m_currentPosition.x(), m_currentPosition.y());
 
     if (va != vb)
     {

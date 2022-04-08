@@ -30,7 +30,7 @@ class Geometry
     void allocateQuad();
     void allocateCube();
 
-    unsigned short m_sliceIndices;
+    GLsizei m_sliceIndices;
     QOpenGLBuffer m_sliceCubeIntersectionCoordBuffer;
     QOpenGLBuffer m_sliceIndexBuffer;
 

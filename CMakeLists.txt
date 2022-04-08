@@ -19,6 +19,10 @@ find_package(Qt6 COMPONENTS REQUIRED
     Charts
     )
 
+if (MSVC)
+    add_compile_options(/W4 /external:anglebrackets /external:W0 /external:I "${CMAKE_SOURCE_DIR}/vendor")
+endif()
+
 # Set path to our custom CMAKE scripts
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 

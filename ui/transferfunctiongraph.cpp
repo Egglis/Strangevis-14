@@ -91,10 +91,10 @@ void TransferFunctionGraph::updatePlotSeries()
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
 
-    m_scatterSeries->attachAxis(m_chart->axisX());
-    m_scatterSeries->attachAxis(m_chart->axisY());
-    m_areaSeries->attachAxis(m_chart->axisX());
-    m_areaSeries->attachAxis(m_chart->axisY());
+    m_scatterSeries->attachAxis(m_chart->axes(Qt::Horizontal)[0]);
+    m_scatterSeries->attachAxis(m_chart->axes(Qt::Vertical)[0]);
+    m_areaSeries->attachAxis(m_chart->axes(Qt::Horizontal)[0]);
+    m_areaSeries->attachAxis(m_chart->axes(Qt::Vertical)[0]);
 };
 
 void TransferFunctionGraph::updateGradient()
@@ -164,7 +164,7 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         QChartView::mouseReleaseEvent(event);
-        QPointF graphPoint = mapLocalToChartPos(event->localPos());
+        QPointF graphPoint = mapLocalToChartPos(event->position());
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)
         {
@@ -185,7 +185,7 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         QChartView::mouseMoveEvent(event);
-        QPointF graphPoint = mapLocalToChartPos(event->localPos());
+        QPointF graphPoint = mapLocalToChartPos(event->position());
         // First point or last point click only able to move in y-direction.
         if (m_currentClickedIndex == 0 ||
             m_currentClickedIndex == m_tfn.getControlPoints().size() - 1)

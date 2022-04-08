@@ -16,7 +16,7 @@ class RayCastingInteractor : public RayCastingWidget
     Q_OBJECT
 
   public:
-    RayCastingInteractor(const std::shared_ptr<ITextureStore> textureStore,
+    RayCastingInteractor(std::unique_ptr<ITextureStore>& textureStore,
                          const std::shared_ptr<ISharedProperties> properties,
                          QWidget* parent = nullptr,
                          Qt::WindowFlags f = Qt::WindowFlags());
@@ -30,8 +30,8 @@ class RayCastingInteractor : public RayCastingWidget
   private:
     void rotateCamera();
     const std::shared_ptr<ISharedProperties> m_properties;
-    qreal m_currentX, m_currentY;
-    qreal m_previousX, m_previousY;
+    QPointF m_currentPosition;
+    QPointF m_previousPosition;
 };
 
 class ExtendedParameterWidget : public QWidget

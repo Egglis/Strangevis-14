@@ -17,7 +17,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
 
   public:
     ObliqueSliceRenderWidget(
-        const std::shared_ptr<ITextureStore> textureStore,
+        std::unique_ptr<ITextureStore>& textureStore,
         const std::shared_ptr<const ISharedProperties> properties,
         QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -35,7 +35,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
   private:
     void correctQuadForAspectRatio(int w, int h);
     void updateTransferTexture(tfn::ColorMap cmap);
-    const std::shared_ptr<ITextureStore> m_textureStore;
+    std::unique_ptr<ITextureStore>& m_textureStore;
     const std::shared_ptr<const ISharedProperties> m_properties;
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;

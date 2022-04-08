@@ -8,7 +8,6 @@
 #include <QMatrix4x4>
 #include <execution>
 
-
 Volume::Volume(QObject* parent)
     : QObject(parent), m_volumeTexture(QOpenGLTexture::Target3D),
       m_updateNeeded(false), m_dims{1.0, 1.0, 1.0}, m_spacing{1.0, 1.0, 1.0}
@@ -123,8 +122,8 @@ void VolumeLoader::load()
     unsigned long long maxCount =
         *std::max_element(histogramData.begin(), histogramData.end());
     std::vector<float> normalizedHistogramData(4096, 0);
-    std::transform(std::execution::par_unseq, histogramData.begin(), histogramData.end(),
-                   normalizedHistogramData.begin(),
+    std::transform(std::execution::par_unseq, histogramData.begin(),
+                   histogramData.end(), normalizedHistogramData.begin(),
                    [maxCount](const auto& elem) {
                        return static_cast<float>(elem) / maxCount;
                    });

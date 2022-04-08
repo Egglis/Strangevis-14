@@ -128,7 +128,6 @@ bool ColorMapStore::loadColorMapsFromFile(QString path)
             std::vector<QVector4D> sortableColors{};
             sortableColors.reserve(tfn::size::NUM_POINTS);
 
-            int index = 0;
             while (!child.isNull())
             {
                 if (child.tagName() == "Point")
