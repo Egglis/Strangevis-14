@@ -11,6 +11,7 @@
 
 class RectangularGridLayout;
 class MainWindowWidget;
+class HistogramWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -24,11 +25,15 @@ class MainWindow : public QMainWindow
 
   public slots:
     void fileOpen();
+  private slots:
+    void openHistogram();
 
   private:
+    void createHistogramWidget();
     const std::shared_ptr<ISharedProperties> m_properties;
     const std::shared_ptr<ITextureStore> m_textureStore;
     const std::shared_ptr<tfn::IColorMapStore> m_colorMapStore;
     MainWindowWidget* m_mainWidget;
+    HistogramWidget* m_histogramWidget;
 };
 #endif // MAINWINDOW_H

@@ -32,6 +32,8 @@ void Volume::load(const QString& fileName)
             &VolumeLoader::deleteLater);
     connect(volumeLoader, &VolumeLoader::gridSpacingChanged, this,
             [this](QVector3D spacing) { m_spacing = spacing; });
+    connect(volumeLoader, &VolumeLoader::histogramCalculated, this,
+            &Volume::histogramCalculated);
     volumeLoader->start();
 }
 
@@ -109,11 +111,24 @@ void VolumeLoader::load()
         emit loadingStartedOrStopped(false);
         return;
     }
+    std::array<std::atomic<unsigned long long>, 4096> histogramData{};
     std::for_each(std::execution::par_unseq, volumeData.begin(),
-                  volumeData.end(), [](auto& elem) { elem *= 16; });
+                  volumeData.end(), [&histogramData](auto& elem) {
+                      histogramData[elem]++;
+                      elem *= 16;
+                  });
     emit volumeLoaded(volumeData);
     emit dimensionsChanged(QVector3D(width, height, depth));
     emit loadingStartedOrStopped(false);
+    unsigned long long maxCount =
+        *std::max_element(histogramData.begin(), histogramData.end());
+    std::vector<float> normalizedHistogramData(4096, 0);
+    std::transform(std::execution::par_unseq, histogramData.begin(), histogramData.end(),
+                   normalizedHistogramData.begin(),
+                   [maxCount](const auto& elem) {
+                       return static_cast<float>(elem) / maxCount;
+                   });
+    emit histogramCalculated(normalizedHistogramData);
 }
 
 void Volume::bind()
