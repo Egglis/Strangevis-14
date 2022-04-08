@@ -123,7 +123,6 @@ void TransferFunctionGraph::updateGradient()
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
 {
     m_cmap = cmap;
-    m_tfn.reset();
     updateGraph();
 };
 
