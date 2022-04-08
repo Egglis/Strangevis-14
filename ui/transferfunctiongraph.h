@@ -8,8 +8,7 @@
 #include <QGraphicsView>
 #include <QtCharts>
 #include <QtGlobal>
-
-// TODO add removing of conrol points
+#include <QApplication>
 
 namespace tfn
 {
@@ -22,7 +21,7 @@ class TransferFunctionGraph : public QChartView
 
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
-    void updateClickedIndex(const QPointF& point);
+    void controlPointPressed(const QPointF& point);
     void addNewControlPoint(const QPointF& point);
 
   protected:
@@ -40,6 +39,7 @@ class TransferFunctionGraph : public QChartView
     QPointF clampToDomain(QPointF point);
     void updateGradient();
     void updatePlotSeries();
+    void removeControlPoint(const QPointF& point);
 
     int m_currentClickedIndex = -1;
 

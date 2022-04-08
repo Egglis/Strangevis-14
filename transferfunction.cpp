@@ -34,6 +34,11 @@ bool TransferFunction::addControlPoint(QPointF pos)
     return true;
 };
 
+void TransferFunction::removeControlPoint(QPointF point)
+{
+    m_controlPoints.removeAll(point);
+}
+
 void TransferFunction::reset()
 {
     m_controlPoints.clear();

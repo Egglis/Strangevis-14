@@ -1,5 +1,6 @@
 #include "transferfunctiongraph.h"
 
+
 namespace tfn
 {
 
@@ -55,7 +56,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     this->setFixedSize(300, 300); // TODO Temporary Sizing for now
 
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
-            &TransferFunctionGraph::updateClickedIndex);
+            &TransferFunctionGraph::controlPointPressed);
 
     connect(m_boundingBox, &QAreaSeries::pressed, this,
             &TransferFunctionGraph::addNewControlPoint);
@@ -143,17 +144,42 @@ QPointF TransferFunctionGraph::clampToDomain(QPointF point)
                    qMax(qMin(max.y(), point.y()), min.y()));
 };
 
-// Sets the current clicked index of the pressed point
-void TransferFunctionGraph::updateClickedIndex(const QPointF& point)
+// Either sets current clicked index or removes the point
+void TransferFunctionGraph::controlPointPressed(const QPointF& point)
 {
-    m_currentClickedIndex = m_tfn.indexOf(point);
+    if (m_currentClickedIndex == -1)
+    {
+        Qt::MouseButtons pressedButton = QGuiApplication::mouseButtons();
+        if (pressedButton == Qt::LeftButton)
+        {
+            m_currentClickedIndex = m_tfn.indexOf(point);
+        }
+        else if (pressedButton == Qt::RightButton)
+        {
+            removeControlPoint(point);
+        }
+    }
 };
 
-// If a point is no clicked, a new point is created
+// If a point is not clicked, a new point is created
 void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
 {
-    if (m_tfn.addControlPoint(point))
+    Qt::MouseButtons button = QGuiApplication::mouseButtons();
+    if (button == Qt::LeftButton)
     {
+        if (m_tfn.addControlPoint(point))
+        {
+            updateGraph();
+        }
+    }
+};
+
+void TransferFunctionGraph::removeControlPoint(const QPointF& point)
+{
+    auto index = m_tfn.indexOf(point);
+    if (index != 0 && index != m_tfn.getControlPoints().size() - 1)
+    {
+        m_tfn.removeControlPoint(point);
         updateGraph();
     }
 };
