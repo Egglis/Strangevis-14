@@ -97,7 +97,7 @@ int TransferFunction::replace(int index, QPointF point)
 {
     if (index == 0 || index == m_controlPoints.size() - 1)
     {
-        point = QPointF(m_controlPoints[m_controlPoints.size()].x(), point.y());
+        point = QPointF(m_controlPoints[index].x(), point.y());
         m_controlPoints.replace(index, clampToDomain(point));
         return index;
     }
