@@ -66,7 +66,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
             auto a = getInterpolatedValueBetweenPoints(
-                m_controlPoints[i], m_controlPoints[i + 1], t);
+                m_controlPoints.at(i), m_controlPoints.at(i+1), t);
             new_cmap.push_back(r);
             new_cmap.push_back(g);
             new_cmap.push_back(b);
@@ -97,7 +97,7 @@ int TransferFunction::replace(int index, QPointF point)
 {
     if (index == 0 || index == m_controlPoints.size() - 1)
     {
-        point = QPointF(m_controlPoints[index].x(), point.y());
+        point = QPointF(m_controlPoints.at(index).x(), point.y());
         m_controlPoints.replace(index, clampToDomain(point));
         return index;
     }
@@ -119,8 +119,8 @@ int TransferFunction::replaceAndReorder(int index, QPointF point)
     {
         // Checks if reordering is necassary and sorts controllpoints and
         // returns new index
-        QPointF n0 = m_controlPoints[index - 1];
-        QPointF n1 = m_controlPoints[index + 1];
+        QPointF n0 = m_controlPoints.at(index - 1);
+        QPointF n1 = m_controlPoints.at(index + 1);
         if (n0.x() > point.x() || n1.x() < point.x())
         {
             m_controlPoints.replace(index, point);
