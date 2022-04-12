@@ -3,7 +3,7 @@
 #include "../geometry.h"
 #include "../transfertexture.h"
 #include "parameterwidget.h"
-#include "transferfunctionwidget.h"
+#include "transferwidget/transferfunctionwidget.h"
 
 #include <QHBoxLayout>
 #include <QMouseEvent>

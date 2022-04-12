@@ -2,16 +2,10 @@
 
 #include "transfertexture.h"
 
-#include <exception>
-
 namespace tfn
 {
 
-TransferFunction::TransferFunction()
-{
-    m_controlPoints.push_back(points::START_POINT);
-    m_controlPoints.push_back(points::END_POINT);
-};
+TransferFunction::TransferFunction() { reset(); };
 
 bool TransferFunction::addControlPoint(QPointF pos)
 {
@@ -33,6 +27,17 @@ bool TransferFunction::addControlPoint(QPointF pos)
     }
     return true;
 };
+
+bool TransferFunction::removeControlPoint(QPointF point)
+{
+    auto index = m_controlPoints.indexOf(point);
+    if (index != 0 && index != m_controlPoints.size() - 1)
+    {
+        m_controlPoints.removeAll(point);
+        return true;
+    }
+    return false;
+}
 
 void TransferFunction::reset()
 {
@@ -57,7 +62,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
             auto a = getInterpolatedValueBetweenPoints(
-                m_controlPoints[i], m_controlPoints[i + 1], t);
+                m_controlPoints.at(i), m_controlPoints.at(i + 1), t);
             new_cmap.push_back(r);
             new_cmap.push_back(g);
             new_cmap.push_back(b);
@@ -86,9 +91,22 @@ constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
 
 int TransferFunction::replace(int index, QPointF point)
 {
+    if (index == 0 || index == m_controlPoints.size() - 1)
+    {
+        point = QPointF(m_controlPoints.at(index).x(), point.y());
+        m_controlPoints.replace(index, clampToDomain(point));
+        return index;
+    }
+    else
+    {
+        return replaceAndReorder(index, clampToDomain(point));
+    }
+};
+
+int TransferFunction::replaceAndReorder(int index, QPointF point)
+{
     // If replacing first and last points reordering is not necassary
-    if (index == 0 || index == m_controlPoints.size() - 1 ||
-        m_controlPoints.size() - 1 == 2)
+    if (m_controlPoints.size() - 1 == 2)
     {
         m_controlPoints.replace(index, point);
         return index;
@@ -97,8 +115,8 @@ int TransferFunction::replace(int index, QPointF point)
     {
         // Checks if reordering is necassary and sorts controllpoints and
         // returns new index
-        QPointF n0 = m_controlPoints[index - 1];
-        QPointF n1 = m_controlPoints[index + 1];
+        QPointF n0 = m_controlPoints.at(index - 1);
+        QPointF n1 = m_controlPoints.at(index + 1);
         if (n0.x() > point.x() || n1.x() < point.x())
         {
             m_controlPoints.replace(index, point);
@@ -113,6 +131,14 @@ int TransferFunction::replace(int index, QPointF point)
             return index;
         }
     }
+};
+
+constexpr QPointF TransferFunction::clampToDomain(QPointF point)
+{
+    QPointF max = tfn::points::END_POINT;
+    QPointF min = tfn::points::START_POINT;
+    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
+                   qMax(qMin(max.y(), point.y()), min.y()));
 };
 
 } // namespace tfn

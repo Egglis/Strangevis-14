@@ -5,11 +5,10 @@
 #include "../transferfunction.h"
 #include "../transfertexture.h"
 
+#include <QApplication>
 #include <QGraphicsView>
 #include <QtCharts>
 #include <QtGlobal>
-
-// TODO add removing of conrol points
 
 namespace tfn
 {
@@ -22,7 +21,7 @@ class TransferFunctionGraph : public QChartView
 
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
-    void updateClickedIndex(const QPointF& point);
+    void updateOrRemoveClickedIndex(const QPointF& point);
     void addNewControlPoint(const QPointF& point);
 
   protected:
@@ -36,10 +35,9 @@ class TransferFunctionGraph : public QChartView
 
     // Maps local coords to chart coords
     QPointF mapLocalToChartPos(QPointF localPos);
-    // Checks if point is out of bounds and returns max x/y pointF
-    QPointF clampToDomain(QPointF point);
     void updateGradient();
     void updatePlotSeries();
+    void removeControlPoint(const QPointF& point);
 
     int m_currentClickedIndex = -1;
 

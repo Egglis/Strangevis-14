@@ -14,13 +14,7 @@
 
 
 class ISharedProperties;
-/*
-TODO:
-Add DataPoints
-Add Colormaps
-Add more settings
 
-*/
 namespace tfn
 {
 

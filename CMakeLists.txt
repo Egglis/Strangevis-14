@@ -45,13 +45,13 @@ qt_add_executable(strangevis WIN32
     properties/gradientproperties.cpp
     properties/transferproperties.cpp
     ui/renderwidget.cpp
-    ui/transferfunctionwidget.cpp
     ui/rectangulargridlayout.cpp
     ui/obliquesliceinteractor.cpp
     ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
-    ui/transferfunctiongraph.cpp
     ui/histogramwidget.cpp
+    ui/transferwidget/transferfunctiongraph.cpp
+    ui/transferwidget/transferfunctionwidget.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp
