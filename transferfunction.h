@@ -24,7 +24,6 @@ class TransferFunction
     QList<QPointF> getControlPoints() { return m_controlPoints; };
     int indexOf(QPointF point) { return m_controlPoints.indexOf(point); };
     int replace(int index, QPointF point);
-    void clear() { m_controlPoints.clear(); };
     void reset();
 
   private:
@@ -33,7 +32,7 @@ class TransferFunction
     constexpr static float getInterpolatedValueBetweenPoints(QPointF p0,
                                                              QPointF p1, int t);
     int replaceAndReorder(int index, QPointF point);
-    QPointF clampToDomain(QPointF point);
+    constexpr static QPointF clampToDomain(QPointF point);
 
     QList<QPointF> m_controlPoints;
 };
