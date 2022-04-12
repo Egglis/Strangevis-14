@@ -5,7 +5,7 @@
 #include "../renderers/raycastingwidget.h"
 #include "../texturestore.h"
 #include "parameterwidget.h"
-#include "transferfunctionwidget.h"
+#include "transferwidget/transferfunctionwidget.h"
 
 #include <QMatrix4x4>
 #include <QVBoxLayout>

@@ -2,8 +2,6 @@
 
 #include "transfertexture.h"
 
-#include <exception>
-
 namespace tfn
 {
 
@@ -34,9 +32,15 @@ bool TransferFunction::addControlPoint(QPointF pos)
     return true;
 };
 
-void TransferFunction::removeControlPoint(QPointF point)
+bool TransferFunction::removeControlPoint(QPointF point)
 {
-    m_controlPoints.removeAll(point);
+    auto index = m_controlPoints.indexOf(point);
+    if (index != 0 && index != m_controlPoints.size() - 1)
+    {
+        m_controlPoints.removeAll(point);
+        return true;
+    }
+    return false;
 }
 
 void TransferFunction::reset()
@@ -91,9 +95,22 @@ constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
 
 int TransferFunction::replace(int index, QPointF point)
 {
+    if (index == 0 || index == m_controlPoints.size() - 1)
+    {
+        point = QPointF(m_controlPoints[m_controlPoints.size()].x(), point.y());
+        m_controlPoints.replace(index, clampToDomain(point));
+        return index;
+    }
+    else
+    {
+        return replaceAndReorder(index, clampToDomain(point));
+    }
+};
+
+int TransferFunction::replaceAndReorder(int index, QPointF point)
+{
     // If replacing first and last points reordering is not necassary
-    if (index == 0 || index == m_controlPoints.size() - 1 ||
-        m_controlPoints.size() - 1 == 2)
+    if (m_controlPoints.size() - 1 == 2)
     {
         m_controlPoints.replace(index, point);
         return index;
@@ -118,6 +135,14 @@ int TransferFunction::replace(int index, QPointF point)
             return index;
         }
     }
+};
+
+QPointF TransferFunction::clampToDomain(QPointF point)
+{
+    QPointF max = tfn::points::END_POINT;
+    QPointF min = tfn::points::START_POINT;
+    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
+                   qMax(qMin(max.y(), point.y()), min.y()));
 };
 
 } // namespace tfn

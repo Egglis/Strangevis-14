@@ -19,7 +19,7 @@ class TransferFunction
   public:
     TransferFunction();
     bool addControlPoint(QPointF pos);
-    void removeControlPoint(QPointF point);
+    bool removeControlPoint(QPointF point);
     std::vector<GLfloat> applyTransferFunction(const std::vector<GLfloat> cmap);
     QList<QPointF> getControlPoints() { return m_controlPoints; };
     int indexOf(QPointF point) { return m_controlPoints.indexOf(point); };
@@ -32,6 +32,8 @@ class TransferFunction
     // points
     constexpr static float getInterpolatedValueBetweenPoints(QPointF p0,
                                                              QPointF p1, int t);
+    int replaceAndReorder(int index, QPointF point);
+    QPointF clampToDomain(QPointF point);
 
     QList<QPointF> m_controlPoints;
 };

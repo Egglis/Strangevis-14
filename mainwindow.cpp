@@ -7,7 +7,7 @@
 #include "ui/parameterwidget.h"
 #include "ui/rectangulargridlayout.h"
 #include "ui/renderwidget.h"
-#include "ui/transferfunctionwidget.h"
+#include "ui/transferwidget/transferfunctionwidget.h"
 
 #include <QAction>
 #include <QFileDialog>
