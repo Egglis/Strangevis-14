@@ -1,6 +1,5 @@
 #include "transferfunctiongraph.h"
 
-
 namespace tfn
 {
 
@@ -37,9 +36,10 @@ TransferFunctionGraph::TransferFunctionGraph(
         QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
     m_boundingBox = new QAreaSeries(lines);
     m_boundingBox->setColor(QColor(0, 0, 0, 0));
+    m_areaSeries->setUpperSeries(m_lineSeries);
 
-    m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_areaSeries);
+    m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
     m_chart->createDefaultAxes();
     auto axes = m_chart->axes();
@@ -48,13 +48,17 @@ TransferFunctionGraph::TransferFunctionGraph(
     axes[0]->setLabelsVisible(false);
     axes[1]->setLabelsVisible(false);
 
+    m_areaSeries->attachAxis(axes[0]);
+    m_areaSeries->attachAxis(axes[1]);
+    m_scatterSeries->attachAxis(axes[0]);
+    m_scatterSeries->attachAxis(axes[1]);
+
     m_chart->setTitle("TransferFunction");
 
     this->setChart(m_chart);
     this->setRenderHint(QPainter::Antialiasing);
     this->setRubberBand(QChartView::NoRubberBand);
     this->setFixedSize(300, 300); // TODO Temporary Sizing for now
-
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
             &TransferFunctionGraph::updateOrRemoveClickedIndex);
 
@@ -76,26 +80,8 @@ void TransferFunctionGraph::updateGraph()
 
 void TransferFunctionGraph::updatePlotSeries()
 {
-    m_chart->removeSeries(m_areaSeries);
-    m_chart->removeSeries(m_scatterSeries);
-    m_chart->removeSeries(m_boundingBox);
-
-    m_lineSeries->clear();
-    m_lineSeries->append(m_tfn.getControlPoints());
-
-    m_scatterSeries->clear();
-    m_scatterSeries->append(m_tfn.getControlPoints());
-
-    m_areaSeries->setUpperSeries(m_lineSeries);
-
-    m_chart->addSeries(m_areaSeries);
-    m_chart->addSeries(m_boundingBox);
-    m_chart->addSeries(m_scatterSeries);
-
-    m_scatterSeries->attachAxis(m_chart->axes(Qt::Horizontal)[0]);
-    m_scatterSeries->attachAxis(m_chart->axes(Qt::Vertical)[0]);
-    m_areaSeries->attachAxis(m_chart->axes(Qt::Horizontal)[0]);
-    m_areaSeries->attachAxis(m_chart->axes(Qt::Vertical)[0]);
+    m_lineSeries->replace(m_tfn.getControlPoints());
+    m_scatterSeries->replace(m_tfn.getControlPoints());
 };
 
 void TransferFunctionGraph::updateGradient()
@@ -175,9 +161,9 @@ void TransferFunctionGraph::removeControlPoint(const QPointF& point)
 // When draggins a point is finished replace point with new location
 void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
 {
+    QChartView::mouseReleaseEvent(event);
     if (m_currentClickedIndex != -1)
     {
-        QChartView::mouseReleaseEvent(event);
         QPointF graphPoint = mapLocalToChartPos(event->position());
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
@@ -188,9 +174,9 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
 // Mouse event for handeling dragging of a point
 void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
 {
+    QChartView::mouseMoveEvent(event);
     if (m_currentClickedIndex != -1)
     {
-        QChartView::mouseMoveEvent(event);
         QPointF graphPoint = mapLocalToChartPos(event->position());
         m_currentClickedIndex =
             m_tfn.replace(m_currentClickedIndex, graphPoint);
