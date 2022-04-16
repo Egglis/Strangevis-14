@@ -1,0 +1,6 @@
+[requires]
+imgui/1.83
+imguizmo/1.83
+
+[generators]
+cmake
