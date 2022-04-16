@@ -2,6 +2,9 @@
 
 #include "../geometry.h"
 
+#include <ImGui.h>
+#include <ImGuizmo.h>
+
 RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
                                    std::unique_ptr<ITextureStore>& textureStore,
                                    QWidget* parent, Qt::WindowFlags f)
@@ -9,7 +12,8 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
-      m_projectionMode{initialRenderProperties.projectionMode}
+      m_projectionMode{initialRenderProperties.projectionMode},
+      m_imGuiReference{nullptr}
 {
     m_viewMatrix.setToIdentity();
     m_viewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
@@ -35,6 +39,8 @@ void RayCastingWidget::zoomCamera(float zoomFactor)
 void RayCastingWidget::initializeGL()
 {
     initializeOpenGLFunctions();
+    m_imGuiReference = QtImGui::initialize(this, false);
+
     glEnable(GL_DEPTH_TEST);
     // initialize geometry
     Geometry::instance();
@@ -67,9 +73,10 @@ void RayCastingWidget::resizeGL(int w, int h)
 void RayCastingWidget::paintGL()
 {
     int location = -1;
-
     glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    renderImGuizmo();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -161,4 +168,16 @@ void RayCastingWidget::changeProjectionMode(Projection mode)
 {
     m_projectionMode = mode;
     update();
+}
+
+void RayCastingWidget::renderImGuizmo()
+{
+    QtImGui::newFrame(m_imGuiReference);
+
+    ImGuizmo::BeginFrame();
+    ImGuizmo::Enable(true);
+    ImGuizmo::ViewManipulate(m_viewMatrix.data(), 2.0f * sqrt(3.0f),
+                             ImVec2(0, 0), ImVec2(128, 128), 0);
+    ImGui::Render();
+    QtImGui::render(m_imGuiReference);
 }
