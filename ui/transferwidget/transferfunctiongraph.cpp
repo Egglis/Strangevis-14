@@ -7,6 +7,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     const std::shared_ptr<ISharedProperties> properties)
     : m_properties{properties}
 {
+
     m_chart->legend()->hide();
     m_pen->setWidth(LINE_WIDTH);
 
@@ -23,6 +24,11 @@ TransferFunctionGraph::TransferFunctionGraph(
     // Used to display gradient below the line
     m_areaSeries->setName("Gradient Display");
     m_areaSeries->setPen(*m_pen);
+
+    // Control Point hint
+    m_hint = new HintItem(m_chart, m_scatterSeries);
+    m_hint->setZValue(11);
+    m_hint->hide();
 
     // Bounding box for hit detection
     QLineSeries* lines = new QLineSeries();
@@ -121,8 +127,6 @@ QPointF TransferFunctionGraph::mapLocalToChartPos(QPointF localpos)
     return chartPos;
 };
 
-
-
 // Either sets current clicked index or removes the point
 void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
 {
@@ -132,6 +136,7 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         if (pressedButton == Qt::LeftButton)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
+            updateControlPointHint(m_currentClickedIndex);
         }
         else if (pressedButton == Qt::RightButton)
         {
@@ -148,14 +153,14 @@ void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
     {
         updateGraph();
     }
-    
 };
 
 void TransferFunctionGraph::removeControlPoint(const QPointF& point)
 {
-    if(m_tfn.removeControlPoint(point)){
+    if (m_tfn.removeControlPoint(point))
+    {
         updateGraph();
-    }    
+    }
 };
 
 // When draggins a point is finished replace point with new location
@@ -168,6 +173,7 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
         m_currentClickedIndex = -1;
+        m_hint->hide();
     }
 };
 
@@ -181,7 +187,16 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
         m_currentClickedIndex =
             m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
+        updateControlPointHint(m_currentClickedIndex);
+        m_hint->show();
     }
+};
+
+void TransferFunctionGraph::updateControlPointHint(int index)
+{
+    QPointF point = m_tfn.getControlPoints().at(index);
+    m_hint->setText(QString("X: %1 Y: %2").arg(point.x()).arg(point.y()));
+    m_hint->setAnchor(point, HINT_OFFSET);
 };
 
 } // namespace tfn
