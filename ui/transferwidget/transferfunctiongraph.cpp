@@ -99,7 +99,7 @@ void TransferFunctionGraph::updateGradient()
     but will be usefull when you can change colors later */
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-
+    
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
         float r = m_cmap.colorMapData()[i * tfn::size::NUM_CHANNELS];
@@ -188,8 +188,7 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         QPointF graphPoint = mapLocalToChartPos(event->position());
-        m_currentClickedIndex =
-            m_tfn.replace(m_currentClickedIndex, graphPoint);
+        m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
         updateControlPointHint(m_currentClickedIndex);
         m_hint->show();

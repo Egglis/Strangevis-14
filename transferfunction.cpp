@@ -89,55 +89,28 @@ constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
     return m * (t - p0.x()) + p0.y();
 };
 
-int TransferFunction::replace(int index, QPointF point)
+void TransferFunction::replace(int index, QPointF point)
 {
     if (index == 0 || index == m_controlPoints.size() - 1)
     {
-        point = QPointF(m_controlPoints.at(index).x(), point.y());
-        m_controlPoints.replace(index, clampToDomain(point));
-        return index;
-    }
-    else
-    {
-        return replaceAndReorder(index, clampToDomain(point));
-    }
-};
-
-int TransferFunction::replaceAndReorder(int index, QPointF point)
-{
-    // If replacing first and last points reordering is not necassary
-    if (m_controlPoints.size() - 1 == 2)
-    {
+        point = QPointF(m_controlPoints.at(index).x(),
+                        qMax(qMin(tfn::points::END_POINT.y(), point.y()),
+                             tfn::points::START_POINT.y()));
         m_controlPoints.replace(index, point);
-        return index;
     }
     else
     {
-        // Checks if reordering is necassary and sorts controllpoints and
-        // returns new index
-        QPointF n0 = m_controlPoints.at(index - 1);
-        QPointF n1 = m_controlPoints.at(index + 1);
-        if (n0.x() > point.x() || n1.x() < point.x())
-        {
-            m_controlPoints.replace(index, point);
-            std::sort(
-                m_controlPoints.begin(), m_controlPoints.end(),
-                [](const auto& x1, const auto& x2) { return x1.x() < x2.x(); });
-            return m_controlPoints.indexOf(point);
-        }
-        else
-        {
-            m_controlPoints.replace(index, point);
-            return index;
-        }
+        m_controlPoints.replace(index, clampToDomain(index, point));
     }
 };
 
-constexpr QPointF TransferFunction::clampToDomain(QPointF point)
+QPointF TransferFunction::clampToDomain(int index, QPointF point)
 {
-    QPointF max = tfn::points::END_POINT;
-    QPointF min = tfn::points::START_POINT;
-    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
+    const QPointF max = tfn::points::END_POINT;
+    const QPointF min = tfn::points::START_POINT;
+    const QPointF left = m_controlPoints.at(index - 1);
+    const QPointF right = m_controlPoints.at(index + 1);
+    return QPointF(qMax(qMin(right.x(), point.x()), left.x()),
                    qMax(qMin(max.y(), point.y()), min.y()));
 };
 
