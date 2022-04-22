@@ -21,6 +21,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_scatterSeries->setBorderColor(POINT_BORDER_COLOR);
     m_scatterSeries->setColor(POINT_COLOR);
 
+
     // Used to display gradient below the line
     m_areaSeries->setName("Gradient Display");
     m_areaSeries->setPen(*m_pen);
@@ -47,6 +48,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
+    m_chart->setBackgroundVisible(false);
     m_chart->createDefaultAxes();
     auto axes = m_chart->axes();
     axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
@@ -64,6 +66,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     this->setChart(m_chart);
     this->setRenderHint(QPainter::Antialiasing);
     this->setRubberBand(QChartView::NoRubberBand);
+    this->setStyleSheet("background: transparent");
     this->setFixedSize(300, 300); // TODO Temporary Sizing for now
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
             &TransferFunctionGraph::updateOrRemoveClickedIndex);
@@ -137,6 +140,7 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
             updateControlPointHint(m_currentClickedIndex);
+
         }
         else if (pressedButton == Qt::RightButton)
         {
@@ -197,6 +201,7 @@ void TransferFunctionGraph::updateControlPointHint(int index)
     QPointF point = m_tfn.getControlPoints().at(index);
     m_hint->setText(QString("X: %1 Y: %2").arg(point.x()).arg(point.y()));
     m_hint->setAnchor(point, HINT_OFFSET);
+    
 };
 
 } // namespace tfn

@@ -50,7 +50,7 @@ class TransferFunctionGraph : public QChartView
     constexpr static int LINE_WIDTH = 3;
     constexpr static QPointF HINT_OFFSET = QPointF(5, -(POINT_SIZE*2));
     constexpr static QColor POINT_BORDER_COLOR = QColor(0, 0, 0);
-    constexpr static QColor POINT_COLOR = QColor(150, 150, 150, 0.4);
+    constexpr static QColor POINT_COLOR = QColor(150, 150, 150, 80);
     constexpr static QColor LINE_COLOR = QColor(165, 165, 164);
 
     TransferFunction m_tfn = TransferFunction();
