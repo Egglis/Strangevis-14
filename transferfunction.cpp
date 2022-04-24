@@ -62,7 +62,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
             auto a = getInterpolatedValueBetweenPoints(
-                m_controlPoints.at(i), m_controlPoints.at(i + 1), t);
+                m_controlPoints.at(i), m_controlPoints.at(i + 1), t*(tfn::points::END_POINT.x()/static_cast<float>(255)));
             new_cmap.push_back(r);
             new_cmap.push_back(g);
             new_cmap.push_back(b);
