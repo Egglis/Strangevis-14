@@ -109,8 +109,7 @@ void TransferFunctionGraph::updateGradient()
         float a = cmap[(i * tfn::size::NUM_CHANNELS) + 3];
 
         QColor col;
-        col.setRgbF(r, g, b);
-        col.setAlphaF(a);
+        col.setRgbF(r, g, b, a);
         m_gradient.setColorAt(i/static_cast<float>(tfn::size::NUM_POINTS), col);
     }
     m_areaSeries->setBrush(m_gradient);
