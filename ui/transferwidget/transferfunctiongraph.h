@@ -43,7 +43,6 @@ class TransferFunctionGraph : public QChartView
     void updateControlPointHint(int index);
 
     int m_currentClickedIndex = -1;
-    int m_previousClickedIndex = -1;
 
     // Styling options
     constexpr static int POINT_SIZE = 15;
