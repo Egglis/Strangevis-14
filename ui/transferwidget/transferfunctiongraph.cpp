@@ -95,26 +95,25 @@ void TransferFunctionGraph::updatePlotSeries()
 
 void TransferFunctionGraph::updateGradient()
 {
-    /* Useless to update graident each time,
-    but will be usefull when you can change colors later */
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    
+    std::vector<GLfloat> cmap =
+        m_tfn.applyTransferFunction(m_cmap.colorMapData());
+
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
-        float r = m_cmap.colorMapData()[i * tfn::size::NUM_CHANNELS];
-        float g = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 1];
-        float b = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 2];
-        float a = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 3];
+        float r = cmap[i * tfn::size::NUM_CHANNELS];
+        float g = cmap[(i * tfn::size::NUM_CHANNELS) + 1];
+        float b = cmap[(i * tfn::size::NUM_CHANNELS) + 2];
+        float a = cmap[(i * tfn::size::NUM_CHANNELS) + 3];
 
         QColor col;
-        col.setRgbF(r, g, b);
-        m_gradient.setColorAt(a, col);
+        col.setRgbF(r, g, b, qMin(a, static_cast<float>(1)));
+        m_gradient.setColorAt(i / static_cast<float>(tfn::size::NUM_POINTS),
+                              col);
     }
-
     m_areaSeries->setBrush(m_gradient);
 };
-
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
 {
     m_cmap = cmap;
