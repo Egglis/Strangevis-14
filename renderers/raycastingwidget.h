@@ -10,6 +10,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 
+#include <QtImGui.h>
+
 enum class Projection { Orthographic, Perspective };
 
 struct RenderProperties
@@ -44,6 +46,8 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void changeTransferFunction(QString transferFunctionName);
 
   private:
+    void renderImGuizmo();
+
     std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
@@ -53,6 +57,8 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
+
+    QtImGui::RenderRef m_imGuiReference;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;

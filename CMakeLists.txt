@@ -6,6 +6,30 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Set path to our custom CMAKE scripts
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+
+# Include and run the conan package manager to install some external libraries for us
+# Requires Python or Conan on the path
+include(conan)
+conan_cmake_autodetect(settings)
+conan_cmake_install(
+    PATH_OR_REFERENCE ${CMAKE_SOURCE_DIR}
+    BUILD missing
+    REMOTE conancenter
+    SETTINGS ${settings}
+    )
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+# Include Qt deployment helper function
+include(windeployqt)
+
+# Include the external qtimgui library to allow us to render ImGui widgets in QOpenGL
+# This was not available in conan.
+add_subdirectory(${CMAKE_SOURCE_DIR}/vendor/qtimgui)
+
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -22,12 +46,6 @@ find_package(Qt6 COMPONENTS REQUIRED
 if (MSVC)
     add_compile_options(/W4 /external:anglebrackets /external:W0 /external:I "${CMAKE_SOURCE_DIR}/vendor")
 endif()
-
-# Set path to our custom CMAKE scripts
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
-# Include Qt deployment helper function
-include(windeployqt)
 
 qt_add_executable(strangevis WIN32
     main.cpp
@@ -93,6 +111,8 @@ target_link_libraries(strangevis PRIVATE
     Qt6::OpenGLWidgets
     Qt6::Xml
     Qt6::Charts
+    qt_imgui_widgets
+    ${CONAN_LIBS}
 )
 windeployqt(strangevis)
 
