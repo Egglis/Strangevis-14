@@ -14,16 +14,26 @@ constexpr static QPointF START_POINT = QPointF(0, 0);
 constexpr static QPointF END_POINT = QPointF(4095, 1);
 }; // namespace points
 
+class ControlPoint : public QPointF
+{
+  public:
+    ControlPoint(QPointF position);
+    void setControlNode(int index, QPointF pos);
+  private:
+    QList<QPointF> m_controlNodes;   
+};
+
 class TransferFunction
 {
   public:
     TransferFunction();
-    bool addControlPoint(QPointF pos);
-    bool removeControlPoint(QPointF point);
+    bool addControlPoint(ControlPoint cp);
+    bool removeControlPoint(ControlPoint point);
     std::vector<GLfloat> applyTransferFunction(const std::vector<GLfloat> cmap);
-    QList<QPointF> getControlPoints() { return m_controlPoints; };
-    int indexOf(QPointF point) { return m_controlPoints.indexOf(point); };
-    void replace(int index, QPointF point);
+    QList<QPointF> getSeriesPoints();
+    QList<ControlPoint> getControlPoints() { return m_controlPoints; };
+    int indexOf(ControlPoint point) { return m_controlPoints.indexOf(point); };
+    void replace(int index, ControlPoint point);
     void reset();
 
   private:
@@ -31,10 +41,14 @@ class TransferFunction
     // points
     constexpr static float getInterpolatedValueBetweenPoints(QPointF p0,
                                                              QPointF p1, int t);
-    QPointF clampToDomain(int index, QPointF point);
+    QPointF clampToDomain(int index, ControlPoint cp);
 
-    QList<QPointF> m_controlPoints;
+    QList<ControlPoint> m_controlPoints;
 };
+
+
+
+
 
 } // namespace tfn
 

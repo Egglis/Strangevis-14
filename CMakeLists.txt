@@ -71,6 +71,7 @@ qt_add_executable(strangevis WIN32
     ui/transferwidget/transferfunctiongraph.cpp
     ui/transferwidget/transferfunctionwidget.cpp
     ui/transferwidget/hintitem.cpp
+    ui/transferwidget/splinecontrolseries.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp

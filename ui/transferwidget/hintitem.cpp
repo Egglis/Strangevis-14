@@ -44,6 +44,7 @@ void HintItem::setAnchor(QPointF point, QPointF offset)
 {
     m_anchor = point;
     setPos(m_chart->mapToPosition(point) + offset);
+    qDebug() << m_chart->mapToPosition(offset);
 };
 
 }; // namespace tfn

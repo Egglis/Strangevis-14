@@ -5,12 +5,15 @@
 #include "../transferfunction.h"
 #include "../transfertexture.h"
 #include "hintitem.h"
+#include "splinecontrolseries.h"
 
 #include <QApplication>
 #include <QGraphicsView>
 #include <QtCharts>
 #include <QtGlobal>
 #include <QString>
+#include <QOpenGLFunctions>
+
 
 namespace tfn
 {
@@ -64,8 +67,12 @@ class TransferFunctionGraph : public QChartView
     QPen* m_pen = new QPen(LINE_COLOR);
     QLinearGradient m_gradient;
     HintItem* m_hint;
+    SplineControlSeries* m_splineControls;
 
 };
+
+
+
 } // namespace tfn
 
 #endif
