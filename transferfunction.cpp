@@ -54,16 +54,16 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
     int from_x = 0;
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
-        auto norm = m_controlPoints[i + 1].x() / tfn::points::END_POINT.x();
-        int target_x = static_cast<int>(norm * (tfn::size::NUM_POINTS - 1));
+        auto x = m_controlPoints[i + 1].x();
+        int target_x = static_cast<int>(x * (tfn::size::NUM_POINTS - 1));
         for (int t = from_x; t <= target_x; t++)
         {
             auto r = cmap[t * tfn::size::NUM_CHANNELS];
             auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
             auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
-            auto a = getInterpolatedValueBetweenPoints(
+            float a = getInterpolatedValueBetweenPoints(
                 m_controlPoints.at(i), m_controlPoints.at(i + 1),
-                t * (tfn::points::END_POINT.x() / static_cast<float>(255)));
+                t / static_cast<float>(tfn::size::NUM_POINTS - 1));
             new_cmap.push_back(r);
             new_cmap.push_back(g);
             new_cmap.push_back(b);
@@ -77,7 +77,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 
 constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
                                                                     QPointF p1,
-                                                                    int t)
+                                                                    float t)
 {
     if (p0.x() == p1.x())
     {
@@ -101,18 +101,24 @@ void TransferFunction::replace(int index, QPointF point)
     }
     else
     {
-        m_controlPoints.replace(index, clampToDomain(index, point));
+        m_controlPoints.replace(index,
+                                clampToNeighbours(index, clampToDomain(point)));
     }
 };
 
-QPointF TransferFunction::clampToDomain(int index, QPointF point)
+QPointF TransferFunction::clampToDomain(QPointF point)
 {
     const QPointF max = tfn::points::END_POINT;
     const QPointF min = tfn::points::START_POINT;
+    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
+                   qMax(qMin(max.y(), point.y()), min.y()));
+};
+
+QPointF TransferFunction::clampToNeighbours(int index, QPointF point)
+{
     const QPointF left = m_controlPoints.at(index - 1);
     const QPointF right = m_controlPoints.at(index + 1);
-    return QPointF(qMax(qMin(right.x(), point.x()), left.x()),
-                   qMax(qMin(max.y(), point.y()), min.y()));
+    return QPointF(qMax(qMin(right.x(), point.x()), left.x()), point.y());
 };
 
 } // namespace tfn
