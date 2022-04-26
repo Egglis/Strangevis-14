@@ -183,16 +183,17 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
     QChartView::mouseReleaseEvent(event);
     QPointF graphPoint = mapLocalToChartPos(event->position());
 
-    m_splineControls->controlNodeReleased(graphPoint);
+    if(m_splineControls->controlNodeReleased(graphPoint)) {
+        updateGraph();
+    };
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         m_previousClickedIndex = m_currentClickedIndex;
         m_currentClickedIndex = -1;
         m_hint->hide();
-
+        updateGraph();
     }
-    updateGraph();
 
 };
 
@@ -201,15 +202,17 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
 {
     QChartView::mouseMoveEvent(event);
     QPointF graphPoint = mapLocalToChartPos(event->position());
-    m_splineControls->controlNodeMoved(graphPoint);
+    if(m_splineControls->controlNodeMoved(graphPoint)){
+        updateGraph();
+    }
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateControlPointHint(m_currentClickedIndex);
         m_splineControls->updateControlNodes();
         m_hint->show();
+        updateGraph();
     }
-            updateGraph();
 
 };
 

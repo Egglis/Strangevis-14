@@ -38,6 +38,7 @@ class TransferFunction
     bool addControlPoint(ControlPoint cp);
     bool removeControlPoint(ControlPoint point);
     std::vector<GLfloat> applyTransferFunction(const std::vector<GLfloat> cmap);
+    QList<QPointF> toLineSeries();
     QList<QPointF> getSeriesPoints();
     QList<ControlPoint> getControlPoints() { return m_controlPoints; };
     int indexOf(ControlPoint point) { return m_controlPoints.indexOf(point); };

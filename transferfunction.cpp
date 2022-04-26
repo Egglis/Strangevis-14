@@ -87,7 +87,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
             auto bt = (t-from_x)/static_cast<float>(target_x-from_x);
             qDebug() << bt << "T";
             QPointF bez =
-                bezier(from, cp0, cp1, target, bt);
+                bezier(from, QPointF(cp0.x() - tfn::nodes::OFFSET.x(), cp0.y()), QPointF(cp1.x(), cp1.y() - tfn::nodes::OFFSET.y()), target, bt);
             m_b.append(bez);
             // Test end
 
@@ -138,6 +138,16 @@ QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
     float y = getPt(ym, yn, t);
 
     return QPointF(x, y);
+};
+
+QList<QPointF> TransferFunction::toLineSeries()
+{
+    for(int i = 0; i < m_controlPoints.length() - 1; i++){
+        QPointF from = m_controlPoints.at(i);
+        QPointF to = m_controlPoints.at(i+1);
+        QPointF cp0 = m_controlPoints[i].getControlNodes().at(tfn::nodes::RIGHT);
+        QPointF cp1 = m_controlPoints[i].getControlNodes().at(tfn::nodes::TOP);
+    }
 };
 
 float TransferFunction::getPt(float n1, float n2, float perc)
@@ -214,10 +224,6 @@ ControlPoint::ControlPoint(QPointF position)
         QPointF(position.x() + tfn::nodes::OFFSET.x(), position.y()));
     m_controlNodes.append(
         QPointF(position.x(), position.y() + tfn::nodes::OFFSET.y()));
-    m_controlNodes.append(
-        QPointF(position.x() - tfn::nodes::OFFSET.x(), position.y()));
-    m_controlNodes.append(
-        QPointF(position.x(), position.y() - tfn::nodes::OFFSET.y()));
 };
 
 void ControlPoint::setControlNode(int index, QPointF pos)
@@ -241,10 +247,6 @@ QPointF ControlPoint::clampToDirections(int dir, QPointF pos)
         return QPointF(qMax(pos.x(), x() + tfn::nodes::OFFSET.x()), y());
     case 1: // Top
         return QPointF(x(), qMax(pos.y(), y() + tfn::nodes::OFFSET.y()));
-    case 2: // Left
-        return QPointF(qMin(pos.x(), x() - tfn::nodes::OFFSET.x()), y());
-    case 3: // Bottom
-        return QPointF(x(), qMin(pos.y(), y() - tfn::nodes::OFFSET.y()));
     }
     return pos;
 };

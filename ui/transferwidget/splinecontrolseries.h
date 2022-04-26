@@ -16,8 +16,8 @@ class SplineControlSeries : public QObject
     SplineControlSeries(TransferFunction* tfn, QChart* chart);
     void setAnchor(int index);
     void setVisible(bool visible);
-    void controlNodeReleased(QPointF point);
-    void controlNodeMoved(QPointF point);
+    bool controlNodeReleased(QPointF point);
+    bool controlNodeMoved(QPointF point);
     void updateControlNodes();
 
   public slots:

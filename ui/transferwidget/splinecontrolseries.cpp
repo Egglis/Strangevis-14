@@ -58,23 +58,27 @@ void SplineControlSeries::setClickedIndex(const QPointF& point)
     }
 };
 
-void SplineControlSeries::controlNodeReleased(QPointF point)
+bool SplineControlSeries::controlNodeReleased(QPointF point)
 {
     if (m_currentClickedNode != -1)
     {
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
         m_currentClickedNode = -1;
         updateControlNodes();
+        return true;
     }
+    return false;
 };
 
-void SplineControlSeries::controlNodeMoved(QPointF point)
+bool SplineControlSeries::controlNodeMoved(QPointF point)
 {
     if (m_currentClickedNode != -1)
     {
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
         updateControlNodes();
+        return true;
     }
+    return false;
 };
 
 }; // namespace tfn
