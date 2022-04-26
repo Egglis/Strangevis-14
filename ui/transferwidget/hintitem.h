@@ -22,6 +22,7 @@ class HintItem : public QGraphicsItem
   private:
     QColor FILL_COLOR = QColor(178, 178, 178, 170);
     QColor TEXT_COLOR = QColor(0, 0, 0);
+    int MARGIN = 2;
 
     QChart* m_chart;
     QScatterSeries* m_series;

@@ -9,6 +9,7 @@
 
 #include <QApplication>
 #include <QGraphicsView>
+#include <QString>
 #include <QtCharts>
 #include <QtGlobal>
 #include <QString>
@@ -17,6 +18,13 @@
 
 namespace tfn
 {
+
+namespace graph
+{
+constexpr static int WIDTH = 300;
+constexpr static int HEIGHT = 300;
+} // namespace graph
+
 class TransferFunctionGraph : public QChartView
 {
     Q_OBJECT
@@ -51,7 +59,7 @@ class TransferFunctionGraph : public QChartView
     // Styling options
     constexpr static int POINT_SIZE = 15;
     constexpr static int LINE_WIDTH = 3;
-    constexpr static QPointF HINT_OFFSET = QPointF(5, -(POINT_SIZE*2));
+    constexpr static QPointF HINT_OFFSET = QPointF(5, -(POINT_SIZE * 2));
     constexpr static QColor POINT_BORDER_COLOR = QColor(0, 0, 0);
     constexpr static QColor POINT_COLOR = QColor(150, 150, 150, 80);
     constexpr static QColor LINE_COLOR = QColor(165, 165, 164);

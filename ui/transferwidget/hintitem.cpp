@@ -1,5 +1,7 @@
 #include "hintitem.h"
 
+#include "transferfunctiongraph.h"
+
 namespace tfn
 {
 
@@ -36,15 +38,20 @@ void HintItem::setText(const QString& text)
     m_textRect =
         metrics.boundingRect(QRect(0, 0, 150, 150), Qt::AlignLeft, m_text);
     m_textRect.translate(5, 5);
-    m_rect = m_textRect.adjusted(-2, -2, 2, 2);
+    m_rect = m_textRect.adjusted(-MARGIN, -MARGIN, MARGIN, MARGIN);
     prepareGeometryChange();
 };
 
 void HintItem::setAnchor(QPointF point, QPointF offset)
 {
     m_anchor = point;
-    setPos(m_chart->mapToPosition(point) + offset);
-    qDebug() << m_chart->mapToPosition(offset);
+    QPointF new_pos = m_chart->mapToPosition(point) + offset;
+    if ((new_pos + m_rect.topRight()).x() > tfn::graph::WIDTH)
+    {
+        const float m = (new_pos + m_rect.topRight()).x() - tfn::graph::WIDTH;
+        new_pos -= QPointF(m, 0);
+    }
+    setPos(new_pos);
 };
 
 }; // namespace tfn

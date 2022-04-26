@@ -70,7 +70,8 @@ TransferFunctionGraph::TransferFunctionGraph(
     this->setRenderHint(QPainter::Antialiasing);
     this->setRubberBand(QChartView::NoRubberBand);
     this->setStyleSheet("background: transparent");
-    this->setFixedSize(300, 300); // TODO Temporary Sizing for now
+    this->setFixedSize(tfn::graph::WIDTH,
+                       tfn::graph::HEIGHT); // TODO Temporary Sizing for now
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
             &TransferFunctionGraph::updateOrRemoveClickedIndex);
 
@@ -100,7 +101,7 @@ void TransferFunctionGraph::updateGradient()
 {
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    std::vector<GLfloat> cmap =
+    const std::vector<GLfloat>& cmap =
         m_tfn.applyTransferFunction(m_cmap.colorMapData());
 
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
@@ -111,13 +112,12 @@ void TransferFunctionGraph::updateGradient()
         float a = cmap[(i * tfn::size::NUM_CHANNELS) + 3];
 
         QColor col;
-        col.setRgbF(r, g, b, qMin(a, static_cast<float>(1)));
+        col.setRgbF(r, g, b, qMin(a, 1.0f));
         m_gradient.setColorAt(i / static_cast<float>(tfn::size::NUM_POINTS),
                               col);
     }
     m_areaSeries->setBrush(m_gradient);
 };
-
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
 {
     m_cmap = cmap;
@@ -219,7 +219,11 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
 void TransferFunctionGraph::updateControlPointHint(int index)
 {
     QPointF point = m_tfn.getControlPoints().at(index);
-    m_hint->setText(QString("X: %1 Y: %2").arg(point.x()).arg(point.y()));
+    double x = point.x();
+    double y = point.y();
+    m_hint->setText(QString("X: %1 Y: %2")
+                        .arg(QString::number(x, 'f', 2))
+                        .arg(QString::number(y, 'f', 2)));
     m_hint->setAnchor(point, HINT_OFFSET);
 };
 

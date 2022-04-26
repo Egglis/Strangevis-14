@@ -67,8 +67,8 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
     m_b.clear();
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
-        auto norm = m_controlPoints[i + 1].x() / tfn::points::END_POINT.x();
-        int target_x = static_cast<int>(norm * (tfn::size::NUM_POINTS - 1));
+        auto x = m_controlPoints[i + 1].x();
+        int target_x = static_cast<int>(x * (tfn::size::NUM_POINTS - 1));
         for (int t = from_x; t <= target_x; t++)
         {
             auto r = cmap[t * tfn::size::NUM_CHANNELS];
@@ -82,12 +82,13 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
                 m_controlPoints.at(i), m_controlPoints.at(i + 1),
                 t * (tfn::points::END_POINT.x() / static_cast<float>(255)));
                 */
-            
+
             // Bezier Test
-            auto bt = (t-from_x)/static_cast<float>(target_x-from_x);
+            auto bt = t / static_cast<float>(tfn::size::NUM_POINTS - 1);
             qDebug() << bt << "T";
-            QPointF bez =
-                bezier(from, QPointF(cp0.x() - tfn::nodes::OFFSET.x(), cp0.y()), QPointF(cp1.x(), cp1.y() - tfn::nodes::OFFSET.y()), target, bt);
+            QPointF bez = bezier(
+                from, QPointF(cp0.x() - tfn::nodes::OFFSET.x(), cp0.y()),
+                QPointF(cp1.x(), cp1.y() - tfn::nodes::OFFSET.y()), target, bt);
             m_b.append(bez);
             // Test end
 
@@ -107,7 +108,7 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 // TODO De Casteljau
 constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
                                                                     QPointF p1,
-                                                                    int t)
+                                                                    float t)
 {
     if (p0.x() == p1.x())
     {
@@ -120,7 +121,8 @@ constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
     return m * (t - p0.x()) + p0.y();
 };
 
-QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3, float t)
+QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
+                                 float t)
 {
     float xa = getPt(p0.x(), p1.x(), t);
     float ya = getPt(p0.y(), p1.y(), t);
@@ -142,10 +144,12 @@ QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
 
 QList<QPointF> TransferFunction::toLineSeries()
 {
-    for(int i = 0; i < m_controlPoints.length() - 1; i++){
+    for (int i = 0; i < m_controlPoints.length() - 1; i++)
+    {
         QPointF from = m_controlPoints.at(i);
-        QPointF to = m_controlPoints.at(i+1);
-        QPointF cp0 = m_controlPoints[i].getControlNodes().at(tfn::nodes::RIGHT);
+        QPointF to = m_controlPoints.at(i + 1);
+        QPointF cp0 =
+            m_controlPoints[i].getControlNodes().at(tfn::nodes::RIGHT);
         QPointF cp1 = m_controlPoints[i].getControlNodes().at(tfn::nodes::TOP);
     }
 };
@@ -155,31 +159,6 @@ float TransferFunction::getPt(float n1, float n2, float perc)
     float diff = n2 - n1;
     return n1 + (diff * perc);
 };
-
-/*
-for( float i = 0 ; i < 1 ; i += 0.01 )
-{
-    // The Green Lines
-    xa = getPt( x1 , x2 , i );
-    ya = getPt( y1 , y2 , i );
-    xb = getPt( x2 , x3 , i );
-    yb = getPt( y2 , y3 , i );
-    xc = getPt( x3 , x4 , i );
-    yc = getPt( y3 , y4 , i );
-
-    // The Blue Line
-    xm = getPt( xa , xb , i );
-    ym = getPt( ya , yb , i );
-    xn = getPt( xb , xc , i );
-    yn = getPt( yb , yc , i );
-
-    // The Black Dot
-    x = getPt( xm , xn , i );
-    y = getPt( ym , yn , i );
-
-    drawPixel( x , y , COLOR_RED );
-}
-*/
 
 // TODO re-do settings when replacing as-well
 void TransferFunction::replace(int index, ControlPoint cp)
@@ -194,20 +173,25 @@ void TransferFunction::replace(int index, ControlPoint cp)
     else
     {
         ControlPoint old_cp = m_controlPoints.at(index);
-        ControlPoint new_cp = clampToDomain(index, cp);
+        ControlPoint new_cp = clampToDomain(cp);
         new_cp.setAllControlNodes(old_cp.getControlNodes());
-        m_controlPoints.replace(index, new_cp);
+        m_controlPoints.replace(index, clampToNeighbours(index, clampToDomain(cp)));
     }
 };
 
-QPointF TransferFunction::clampToDomain(int index, ControlPoint cp)
+QPointF TransferFunction::clampToDomain(ControlPoint point)
 {
     const QPointF max = tfn::points::END_POINT;
     const QPointF min = tfn::points::START_POINT;
+    return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
+                   qMax(qMin(max.y(), point.y()), min.y()));
+};
+
+QPointF TransferFunction::clampToNeighbours(int index, ControlPoint point)
+{
     const QPointF left = m_controlPoints.at(index - 1);
     const QPointF right = m_controlPoints.at(index + 1);
-    return QPointF(qMax(qMin(right.x(), cp.x()), left.x()),
-                   qMax(qMin(max.y(), cp.y()), min.y()));
+    return QPointF(qMax(qMin(right.x(), point.x()), left.x()), point.y());
 };
 
 void TransferFunction::setControlNodePos(int index, int dir, QPointF pos)
@@ -250,31 +234,5 @@ QPointF ControlPoint::clampToDirections(int dir, QPointF pos)
     }
     return pos;
 };
+
 } // namespace tfn
-
-/*
-for( float i = 0 ; i < 1 ; i += 0.01 )
-{
-    // The Green Lines
-    xa = getPt( x1 , x2 , i );
-    ya = getPt( y1 , y2 , i );
-    xb = getPt( x2 , x3 , i );
-    yb = getPt( y2 , y3 , i );
-    xc = getPt( x3 , x4 , i );
-    yc = getPt( y3 , y4 , i );
-
-    // The Blue Line
-    xm = getPt( xa , xb , i );
-    ym = getPt( ya , yb , i );
-    xn = getPt( xb , xc , i );
-    yn = getPt( yb , yc , i );
-
-    // The Black Dot
-    x = getPt( xm , xn , i );
-    y = getPt( ym , yn , i );
-
-    drawPixel( x , y , COLOR_RED );
-}
-
-
-*/
