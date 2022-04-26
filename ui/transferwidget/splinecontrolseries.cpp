@@ -3,6 +3,7 @@
 namespace tfn
 {
 
+
 SplineControlSeries::SplineControlSeries(TransferFunction* tfn, QChart* chart)
     : m_tfn{tfn}, m_chart{chart}
 {
@@ -25,14 +26,16 @@ SplineControlSeries::SplineControlSeries(TransferFunction* tfn, QChart* chart)
 void SplineControlSeries::setAnchor(int index)
 {
     m_index = index;
-    ControlPoint cp = static_cast<ControlPoint>(m_tfn->getControlPoints().at(index));
-    m_controlNodesSeries->replace(cp.getControlNodes());
+    m_controlNodesSeries->replace(
+        static_cast<ControlPoint>(m_tfn->getControlPoints().at(index))
+            .getControlNodes());
 };
 
 void SplineControlSeries::updateControlNodes()
 {
-    qDebug() << m_tfn->getControlPoints()[m_index].getControlNodes();
-    m_controlNodesSeries->replace(static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index)).getControlNodes());
+    m_controlNodesSeries->replace(
+        static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index))
+            .getControlNodes());
 }
 
 void SplineControlSeries::setVisible(bool visible)
@@ -40,7 +43,6 @@ void SplineControlSeries::setVisible(bool visible)
     m_controlNodesSeries->setVisible(visible);
     m_top->setVisible(visible);
     m_right->setVisible(visible);
-
 };
 
 void SplineControlSeries::setClickedIndex(const QPointF& point)

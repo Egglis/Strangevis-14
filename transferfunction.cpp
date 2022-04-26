@@ -5,19 +5,24 @@
 namespace tfn
 {
 
-TransferFunction::TransferFunction() { reset(); };
-
-QList<QPointF> TransferFunction::getSeriesPoints()
+TransferFunction::TransferFunction()
 {
-    QList<QPointF> seriesPoints;
-    for (ControlPoint cp : m_controlPoints)
+    m_interpolatedPoints.reserve(tfn::size::NUM_POINTS);
+    for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
-        seriesPoints.append(QPointF(cp.x(), cp.y()));
+        m_interpolatedPoints.append(QPointF(0, 0));
     }
-    return seriesPoints;
+    reset();
+    interpolatePoints();
 };
 
-// TODO Should update both neigbour points and link their spline settings?
+void TransferFunction::reset()
+{
+    m_controlPoints.clear();
+    m_controlPoints.push_back(ControlPoint(tfn::points::START_POINT));
+    m_controlPoints.push_back(ControlPoint(tfn::points::END_POINT));
+};
+
 bool TransferFunction::addControlPoint(ControlPoint cp)
 {
     if (cp.x() <= tfn::points::START_POINT.x() ||
@@ -39,7 +44,6 @@ bool TransferFunction::addControlPoint(ControlPoint cp)
     return true;
 };
 
-// TODO Should remove and re check the controll points settings after deletion
 bool TransferFunction::removeControlPoint(ControlPoint cp)
 {
     auto index = m_controlPoints.indexOf(cp);
@@ -51,78 +55,55 @@ bool TransferFunction::removeControlPoint(ControlPoint cp)
     return false;
 }
 
-void TransferFunction::reset()
-{
-    m_controlPoints.clear();
-    m_controlPoints.push_back(ControlPoint(tfn::points::START_POINT));
-    m_controlPoints.push_back(ControlPoint(tfn::points::END_POINT));
-};
-
 std::vector<GLfloat>
 TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 {
-    std::vector<GLfloat> new_cmap{};
-    new_cmap.reserve(tfn::size::ARRAY_SIZE);
+    std::vector<GLfloat> new_cmap;
+    new_cmap.reserve(tfn::size::NUM_POINTS);
+    for (int i = 0; i < m_interpolatedPoints.length(); i++)
+    {
+        float r = cmap[i * tfn::size::NUM_CHANNELS];
+        float g = cmap[i * tfn::size::NUM_CHANNELS + 1];
+        float b = cmap[i * tfn::size::NUM_CHANNELS + 2];
+        float a = m_interpolatedPoints.at(i).y();
+
+        new_cmap.push_back(r);
+        new_cmap.push_back(g);
+        new_cmap.push_back(b);
+        new_cmap.push_back(a);
+    };
+    return new_cmap;
+}
+
+void TransferFunction::interpolatePoints()
+{
     int from_x = 0;
-    m_b.clear();
     for (int i = 0; i < m_controlPoints.length() - 1; i++)
     {
         auto x = m_controlPoints[i + 1].x();
         int target_x = static_cast<int>(x * (tfn::size::NUM_POINTS - 1));
         for (int t = from_x; t <= target_x; t++)
         {
-            auto r = cmap[t * tfn::size::NUM_CHANNELS];
-            auto g = cmap[(t * tfn::size::NUM_CHANNELS) + 1];
-            auto b = cmap[(t * tfn::size::NUM_CHANNELS) + 2];
-            QPointF from = m_controlPoints.at(i);
-            QPointF target = m_controlPoints.at(i + 1);
+            const QPointF from = m_controlPoints.at(i);
+            const QPointF target = m_controlPoints.at(i + 1);
             QPointF cp0 = m_controlPoints[i].getControlNodes().at(0);
             QPointF cp1 = m_controlPoints[i].getControlNodes().at(1);
-            /*auto a = getInterpolatedValueBetweenPoints(
-                m_controlPoints.at(i), m_controlPoints.at(i + 1),
-                t * (tfn::points::END_POINT.x() / static_cast<float>(255)));
-                */
 
-            // Bezier Test
-            auto bt = t / static_cast<float>(tfn::size::NUM_POINTS - 1);
-            qDebug() << bt << "T";
-            QPointF bez = bezier(
+            float perc = (t - from_x) / static_cast<float>(target_x - from_x);
+            QPointF interpolatedPoint = deCasteljau(
                 from, QPointF(cp0.x() - tfn::nodes::OFFSET.x(), cp0.y()),
-                QPointF(cp1.x(), cp1.y() - tfn::nodes::OFFSET.y()), target, bt);
-            m_b.append(bez);
-            // Test end
-
-            auto a = bez.y();
-            new_cmap.push_back(r);
-            new_cmap.push_back(g);
-            new_cmap.push_back(b);
-            new_cmap.push_back(a);
-            qDebug() << a;
+                QPointF(cp1.x(), cp1.y() - tfn::nodes::OFFSET.y()), target,
+                perc);
+            qDebug() << t;
+            m_interpolatedPoints.replace(t, interpolatedPoint);
         }
         from_x = target_x + 1;
     }
-    assert(new_cmap.size() == tfn::size::ARRAY_SIZE);
-    return new_cmap;
-}
-
-// TODO De Casteljau
-constexpr float TransferFunction::getInterpolatedValueBetweenPoints(QPointF p0,
-                                                                    QPointF p1,
-                                                                    float t)
-{
-    if (p0.x() == p1.x())
-    {
-        return qMax(p0.y(), p1.y());
-    }
-    float a = (p1.y() - p0.y());
-    float b = (p1.x() - p0.x());
-    assert(b > 0 || b < 0);
-    float m = a / b;
-    return m * (t - p0.x()) + p0.y();
 };
 
-QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
-                                 float t)
+// De Casteljau's algorithm for cubic bezier splines
+QPointF TransferFunction::deCasteljau(QPointF p0, QPointF p1, QPointF p2,
+                                      QPointF p3, float t)
 {
     float xa = getPt(p0.x(), p1.x(), t);
     float ya = getPt(p0.y(), p1.y(), t);
@@ -142,19 +123,7 @@ QPointF TransferFunction::bezier(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
     return QPointF(x, y);
 };
 
-QList<QPointF> TransferFunction::toLineSeries()
-{
-    for (int i = 0; i < m_controlPoints.length() - 1; i++)
-    {
-        QPointF from = m_controlPoints.at(i);
-        QPointF to = m_controlPoints.at(i + 1);
-        QPointF cp0 =
-            m_controlPoints[i].getControlNodes().at(tfn::nodes::RIGHT);
-        QPointF cp1 = m_controlPoints[i].getControlNodes().at(tfn::nodes::TOP);
-    }
-};
-
-float TransferFunction::getPt(float n1, float n2, float perc)
+constexpr float TransferFunction::getPt(float n1, float n2, float perc)
 {
     float diff = n2 - n1;
     return n1 + (diff * perc);
@@ -172,17 +141,21 @@ void TransferFunction::replace(int index, ControlPoint cp)
     }
     else
     {
+        // TODO clean-up!!!!
         ControlPoint old_cp = m_controlPoints.at(index);
-        ControlPoint new_cp = clampToDomain(cp);
+        ControlPoint new_cp =
+            clampToDomain(cp, tfn::points::END_POINT, tfn::points::START_POINT);
         new_cp.setAllControlNodes(old_cp.getControlNodes());
-        m_controlPoints.replace(index, clampToNeighbours(index, clampToDomain(cp)));
+        m_controlPoints.replace(
+            index,
+            clampToNeighbours(index, clampToDomain(cp, tfn::points::END_POINT,
+                                                   tfn::points::START_POINT)));
     }
 };
 
-QPointF TransferFunction::clampToDomain(ControlPoint point)
+QPointF TransferFunction::clampToDomain(ControlPoint point, QPointF max,
+                                        QPointF min)
 {
-    const QPointF max = tfn::points::END_POINT;
-    const QPointF min = tfn::points::START_POINT;
     return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
                    qMax(qMin(max.y(), point.y()), min.y()));
 };
@@ -196,8 +169,31 @@ QPointF TransferFunction::clampToNeighbours(int index, ControlPoint point)
 
 void TransferFunction::setControlNodePos(int index, int dir, QPointF pos)
 {
-    m_controlPoints[index].setControlNode(dir, pos);
+    if (index != m_controlPoints.length())
+    {
+        ControlPoint& cp0 = m_controlPoints[index];
+        ControlPoint& cp1 = m_controlPoints[index + 1];
+        const QPointF max = QPointF(cp1.x(), qMax(cp0.y(), cp1.y()));
+        const QPointF min = QPointF(cp0.x(), qMin(cp0.y(), cp1.y()));
+        cp0.setControlNode(dir, clampToDomain(pos, max, min));
+    }
 };
+// TODO disable controll nodes for last index!!
+// TODO Make sure settings are not reset when a position is moved
+// TODO Makes sure that they are retained if possible and only clamp when needed
+// TODO refecator lots of useless code
+// TODO removed debugs()
+// TODO remove TODOs
+// TODO make lineSeries display when using control points
+// TODO hide() nodes when moving point appropirately
+// TODO maybe move control point into seperate files.cpp/.h
+// TODO merge regeast
+// TODO get roasted
+// TODO make applytransferfunction return a refrences instead of making a copy
+// TODO rename some function names in control point to avoid mixup between graph
+// TODO add some static namespace VARIBLES for constants!!!
+
+// --------- CONTROL POINT ----------------
 
 ControlPoint::ControlPoint(QPointF position)
 {
@@ -212,7 +208,7 @@ ControlPoint::ControlPoint(QPointF position)
 
 void ControlPoint::setControlNode(int index, QPointF pos)
 {
-    m_controlNodes.replace(index, clampToDirections(index, pos));
+    m_controlNodes.replace(index, pos);
 };
 
 void ControlPoint::setAllControlNodes(QList<QPointF> nodes)
@@ -223,16 +219,7 @@ void ControlPoint::setAllControlNodes(QList<QPointF> nodes)
     }
 };
 
-QPointF ControlPoint::clampToDirections(int dir, QPointF pos)
-{
-    switch (dir)
-    {
-    case 0: // Right
-        return QPointF(qMax(pos.x(), x() + tfn::nodes::OFFSET.x()), y());
-    case 1: // Top
-        return QPointF(x(), qMax(pos.y(), y() + tfn::nodes::OFFSET.y()));
-    }
-    return pos;
-};
+// TODO remove function
+QPointF ControlPoint::clampToDirections(int dir, QPointF pos) { return pos; };
 
 } // namespace tfn

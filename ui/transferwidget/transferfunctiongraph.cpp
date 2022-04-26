@@ -85,6 +85,7 @@ TransferFunctionGraph::TransferFunctionGraph(
 
 void TransferFunctionGraph::updateGraph()
 {
+    m_tfn.interpolatePoints();
     updatePlotSeries();
     updateGradient();
     this->update();
@@ -93,16 +94,20 @@ void TransferFunctionGraph::updateGraph()
 
 void TransferFunctionGraph::updatePlotSeries()
 {
-    m_lineSeries->replace(m_tfn.m_b);
-    m_scatterSeries->replace(m_tfn.getSeriesPoints());
+    QList<QPointF> scatterSeries;
+    for (ControlPoint cp : m_tfn.getControlPoints()){
+        scatterSeries.append(static_cast<QPointF>(cp));
+    }
+    m_lineSeries->replace(m_tfn.getInterpolatedPoints());
+    m_scatterSeries->replace(scatterSeries);
 };
 
 void TransferFunctionGraph::updateGradient()
 {
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    const std::vector<GLfloat>& cmap =
-        m_tfn.applyTransferFunction(m_cmap.colorMapData());
+    // TODO Change to pointer or similar
+    const std::vector<GLfloat>& cmap = m_tfn.applyTransferFunction(m_cmap.colorMapData());
 
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
@@ -204,12 +209,12 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
     QPointF graphPoint = mapLocalToChartPos(event->position());
     if(m_splineControls->controlNodeMoved(graphPoint)){
         updateGraph();
+        m_splineControls->updateControlNodes();
     }
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateControlPointHint(m_currentClickedIndex);
-        m_splineControls->updateControlNodes();
         m_hint->show();
         updateGraph();
     }
