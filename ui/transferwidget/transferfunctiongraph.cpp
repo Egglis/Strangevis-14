@@ -92,7 +92,7 @@ void TransferFunctionGraph::updateGraph()
 
 void TransferFunctionGraph::updatePlotSeries()
 {
-    m_lineSeries->replace(m_tfn.getSeriesPoints());
+    m_lineSeries->replace(m_tfn.m_b);
     m_scatterSeries->replace(m_tfn.getSeriesPoints());
 };
 
@@ -143,11 +143,12 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
             updateControlPointHint(m_currentClickedIndex);
+            m_splineControls->setVisible(false);
 
             if (m_currentClickedIndex == m_previousClickedIndex)
             {
                 qDebug() << "Double Clicked Point";
-                m_splineControls->setAnchor(point, m_currentClickedIndex);
+                m_splineControls->setAnchor(m_currentClickedIndex);
                 m_splineControls->setVisible(true);
             }
         }
@@ -186,11 +187,13 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
-        updateGraph();
         m_previousClickedIndex = m_currentClickedIndex;
         m_currentClickedIndex = -1;
         m_hint->hide();
+
     }
+    updateGraph();
+
 };
 
 // Mouse event for handeling dragging of a point
@@ -202,11 +205,12 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
-        updateGraph();
         updateControlPointHint(m_currentClickedIndex);
+        m_splineControls->updateControlNodes();
         m_hint->show();
-        m_splineControls->setVisible(false);
     }
+            updateGraph();
+
 };
 
 void TransferFunctionGraph::updateControlPointHint(int index)

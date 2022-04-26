@@ -14,27 +14,29 @@ class SplineControlSeries : public QObject
     Q_OBJECT
   public:
     SplineControlSeries(TransferFunction* tfn, QChart* chart);
-    void setAnchor(QPointF pos, int index);
+    void setAnchor(int index);
     void setVisible(bool visible);
     void controlNodeReleased(QPointF point);
     void controlNodeMoved(QPointF point);
+    void updateControlNodes();
+
   public slots:
     void setClickedIndex(const QPointF& point);
+  signals:
+    void controlNodesChanged();
   private:
-    void updateControlNodes();
     TransferFunction* m_tfn;
     QChart* m_chart;
     int m_index;
     QPointF m_pos;
+    ControlPoint* m_cp;
     QPointF OFFSET = QPointF(190, 0.06);
-    int m_currentClickedIndex = -1;
+    int m_currentClickedNode = -1;
 
     QList<QPointF> m_controlNodes;
     QScatterSeries* m_controlNodesSeries = new QScatterSeries();
     QLineSeries* m_top = new QLineSeries();
     QLineSeries* m_right = new QLineSeries();
-    QLineSeries* m_bottom = new QLineSeries();
-    QLineSeries* m_left = new QLineSeries();
 };
 
 }; // namespace tfn
