@@ -7,6 +7,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     const std::shared_ptr<ISharedProperties> properties)
     : m_properties{properties}
 {
+
     m_chart->legend()->hide();
     m_pen->setWidth(LINE_WIDTH);
 
@@ -23,6 +24,11 @@ TransferFunctionGraph::TransferFunctionGraph(
     // Used to display gradient below the line
     m_areaSeries->setName("Gradient Display");
     m_areaSeries->setPen(*m_pen);
+
+    // Control Point hint
+    m_hint = new HintItem(m_chart, m_scatterSeries);
+    m_hint->setZValue(11);
+    m_hint->hide();
 
     // Bounding box for hit detection
     QLineSeries* lines = new QLineSeries();
@@ -41,6 +47,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_scatterSeries);
+    m_chart->setBackgroundVisible(false);
     m_chart->createDefaultAxes();
     auto axes = m_chart->axes();
     axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
@@ -58,7 +65,9 @@ TransferFunctionGraph::TransferFunctionGraph(
     this->setChart(m_chart);
     this->setRenderHint(QPainter::Antialiasing);
     this->setRubberBand(QChartView::NoRubberBand);
-    this->setFixedSize(300, 300); // TODO Temporary Sizing for now
+    this->setStyleSheet("background: transparent");
+    this->setFixedSize(tfn::graph::WIDTH,
+                       tfn::graph::HEIGHT); // TODO Temporary Sizing for now
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
             &TransferFunctionGraph::updateOrRemoveClickedIndex);
 
@@ -86,26 +95,25 @@ void TransferFunctionGraph::updatePlotSeries()
 
 void TransferFunctionGraph::updateGradient()
 {
-    /* Useless to update graident each time,
-    but will be usefull when you can change colors later */
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    const std::vector<GLfloat>& cmap =
+        m_tfn.applyTransferFunction(m_cmap.colorMapData());
 
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
-        float r = m_cmap.colorMapData()[i * tfn::size::NUM_CHANNELS];
-        float g = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 1];
-        float b = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 2];
-        float a = m_cmap.colorMapData()[(i * tfn::size::NUM_CHANNELS) + 3];
+        float r = cmap[i * tfn::size::NUM_CHANNELS];
+        float g = cmap[(i * tfn::size::NUM_CHANNELS) + 1];
+        float b = cmap[(i * tfn::size::NUM_CHANNELS) + 2];
+        float a = cmap[(i * tfn::size::NUM_CHANNELS) + 3];
 
         QColor col;
-        col.setRgbF(r, g, b);
-        m_gradient.setColorAt(a, col);
+        col.setRgbF(r, g, b, qMin(a, 1.0f));
+        m_gradient.setColorAt(i / static_cast<float>(tfn::size::NUM_POINTS),
+                              col);
     }
-
     m_areaSeries->setBrush(m_gradient);
 };
-
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
 {
     m_cmap = cmap;
@@ -121,8 +129,6 @@ QPointF TransferFunctionGraph::mapLocalToChartPos(QPointF localpos)
     return chartPos;
 };
 
-
-
 // Either sets current clicked index or removes the point
 void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
 {
@@ -132,6 +138,7 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         if (pressedButton == Qt::LeftButton)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
+            updateControlPointHint(m_currentClickedIndex);
         }
         else if (pressedButton == Qt::RightButton)
         {
@@ -148,14 +155,14 @@ void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
     {
         updateGraph();
     }
-    
 };
 
 void TransferFunctionGraph::removeControlPoint(const QPointF& point)
 {
-    if(m_tfn.removeControlPoint(point)){
+    if (m_tfn.removeControlPoint(point))
+    {
         updateGraph();
-    }    
+    }
 };
 
 // When draggins a point is finished replace point with new location
@@ -168,6 +175,7 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
         m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
         m_currentClickedIndex = -1;
+        m_hint->hide();
     }
 };
 
@@ -178,10 +186,22 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
     if (m_currentClickedIndex != -1)
     {
         QPointF graphPoint = mapLocalToChartPos(event->position());
-        m_currentClickedIndex =
-            m_tfn.replace(m_currentClickedIndex, graphPoint);
+        m_tfn.replace(m_currentClickedIndex, graphPoint);
         updateGraph();
+        updateControlPointHint(m_currentClickedIndex);
+        m_hint->show();
     }
+};
+
+void TransferFunctionGraph::updateControlPointHint(int index)
+{
+    QPointF point = m_tfn.getControlPoints().at(index);
+    double x = point.x();
+    double y = point.y();
+    m_hint->setText(QString("X: %1 Y: %2")
+                        .arg(QString::number(x, 'f', 2))
+                        .arg(QString::number(y, 'f', 2)));
+    m_hint->setAnchor(point, HINT_OFFSET);
 };
 
 } // namespace tfn

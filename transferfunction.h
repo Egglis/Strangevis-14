@@ -11,7 +11,7 @@ namespace tfn
 namespace points
 {
 constexpr static QPointF START_POINT = QPointF(0, 0);
-constexpr static QPointF END_POINT = QPointF(4095, 1);
+constexpr static QPointF END_POINT = QPointF(1, 1);
 }; // namespace points
 
 class TransferFunction
@@ -23,17 +23,16 @@ class TransferFunction
     std::vector<GLfloat> applyTransferFunction(const std::vector<GLfloat> cmap);
     QList<QPointF> getControlPoints() { return m_controlPoints; };
     int indexOf(QPointF point) { return m_controlPoints.indexOf(point); };
-    int replace(int index, QPointF point);
+    void replace(int index, QPointF point);
     void reset();
 
   private:
     // Uses the line equation y = mx + b to interpolate alpha values between
     // points
-    constexpr static float getInterpolatedValueBetweenPoints(QPointF p0,
-                                                             QPointF p1, int t);
-    int replaceAndReorder(int index, QPointF point);
-    constexpr static QPointF clampToDomain(QPointF point);
-
+    constexpr static float
+    getInterpolatedValueBetweenPoints(QPointF p0, QPointF p1, float t);
+    QPointF clampToDomain(QPointF point);
+    QPointF clampToNeighbours(int index, QPointF point);
     QList<QPointF> m_controlPoints;
 };
 
