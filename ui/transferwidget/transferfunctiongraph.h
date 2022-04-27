@@ -9,12 +9,10 @@
 
 #include <QApplication>
 #include <QGraphicsView>
+#include <QOpenGLFunctions>
 #include <QString>
 #include <QtCharts>
 #include <QtGlobal>
-#include <QString>
-#include <QOpenGLFunctions>
-
 
 namespace tfn
 {
@@ -31,7 +29,6 @@ class TransferFunctionGraph : public QChartView
   public:
     TransferFunctionGraph(const std::shared_ptr<ISharedProperties> properties);
     void updateGraph();
-
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
     void updateOrRemoveClickedIndex(const QPointF& point);
@@ -76,10 +73,7 @@ class TransferFunctionGraph : public QChartView
     QLinearGradient m_gradient;
     HintItem* m_hint;
     SplineControlSeries* m_splineControls;
-
 };
-
-
 
 } // namespace tfn
 

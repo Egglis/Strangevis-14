@@ -30,7 +30,8 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_hint->setZValue(11);
     m_hint->hide();
 
-
+    m_splineControls = new SplineControlSeries(&m_tfn, m_chart);
+    m_splineControls->setVisible(false);
 
     // Bounding box for hit detection
     QLineSeries* lines = new QLineSeries();
@@ -48,9 +49,11 @@ TransferFunctionGraph::TransferFunctionGraph(
 
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_boundingBox);
-    m_splineControls = new SplineControlSeries(&m_tfn, m_chart);
-    m_splineControls->setVisible(true);
+    m_chart->addSeries(m_splineControls->getLineSeries(tfn::nodes::NODE0));
+    m_chart->addSeries(m_splineControls->getLineSeries(tfn::nodes::NODE1));
     m_chart->addSeries(m_scatterSeries);
+    m_chart->addSeries(m_splineControls->getScatterSeries());
+
     m_chart->setBackgroundVisible(false);
     m_chart->createDefaultAxes();
     auto axes = m_chart->axes();
@@ -95,7 +98,8 @@ void TransferFunctionGraph::updateGraph()
 void TransferFunctionGraph::updatePlotSeries()
 {
     QList<QPointF> scatterSeries;
-    for (ControlPoint cp : m_tfn.getControlPoints()){
+    for (ControlPoint cp : m_tfn.getControlPoints())
+    {
         scatterSeries.append(static_cast<QPointF>(cp));
     }
     m_lineSeries->replace(m_tfn.getInterpolatedPoints());
@@ -107,7 +111,8 @@ void TransferFunctionGraph::updateGradient()
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     // TODO Change to pointer or similar
-    const std::vector<GLfloat>& cmap = m_tfn.applyTransferFunction(m_cmap.colorMapData());
+    const std::vector<GLfloat>& cmap =
+        m_tfn.applyTransferFunction(m_cmap.colorMapData());
 
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
@@ -123,6 +128,7 @@ void TransferFunctionGraph::updateGradient()
     }
     m_areaSeries->setBrush(m_gradient);
 };
+
 void TransferFunctionGraph::setDisplayedColorMap(ColorMap cmap)
 {
     m_cmap = cmap;
@@ -147,19 +153,16 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         if (pressedButton == Qt::LeftButton)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
-            updateControlPointHint(m_currentClickedIndex);
-            m_splineControls->setVisible(false);
 
-            if (m_currentClickedIndex == m_previousClickedIndex)
-            {
-                qDebug() << "Double Clicked Point";
-                m_splineControls->setAnchor(m_currentClickedIndex);
-                m_splineControls->setVisible(true);
-            }
+            m_splineControls->setVisible(
+                m_currentClickedIndex == m_previousClickedIndex &&
+                m_currentClickedIndex != m_tfn.getControlPoints().length());
         }
         else if (pressedButton == Qt::RightButton)
         {
             removeControlPoint(point);
+            m_splineControls->setVisible(false);
+            m_currentClickedIndex = -1;
         }
     }
 };
@@ -170,6 +173,7 @@ void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
     Qt::MouseButtons button = QGuiApplication::mouseButtons();
     if (button == Qt::LeftButton && m_tfn.addControlPoint(point))
     {
+        m_splineControls->setVisible(false);
         updateGraph();
     }
 };
@@ -188,18 +192,19 @@ void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)
     QChartView::mouseReleaseEvent(event);
     QPointF graphPoint = mapLocalToChartPos(event->position());
 
-    if(m_splineControls->controlNodeReleased(graphPoint)) {
+    if (m_splineControls->controlNodeReleased(graphPoint))
+    {
         updateGraph();
     };
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
+        m_splineControls->setAnchor(m_currentClickedIndex);
         m_previousClickedIndex = m_currentClickedIndex;
         m_currentClickedIndex = -1;
         m_hint->hide();
         updateGraph();
     }
-
 };
 
 // Mouse event for handeling dragging of a point
@@ -207,18 +212,18 @@ void TransferFunctionGraph::mouseMoveEvent(QMouseEvent* event)
 {
     QChartView::mouseMoveEvent(event);
     QPointF graphPoint = mapLocalToChartPos(event->position());
-    if(m_splineControls->controlNodeMoved(graphPoint)){
+    if (m_splineControls->controlNodeMoved(graphPoint))
+    {
         updateGraph();
-        m_splineControls->updateControlNodes();
     }
     if (m_currentClickedIndex != -1)
     {
         m_tfn.replace(m_currentClickedIndex, graphPoint);
+        m_splineControls->setAnchor(m_currentClickedIndex);
         updateControlPointHint(m_currentClickedIndex);
         m_hint->show();
         updateGraph();
     }
-
 };
 
 void TransferFunctionGraph::updateControlPointHint(int index)
