@@ -6,7 +6,7 @@ namespace tfn
 SplineControlSeries::SplineControlSeries(TransferFunction* tfn) : m_tfn{tfn}
 {
     m_controlNodesSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_controlNodesSeries->setMarkerSize(10);
+    m_controlNodesSeries->setMarkerSize(6);
     m_controlNodesSeries->setBorderColor(Qt::green);
     m_controlNodesSeries->setColor(Qt::gray);
 
@@ -60,6 +60,7 @@ void SplineControlSeries::updateControlNodes()
 
 void SplineControlSeries::setClickedNode(const QPointF& point)
 {
+
     if (m_currentClickedNode == -1)
     {
         const Qt::MouseButtons pressedButton = QGuiApplication::mouseButtons();
@@ -73,10 +74,7 @@ void SplineControlSeries::setClickedNode(const QPointF& point)
                 static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index))
                     .getControlNodes()
                     .indexOf(point);
-        }
-        else if (pressedButton == Qt::RightButton)
-        {
-            setVisible(false);
+
         }
     }
 };
@@ -91,7 +89,6 @@ bool SplineControlSeries::controlNodeReleased(QPointF point)
                                      point);
         }
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
-        m_previousClickedNode = m_currentClickedNode;
         m_currentClickedNode = -1;
         updateControlNodes();
         return true;

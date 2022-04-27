@@ -148,14 +148,14 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
 {
     if (m_currentClickedIndex == -1)
     {
-        Qt::MouseButtons pressedButton = QGuiApplication::mouseButtons();
+        const Qt::MouseButtons pressedButton = QGuiApplication::mouseButtons();
         if (pressedButton == Qt::LeftButton)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
-
-            m_splineControls->setVisible(
-                m_currentClickedIndex == m_previousClickedIndex &&
-                m_currentClickedIndex != m_tfn.getControlPoints().length());
+            m_splineControls->setAnchor(m_currentClickedIndex);
+            m_splineControls->setVisible(m_currentClickedIndex == m_previousClickedIndex &&
+                                         m_currentClickedIndex !=
+                                             m_tfn.getControlPoints().length());
         }
         else if (pressedButton == Qt::RightButton)
         {
@@ -184,6 +184,7 @@ void TransferFunctionGraph::removeControlPoint(const QPointF& point)
         updateGraph();
     }
 };
+
 
 // When draggins a point is finished replace point with new location
 void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)

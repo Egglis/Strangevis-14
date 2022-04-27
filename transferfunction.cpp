@@ -190,14 +190,12 @@ void TransferFunction::setControlNodePos(int index, int node, QPointF pos)
     }
 };
 
-// TODO make applytransferfunction return a refrences instead of making a copy
-
 ControlPoint::ControlPoint(QPointF position)
 {
     this->setX(position.x());
     this->setY(position.y());
-    m_controlNodes.append(QPointF(position.x(), position.y()));
-    m_controlNodes.append(QPointF(position.x(), position.y()));
+    m_controlNodes.append(position);
+    m_controlNodes.append(position);
 };
 
 void ControlPoint::setControlNode(int node, QPointF pos)

@@ -30,13 +30,11 @@ class SplineControlSeries : public QObject
 
   private:
     TransferFunction* m_tfn;
-    int m_index;
-    QPointF m_pos;
     ControlPoint* m_cp;
-    QPointF OFFSET = QPointF(190, 0.06);
     int m_currentClickedNode = -1;
-    int m_previousClickedNode = -1;
     bool m_isLinked = false;
+    int m_index;
+
 
     QList<QPointF> m_controlNodes;
     QScatterSeries* m_controlNodesSeries = new QScatterSeries();
