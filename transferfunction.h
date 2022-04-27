@@ -39,7 +39,8 @@ class TransferFunction
     void reset();
     bool addControlPoint(ControlPoint cp);
     bool removeControlPoint(ControlPoint point);
-    std::vector<GLfloat> applyTransferFunction(const std::vector<GLfloat> cmap);
+    void applyTransferFunction(const std::vector<GLfloat> cmap);
+    std::vector<GLfloat>* getColorMapData() {return &m_cmapData; };
     void interpolatePoints();
 
     QList<ControlPoint> getControlPoints() { return m_controlPoints; };
@@ -59,6 +60,7 @@ class TransferFunction
 
     QList<ControlPoint> m_controlPoints;
     QList<QPointF> m_interpolatedPoints;
+    std::vector<GLfloat> m_cmapData;
 };
 
 } // namespace tfn

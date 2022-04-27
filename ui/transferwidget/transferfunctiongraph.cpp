@@ -30,7 +30,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_hint->setZValue(11);
     m_hint->hide();
 
-    m_splineControls = new SplineControlSeries(&m_tfn, m_chart);
+    m_splineControls = new SplineControlSeries(&m_tfn);
     m_splineControls->setVisible(false);
 
     // Bounding box for hit detection
@@ -89,6 +89,7 @@ TransferFunctionGraph::TransferFunctionGraph(
 void TransferFunctionGraph::updateGraph()
 {
     m_tfn.interpolatePoints();
+    m_tfn.applyTransferFunction(m_cmap.colorMapData());
     updatePlotSeries();
     updateGradient();
     this->update();
@@ -110,16 +111,14 @@ void TransferFunctionGraph::updateGradient()
 {
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    // TODO Change to pointer or similar
-    const std::vector<GLfloat>& cmap =
-        m_tfn.applyTransferFunction(m_cmap.colorMapData());
 
+    std::vector<GLfloat>* cmap = m_tfn.getColorMapData();
     for (int i = 0; i < tfn::size::NUM_POINTS; i++)
     {
-        float r = cmap[i * tfn::size::NUM_CHANNELS];
-        float g = cmap[(i * tfn::size::NUM_CHANNELS) + 1];
-        float b = cmap[(i * tfn::size::NUM_CHANNELS) + 2];
-        float a = cmap[(i * tfn::size::NUM_CHANNELS) + 3];
+        float r = cmap->at(i * tfn::size::NUM_CHANNELS);
+        float g = cmap->at(i * tfn::size::NUM_CHANNELS + 1);
+        float b = cmap->at(i * tfn::size::NUM_CHANNELS + 2);
+        float a = cmap->at(i * tfn::size::NUM_CHANNELS + 3);
 
         QColor col;
         col.setRgbF(r, g, b, qMin(a, 1.0f));

@@ -61,11 +61,9 @@ bool TransferFunction::removeControlPoint(ControlPoint cp)
     return false;
 }
 
-std::vector<GLfloat>
-TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
+void TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
 {
-    std::vector<GLfloat> new_cmap;
-    new_cmap.reserve(tfn::size::NUM_POINTS);
+    m_cmapData.clear();
     for (int i = 0; i < m_interpolatedPoints.length(); i++)
     {
         float r = cmap[i * tfn::size::NUM_CHANNELS];
@@ -73,12 +71,11 @@ TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
         float b = cmap[i * tfn::size::NUM_CHANNELS + 2];
         float a = m_interpolatedPoints.at(i).y();
 
-        new_cmap.push_back(r);
-        new_cmap.push_back(g);
-        new_cmap.push_back(b);
-        new_cmap.push_back(a);
+        m_cmapData.push_back(r);
+        m_cmapData.push_back(g);
+        m_cmapData.push_back(b);
+        m_cmapData.push_back(a);
     };
-    return new_cmap;
 }
 
 void TransferFunction::interpolatePoints()
