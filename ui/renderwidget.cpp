@@ -29,8 +29,7 @@ RayCastingInteractor::RayCastingInteractor(
     : RayCastingWidget(
           RenderProperties{1.0, properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
-                           properties->gradientMethod().method(),
-                           Projection::Perspective},
+                           properties->gradientMethod().method()},
           textureStore, parent, f),
       m_properties{properties}
 {

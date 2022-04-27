@@ -12,7 +12,6 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
-      m_projectionMode{initialRenderProperties.projectionMode},
       m_imGuiReference{nullptr}
 {
     m_viewMatrix.setToIdentity();
@@ -62,12 +61,7 @@ void RayCastingWidget::resizeGL(int w, int h)
     qreal aspectRatio = static_cast<qreal>(w) / static_cast<qreal>(h);
 
     m_projectionMatrix.setToIdentity();
-    if (m_projectionMode == Projection::Perspective)
-        m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane,
-                                       m_farPlane);
-    if (m_projectionMode == Projection::Orthographic)
-        m_projectionMatrix.ortho(-aspectRatio, aspectRatio, -1, 1, m_nearPlane,
-                                 m_farPlane);
+    m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane, m_farPlane);
 }
 
 void RayCastingWidget::paintGL()
@@ -161,12 +155,6 @@ void RayCastingWidget::changeGradientMethod(GradientMethod method)
 void RayCastingWidget::changeTransferFunction(QString transferFunction)
 {
     m_transferFunctionName = transferFunction;
-    update();
-}
-
-void RayCastingWidget::changeProjectionMode(Projection mode)
-{
-    m_projectionMode = mode;
     update();
 }
 
