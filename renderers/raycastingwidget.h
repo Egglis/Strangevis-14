@@ -1,9 +1,12 @@
 #ifndef RAYCASTINGWIDGET_H
 #define RAYCASTINGWIDGET_H
 
+#include "volumerenderer.h"
 #include "../geometry/cubeplaneintersection.h"
 #include "../geometry/plane.h"
 #include "../properties/gradientproperties.h"
+#include "../properties/cameraproperties.h"
+#include "../properties/viewport.h"
 #include "../texturestore.h"
 
 #include <QOpenGLExtraFunctions>
@@ -45,6 +48,8 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
   private:
     void renderImGuizmo();
 
+
+    QOpenGLExtraFunctions m_openGLExtra;
     std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
@@ -54,8 +59,10 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
     CameraProperties m_camera;
+    ViewPort m_viewPort;
 
     QtImGui::RenderRef m_imGuiReference;
+    VolumeRenderer m_volumeRenderer;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;

@@ -9,14 +9,12 @@ class CameraProperties
     CameraProperties();
     QMatrix4x4 projectionMatrix() const { return m_projectionMatrix; };
     QMatrix4x4 rotationMatrix() const { return m_rotationMatrix; };
-    QMatrix4x4 viewMatrix() const
-    {
-        return m_viewMatrix;
-    };
+    QMatrix4x4 viewMatrix() const { return m_viewMatrix; };
     QMatrix4x4 projectionViewMatrix() const
     {
         return projectionMatrix() * viewMatrix();
     };
+    float focalLength() const { return m_focalLength; };
   public slots:
     void updateProjectionMatrix(float aspectRatio);
     void rotateCamera(float angle, QVector3D axis);
@@ -31,6 +29,7 @@ class CameraProperties
     constexpr static float m_nearPlane = 0.5;
     constexpr static float m_farPlane = 32.0;
     constexpr static float m_fov = 60.0;
+    const float m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0);
 };
 
 #endif // CAMERAPROPERTIES_H
