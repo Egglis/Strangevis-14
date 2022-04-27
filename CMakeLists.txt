@@ -58,6 +58,7 @@ qt_add_executable(strangevis WIN32
     transfertexture.cpp
     renderers/raycastingwidget.cpp
     renderers/obliqueslicewidget.cpp
+    properties/cameraproperties.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
     properties/gradientproperties.cpp

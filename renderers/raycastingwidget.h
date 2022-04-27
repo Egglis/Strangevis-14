@@ -15,6 +15,7 @@
 struct RenderProperties
 {
     float zoomFactor;
+    QVector3D cameraPosition;
     QString transferFunction;
     Plane clippingPlane;
     GradientMethod gradientMethod;
@@ -52,6 +53,7 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
+    CameraProperties m_camera;
 
     QtImGui::RenderRef m_imGuiReference;
 

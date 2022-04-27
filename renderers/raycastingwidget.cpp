@@ -5,18 +5,21 @@
 #include <ImGui.h>
 #include <ImGuizmo.h>
 
+
 RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
                                    std::unique_ptr<ITextureStore>& textureStore,
                                    QWidget* parent, Qt::WindowFlags f)
+    RenderProperties initialRenderProperties,
+    std::unique_ptr<ITextureStore>& textureStore, QWidget* parent,
+    Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}
 {
-    m_viewMatrix.setToIdentity();
-    m_viewMatrix.translate(0.0, 0.0, -2.0 * sqrt(3.0));
-    zoomCamera(initialRenderProperties.zoomFactor);
+    m_camera.moveCamera(initialRenderProperties.cameraPosition);
+    m_camera.zoomCamera(initialRenderProperties.zoomFactor);
 
     connect(&m_textureStore->volume(), &Volume::volumeLoaded, this,
             [this]() { update(); });
@@ -24,14 +27,12 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
 
 void RayCastingWidget::rotateCamera(qreal angle, QVector3D axis)
 {
-    QMatrix4x4 inverseModelViewMatrix = m_viewMatrix.inverted();
-    QVector4D transformedAxis = inverseModelViewMatrix * QVector4D(axis, 0.0f);
-    m_viewMatrix.rotate(qRadiansToDegrees(angle), transformedAxis.toVector3D());
+    m_camera.rotateCamera(qRadiansToDegrees(angle), axis);
     update();
 }
 void RayCastingWidget::zoomCamera(float zoomFactor)
 {
-    m_viewMatrix.scale(zoomFactor);
+    m_camera.zoomCamera(zoomFactor);
     update();
 }
 
@@ -60,8 +61,7 @@ void RayCastingWidget::resizeGL(int w, int h)
 {
     qreal aspectRatio = static_cast<qreal>(w) / static_cast<qreal>(h);
 
-    m_projectionMatrix.setToIdentity();
-    m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane, m_farPlane);
+    m_camera.updateProjectionMatrix(aspectRatio);
 }
 
 void RayCastingWidget::paintGL()
@@ -75,11 +75,9 @@ void RayCastingWidget::paintGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    QMatrix4x4 modelViewProjectionMatrix =
-        m_projectionMatrix * m_viewMatrix *
-        m_textureStore->volume().modelMatrix();
+    auto modelViewProjectionMatrix = m_camera.projectionViewMatrix()*m_textureStore->volume().modelMatrix();
 
-    QVector3D rayOrigin = m_viewMatrix.inverted().map(QVector3D(0, 0, 0));
+    QVector3D rayOrigin = m_camera.viewMatrix().inverted().map(QVector3D(0, 0, 0));
 
     m_cubeProgram.bind();
     location = m_cubeProgram.uniformLocation("clippingPlaneEquation");
@@ -87,7 +85,7 @@ void RayCastingWidget::paintGL()
     location = m_cubeProgram.uniformLocation("rayOrigin");
     m_cubeProgram.setUniformValue(location, rayOrigin);
     location = m_cubeProgram.uniformLocation("viewMatrix");
-    m_cubeProgram.setUniformValue(location, m_viewMatrix);
+    m_cubeProgram.setUniformValue(location, m_camera.viewMatrix());
     location = m_cubeProgram.uniformLocation("modelMatrix");
     m_cubeProgram.setUniformValue(location,
                                   m_textureStore->volume().modelMatrix());
@@ -164,7 +162,7 @@ void RayCastingWidget::renderImGuizmo()
 
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(true);
-    ImGuizmo::ViewManipulate(m_viewMatrix.data(), 2.0f * sqrt(3.0f),
+    ImGuizmo::ViewManipulate(m_camera.rotationMatrix().data(), 2.0f * sqrt(3.0f),
                              ImVec2(0, 0), ImVec2(128, 128), 0);
     ImGui::Render();
     QtImGui::render(m_imGuiReference);

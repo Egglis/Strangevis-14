@@ -26,8 +26,7 @@ RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
-    : RayCastingWidget(
-          RenderProperties{1.0, properties->transferFunction().colorMap(),
+          RenderProperties{1.0, QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))}, properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->gradientMethod().method()},
           textureStore, parent, f),
