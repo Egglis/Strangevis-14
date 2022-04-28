@@ -25,13 +25,12 @@ ExtendedParameterWidget::ExtendedParameterWidget(
 RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
-    Qt::WindowFlags f)
-    : RayCastingWidget(
-          RenderProperties{1.0, properties->transferFunction().colorMap(),
+    Qt::WindowFlags f) :
+    RayCastingWidget{
+          RenderProperties{1.0, QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))}, properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
-                           properties->gradientMethod().method(),
-                           Projection::Perspective},
-          textureStore, parent, f),
+                           properties->gradientMethod().method()},
+          textureStore, parent, f},
       m_properties{properties}
 {
     connect(&m_properties.get()->clippingPlane(),
@@ -91,7 +90,8 @@ void RayCastingInteractor::wheelEvent(QWheelEvent* p_event)
 
 void RayCastingInteractor::rotateCamera()
 {
-    QVector3D va = arcballVector(m_previousPosition.x(), m_previousPosition.y());
+    QVector3D va =
+        arcballVector(m_previousPosition.x(), m_previousPosition.y());
     QVector3D vb = arcballVector(m_currentPosition.x(), m_currentPosition.y());
 
     if (va != vb)

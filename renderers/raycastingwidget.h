@@ -1,10 +1,14 @@
 #ifndef RAYCASTINGWIDGET_H
 #define RAYCASTINGWIDGET_H
 
+#include "volumerenderer.h"
 #include "../geometry/cubeplaneintersection.h"
 #include "../geometry/plane.h"
+#include "../properties/cameraproperties.h"
 #include "../properties/gradientproperties.h"
+#include "../properties/viewport.h"
 #include "../texturestore.h"
+#include "volumerenderer.h"
 
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -12,18 +16,16 @@
 
 #include <QtImGui.h>
 
-enum class Projection { Orthographic, Perspective };
-
 struct RenderProperties
 {
     float zoomFactor;
+    QVector3D cameraPosition;
     QString transferFunction;
     Plane clippingPlane;
     GradientMethod gradientMethod;
-    Projection projectionMode;
 };
 
-class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
+class RayCastingWidget : public QOpenGLWidget
 {
     Q_OBJECT
 
@@ -41,31 +43,32 @@ class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
     void rotateCamera(qreal angle, QVector3D axis);
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
-    void changeProjectionMode(Projection projectionMode);
     void changeGradientMethod(GradientMethod method);
     void changeTransferFunction(QString transferFunctionName);
 
   private:
     void renderImGuizmo();
 
+
+    QOpenGLExtraFunctions m_openGLExtra;
     std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
     GradientMethod m_gradientMethod;
-    Projection m_projectionMode;
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
+    CameraProperties m_camera;
+    ViewPort m_viewPort;
 
     QtImGui::RenderRef m_imGuiReference;
+    VolumeRenderer m_volumeRenderer;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
     qreal m_fov = 60.0;
     const GLfloat m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0);
-    constexpr static QVector4D DISABLED_CLIPPING_EQUATION =
-        QVector4D{0, 0, 1, 1000};
 };
 
 #endif // RAYCASTINGWIDGET_H
