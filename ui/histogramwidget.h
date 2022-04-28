@@ -13,9 +13,12 @@ class HistogramWidget : public QChartView
 
     private:
     QList<QPointF> dataAsList(const std::vector<float>& normalizedHistogramData);
+    void normalizeHistogram(std::vector<float>& histogramData);
 
     QChart* m_chart;
     QLineSeries* m_series;
+    std::vector<float> m_fullHistogram;
+    bool filtered = false;
 };
 
 #endif // HISTOGRAMWIDGET_H
