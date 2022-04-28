@@ -16,6 +16,7 @@ TransferWidget::TransferWidget(
 {
 
     m_layout = new QHBoxLayout();
+    auto* v_layout = new QVBoxLayout();
     m_selector =
         new ColorMapSelector(nullptr, m_colorMapStore->availableColorMaps());
     m_tfnGraph = new TransferFunctionGraph(properties);
@@ -26,11 +27,17 @@ TransferWidget::TransferWidget(
             &m_properties.get()->transferFunction(),
             &TransferProperties::updateColorMap);
 
-    m_layout->addWidget(m_selector);
-    int result = m_selector->findText("gist_gray");
-    result > -1 ? m_selector->setCurrentIndex(result) : setSelectedColorMap(0);
+    setSelectedColorMap(0);
 
-    m_layout->addWidget(m_tfnGraph);
+    v_layout->addWidget(m_selector,4);
+    auto* button_layout = new QHBoxLayout();
+    v_layout->addLayout(button_layout,1);
+    auto* button = new QPushButton("Hello World");
+    auto checkbox = new QCheckBox("Overlay Histogram");
+    button_layout->addWidget(button);
+    button_layout->addWidget(checkbox);
+    m_layout->addWidget(m_tfnGraph, 3);
+    m_layout->addLayout(v_layout, 1);
     setLayout(m_layout);
 };
 
@@ -43,7 +50,7 @@ void TransferWidget::setSelectedColorMap(const QString& name)
 
 ColorMapSelector::ColorMapSelector(QWidget* parent,
                                    std::vector<QString> colorMaps)
-    : QComboBox(parent)
+    : QListWidget(parent)
 {
     for (const auto& colorMap : colorMaps)
     {

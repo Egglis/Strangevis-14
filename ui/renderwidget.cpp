@@ -14,11 +14,10 @@ ExtendedParameterWidget::ExtendedParameterWidget(
     const std::shared_ptr<ISharedProperties>& properties,
     const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
     QWidget* parent)
-    : QWidget(parent), m_parameterWidget(properties, this),
+    : QWidget(parent),
       m_transferWidget(properties, colorMapStore, this), m_layout{this}
 {
     m_layout.addWidget(&m_transferWidget);
-    m_layout.addWidget(&m_parameterWidget);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 

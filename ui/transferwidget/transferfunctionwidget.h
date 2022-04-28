@@ -4,21 +4,16 @@
 #include "../transfertexture.h"
 #include "transferfunctiongraph.h"
 
-#include <QComboBox>
-#include <QGraphicsView>
-#include <QHBoxLayout>
 #include <QOpenGLTexture>
-#include <QSlider>
 #include <QWidget>
-#include <QtCharts>
-
 
 class ISharedProperties;
+class QHBoxLayout;
 
 namespace tfn
 {
 
-class ColorMapSelector : public QComboBox
+class ColorMapSelector : public QListWidget
 {
     Q_OBJECT
   public:
