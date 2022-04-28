@@ -45,6 +45,5 @@ class ExtendedParameterWidget : public QWidget
   private:
     QVBoxLayout m_layout;
     tfn::TransferWidget m_transferWidget;
-    ParameterWidget m_parameterWidget;
 };
 #endif // RENDERWIDGET_H

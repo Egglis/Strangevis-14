@@ -17,8 +17,8 @@ namespace tfn
 
 namespace graph
 {
-constexpr static int WIDTH = 300;
-constexpr static int HEIGHT = 300;
+constexpr static int WIDTH = 600;
+constexpr static int HEIGHT = 600;
 } // namespace graph
 
 class TransferFunctionGraph : public QChartView

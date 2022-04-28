@@ -66,8 +66,6 @@ TransferFunctionGraph::TransferFunctionGraph(
     this->setRenderHint(QPainter::Antialiasing);
     this->setRubberBand(QChartView::NoRubberBand);
     this->setStyleSheet("background: transparent");
-    this->setFixedSize(tfn::graph::WIDTH,
-                       tfn::graph::HEIGHT); // TODO Temporary Sizing for now
     connect(m_scatterSeries, &QScatterSeries::pressed, this,
             &TransferFunctionGraph::updateOrRemoveClickedIndex);
 

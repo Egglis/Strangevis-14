@@ -32,7 +32,7 @@ QVBoxLayout* MainWindowWidget::create2dRenderLayout()
 QVBoxLayout* MainWindowWidget::create3dRenderLayout()
 {
     QVBoxLayout* vLayout = new QVBoxLayout();
-    vLayout->addWidget(m_3dRenderWidget, 5);
+    vLayout->addWidget(m_3dRenderWidget, 4);
     vLayout->addWidget(m_3dToolBarWidget, 1);
     return vLayout;
 }
