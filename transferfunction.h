@@ -56,7 +56,6 @@ class TransferFunction
     void setControlNodePos(int index, Nodes node, QPointF pos);
 
     QList<QPointF> getInterpolatedPoints() { return m_interpolatedPoints; };
-
   private:
     constexpr static QPointF deCasteljau(QPointF p0, QPointF p1, QPointF p2,
                                          QPointF p3, float t);

@@ -33,7 +33,7 @@ class TransferFunctionGraph : public QChartView
   public slots:
     void updateOrRemoveClickedIndex(const QPointF& point);
     void addNewControlPoint(const QPointF& point);
-
+    void reset();
   protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);

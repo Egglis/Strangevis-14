@@ -49,6 +49,12 @@ TransferFunctionGraph::TransferFunctionGraph(
             &TransferProperties::updateTransferFunction);
 };
 
+void TransferFunctionGraph::reset(){
+    m_tfn.reset();
+    updateGraph();
+    m_splineControls->setVisible(false);
+}
+
 void TransferFunctionGraph::constructBoundingBox()
 {
     QLineSeries* lines = new QLineSeries();
