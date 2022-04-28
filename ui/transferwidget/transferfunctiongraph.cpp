@@ -7,25 +7,15 @@ TransferFunctionGraph::TransferFunctionGraph(
     const std::shared_ptr<ISharedProperties> properties)
     : m_properties{properties}
 {
-
     m_chart->legend()->hide();
-    m_pen->setWidth(LINE_WIDTH);
+    m_chart->setBackgroundVisible(false);
+    m_chart->setTitle("TransferFunction");
 
-    // Linear gradient for areaSeries
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
-    // Used to display control points as scatterplot
-    m_scatterSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    m_scatterSeries->setMarkerSize(POINT_SIZE);
-    m_scatterSeries->setBorderColor(POINT_BORDER_COLOR);
-    m_scatterSeries->setColor(POINT_COLOR);
+    constructControlPointSeries();
 
-    // Used to display gradient below the line
-    m_areaSeries->setName("Gradient Display");
-    m_areaSeries->setPen(*m_pen);
-
-    // Control Point hint
     m_hint = new HintItem(m_chart, m_scatterSeries);
     m_hint->setZValue(11);
     m_hint->hide();
@@ -33,19 +23,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_splineControls = new SplineControlSeries(&m_tfn);
     m_splineControls->setVisible(false);
 
-    // Bounding box for hit detection
-    QLineSeries* lines = new QLineSeries();
-    lines->append(
-        QPointF(tfn::points::START_POINT.x(), tfn::points::START_POINT.y()));
-    lines->append(
-        QPointF(tfn::points::START_POINT.x(), tfn::points::END_POINT.y()));
-    lines->append(
-        QPointF(tfn::points::END_POINT.x(), tfn::points::END_POINT.y()));
-    lines->append(
-        QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
-    m_boundingBox = new QAreaSeries(lines);
-    m_boundingBox->setColor(QColor(0, 0, 0, 0));
-    m_areaSeries->setUpperSeries(m_lineSeries);
+    constructBoundingBox();
 
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_boundingBox);
@@ -54,20 +32,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_scatterSeries);
     m_chart->addSeries(m_splineControls->getScatterSeries());
 
-    m_chart->setBackgroundVisible(false);
-    m_chart->createDefaultAxes();
-    auto axes = m_chart->axes();
-    axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
-    axes[1]->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
-    axes[0]->setLabelsVisible(false);
-    axes[1]->setLabelsVisible(false);
-
-    m_areaSeries->attachAxis(axes[0]);
-    m_areaSeries->attachAxis(axes[1]);
-    m_scatterSeries->attachAxis(axes[0]);
-    m_scatterSeries->attachAxis(axes[1]);
-
-    m_chart->setTitle("TransferFunction");
+    setupAxis();
 
     this->setChart(m_chart);
     this->setRenderHint(QPainter::Antialiasing);
@@ -86,6 +51,34 @@ TransferFunctionGraph::TransferFunctionGraph(
             &TransferProperties::updateTransferFunction);
 };
 
+void TransferFunctionGraph::constructBoundingBox()
+{
+    QLineSeries* lines = new QLineSeries();
+    lines->append(
+        QPointF(tfn::points::START_POINT.x(), tfn::points::START_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::START_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::END_POINT.x(), tfn::points::END_POINT.y()));
+    lines->append(
+        QPointF(tfn::points::END_POINT.x(), tfn::points::START_POINT.y()));
+    m_boundingBox = new QAreaSeries(lines);
+    m_boundingBox->setColor(QColor(0, 0, 0, 0));
+}
+
+void TransferFunctionGraph::constructControlPointSeries()
+{
+    m_scatterSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    m_scatterSeries->setMarkerSize(POINT_SIZE);
+    m_scatterSeries->setBorderColor(POINT_BORDER_COLOR);
+    m_scatterSeries->setColor(POINT_COLOR);
+
+    m_pen->setWidth(LINE_WIDTH);
+    m_areaSeries->setName("Gradient Display");
+    m_areaSeries->setPen(*m_pen);
+    m_areaSeries->setUpperSeries(m_lineSeries);
+}
+
 void TransferFunctionGraph::updateGraph()
 {
     m_tfn.interpolatePoints();
@@ -95,6 +88,21 @@ void TransferFunctionGraph::updateGraph()
     this->update();
     emit transferFunctionChanged(m_tfn);
 };
+
+void TransferFunctionGraph::setupAxis()
+{
+    m_chart->createDefaultAxes();
+    auto axes = m_chart->axes();
+    axes[0]->setRange(tfn::points::START_POINT.x(), tfn::points::END_POINT.x());
+    axes[1]->setRange(tfn::points::START_POINT.y(), tfn::points::END_POINT.y());
+    axes[0]->setLabelsVisible(false);
+    axes[1]->setLabelsVisible(false);
+
+    m_areaSeries->attachAxis(axes[0]);
+    m_areaSeries->attachAxis(axes[1]);
+    m_scatterSeries->attachAxis(axes[0]);
+    m_scatterSeries->attachAxis(axes[1]);
+}
 
 void TransferFunctionGraph::updatePlotSeries()
 {
@@ -153,9 +161,9 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
         {
             m_currentClickedIndex = m_tfn.indexOf(point);
             m_splineControls->setAnchor(m_currentClickedIndex);
-            m_splineControls->setVisible(m_currentClickedIndex == m_previousClickedIndex &&
-                                         m_currentClickedIndex !=
-                                             m_tfn.getControlPoints().length());
+            m_splineControls->setVisible(
+                m_currentClickedIndex == m_previousClickedIndex &&
+                m_currentClickedIndex != m_tfn.getControlPoints().length()-1);
         }
         else if (pressedButton == Qt::RightButton)
         {
@@ -169,7 +177,7 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
 // If an empty spot on the graph is clicked, a new point is created
 void TransferFunctionGraph::addNewControlPoint(const QPointF& point)
 {
-    Qt::MouseButtons button = QGuiApplication::mouseButtons();
+    const Qt::MouseButtons button = QGuiApplication::mouseButtons();
     if (button == Qt::LeftButton && m_tfn.addControlPoint(point))
     {
         m_splineControls->setVisible(false);
@@ -184,7 +192,6 @@ void TransferFunctionGraph::removeControlPoint(const QPointF& point)
         updateGraph();
     }
 };
-
 
 // When draggins a point is finished replace point with new location
 void TransferFunctionGraph::mouseReleaseEvent(QMouseEvent* event)

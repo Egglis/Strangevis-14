@@ -49,6 +49,9 @@ class TransferFunctionGraph : public QChartView
     void updatePlotSeries();
     void removeControlPoint(const QPointF& point);
     void updateControlPointHint(int index);
+    void constructBoundingBox();
+    void constructControlPointSeries();
+    void setupAxis();
 
     int m_currentClickedIndex = -1;
     int m_previousClickedIndex = -1;

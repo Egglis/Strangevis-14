@@ -40,23 +40,23 @@ class TransferFunction
     bool addControlPoint(ControlPoint cp);
     bool removeControlPoint(ControlPoint point);
     void applyTransferFunction(const std::vector<GLfloat> cmap);
-    std::vector<GLfloat>* getColorMapData() {return &m_cmapData; };
+    std::vector<GLfloat>* getColorMapData() { return &m_cmapData; };
     void interpolatePoints();
 
     QList<ControlPoint> getControlPoints() { return m_controlPoints; };
     int indexOf(ControlPoint point) { return m_controlPoints.indexOf(point); };
     void replace(int index, ControlPoint point);
 
-    QPointF deCasteljau(QPointF p0, QPointF p1, QPointF p2, QPointF p3,
-                        float t);
     void setControlNodePos(int index, int node, QPointF pos);
 
     QList<QPointF> getInterpolatedPoints() { return m_interpolatedPoints; };
 
   private:
+    constexpr static QPointF deCasteljau(QPointF p0, QPointF p1, QPointF p2,
+                                         QPointF p3, float t);
     constexpr static float getPt(float n1, float n2, float perc);
     QPointF clampToNeighbours(int index, ControlPoint point);
-    QPointF clampToDomain(ControlPoint point, QPointF max, QPointF min);
+    QPointF clampToDomain(ControlPoint point, QPointF min, QPointF max);
 
     QList<ControlPoint> m_controlPoints;
     QList<QPointF> m_interpolatedPoints;

@@ -103,8 +103,8 @@ void TransferFunction::interpolatePoints()
 };
 
 // De Casteljau's algorithm for cubic bezier splines
-QPointF TransferFunction::deCasteljau(QPointF p0, QPointF p1, QPointF p2,
-                                      QPointF p3, float t)
+constexpr QPointF TransferFunction::deCasteljau(QPointF p0, QPointF p1,
+                                                QPointF p2, QPointF p3, float t)
 {
     float xa = getPt(p0.x(), p1.x(), t);
     float ya = getPt(p0.y(), p1.y(), t);
@@ -141,12 +141,11 @@ void TransferFunction::replace(int index, ControlPoint cp)
     }
     else
     {
-        ControlPoint old_cp =
-            static_cast<ControlPoint>(m_controlPoints.at(index));
+        ControlPoint old_cp = m_controlPoints.at(index);
         m_controlPoints.replace(
             index,
-            clampToNeighbours(index, clampToDomain(cp, tfn::points::END_POINT,
-                                                   tfn::points::START_POINT)));
+            clampToNeighbours(index, clampToDomain(cp, tfn::points::START_POINT,
+                                                   tfn::points::END_POINT)));
 
         setControlNodePos(index, tfn::nodes::NODE0,
                           old_cp.getControlNodes()[tfn::nodes::NODE0] +
@@ -155,8 +154,7 @@ void TransferFunction::replace(int index, ControlPoint cp)
                           old_cp.getControlNodes()[tfn::nodes::NODE1] +
                               (cp - old_cp));
 
-        ControlPoint left_cp =
-            static_cast<ControlPoint>(m_controlPoints.at(index - 1));
+        ControlPoint left_cp = m_controlPoints.at(index - 1);
         setControlNodePos(index - 1, tfn::nodes::NODE0,
                           left_cp.getControlNodes()[tfn::nodes::NODE0]);
         setControlNodePos(index - 1, tfn::nodes::NODE1,
@@ -164,8 +162,8 @@ void TransferFunction::replace(int index, ControlPoint cp)
     }
 };
 
-QPointF TransferFunction::clampToDomain(ControlPoint point, QPointF max,
-                                        QPointF min)
+QPointF TransferFunction::clampToDomain(ControlPoint point, QPointF min,
+                                        QPointF max)
 {
     return QPointF(qMax(qMin(max.x(), point.x()), min.x()),
                    qMax(qMin(max.y(), point.y()), min.y()));
@@ -180,13 +178,13 @@ QPointF TransferFunction::clampToNeighbours(int index, ControlPoint point)
 
 void TransferFunction::setControlNodePos(int index, int node, QPointF pos)
 {
-    if (index != m_controlPoints.length())
+    if (index != m_controlPoints.length()-1)
     {
         ControlPoint& cp0 = m_controlPoints[index];
         ControlPoint& cp1 = m_controlPoints[index + 1];
         const QPointF max = QPointF(cp1.x(), qMax(cp0.y(), cp1.y()));
         const QPointF min = QPointF(cp0.x(), qMin(cp0.y(), cp1.y()));
-        cp0.setControlNode(node, clampToDomain(pos, max, min));
+        cp0.setControlNode(node, clampToDomain(pos, min, max));
     }
 };
 
