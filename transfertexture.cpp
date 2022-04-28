@@ -44,7 +44,7 @@ void TransferTexture::bind()
         m_transferTexture.setSize(tfn::size::NUM_POINTS);
         m_transferTexture.allocateStorage();
         m_transferTexture.setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32,
-                                  m_tfn.getColorMapData()->data());
+                                  m_tfn.getColorMapData().data());
 
         m_updateNeeded = false;
     }

@@ -7,11 +7,7 @@ namespace tfn
 
 TransferFunction::TransferFunction()
 {
-    m_interpolatedPoints.reserve(tfn::size::NUM_POINTS);
-    for (int i = 0; i < tfn::size::NUM_POINTS; i++)
-    {
-        m_interpolatedPoints.append(QPointF(0, 0));
-    }
+    m_interpolatedPoints = QList<QPointF>(size::NUM_POINTS, QPointF(0, 0));
     reset();
     interpolatePoints();
 };
@@ -61,21 +57,21 @@ bool TransferFunction::removeControlPoint(ControlPoint cp)
     return false;
 }
 
-void TransferFunction::applyTransferFunction(const std::vector<GLfloat> cmap)
+void TransferFunction::updateTransferFunction(){
+    interpolatePoints();
+    applyTransferFunction();
+}
+
+void TransferFunction::applyTransferFunction()
 {
-    m_cmapData.clear();
     for (int i = 0; i < m_interpolatedPoints.length(); i++)
     {
-        float r = cmap[i * tfn::size::NUM_CHANNELS];
-        float g = cmap[i * tfn::size::NUM_CHANNELS + 1];
-        float b = cmap[i * tfn::size::NUM_CHANNELS + 2];
-        float a = m_interpolatedPoints.at(i).y();
-
-        m_cmapData.push_back(r);
-        m_cmapData.push_back(g);
-        m_cmapData.push_back(b);
-        m_cmapData.push_back(a);
+        m_cmapData[(i * size::NUM_CHANNELS) + 3] = m_interpolatedPoints.at(i).y();
     };
+}
+
+void TransferFunction::setColorMap(ColorMap cmap){
+    m_cmapData = cmap.colorMapData();
 }
 
 void TransferFunction::interpolatePoints()
@@ -180,8 +176,8 @@ void TransferFunction::setControlNodePos(int index, Nodes node, QPointF pos)
 {
     if (index != m_controlPoints.length()-1)
     {
-        ControlPoint& cp0 = m_controlPoints[index];
-        ControlPoint& cp1 = m_controlPoints[index + 1];
+        ControlPoint cp0 = m_controlPoints.at(index);
+        ControlPoint cp1 = m_controlPoints.at(index + 1);
         const QPointF max = QPointF(cp1.x(), qMax(cp0.y(), cp1.y()));
         const QPointF min = QPointF(cp0.x(), qMin(cp0.y(), cp1.y()));
         cp0.setControlNode(node, clampToDomain(pos, min, max));

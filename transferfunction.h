@@ -22,6 +22,8 @@ enum class Nodes
 
 };
 
+class ColorMap;
+
 class ControlPoint : public QPointF
 {
   public:
@@ -41,8 +43,10 @@ class TransferFunction
     void reset();
     bool addControlPoint(ControlPoint cp);
     bool removeControlPoint(ControlPoint point);
-    void applyTransferFunction(const std::vector<GLfloat> cmap);
-    std::vector<GLfloat>* getColorMapData() { return &m_cmapData; };
+    void setColorMap(ColorMap cmap);
+    void updateTransferFunction();
+    void applyTransferFunction();
+    const std::vector<GLfloat>& getColorMapData() const { return m_cmapData; };
     void interpolatePoints();
 
     QList<ControlPoint> getControlPoints() { return m_controlPoints; };

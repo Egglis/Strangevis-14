@@ -65,7 +65,6 @@ class TransferFunctionGraph : public QChartView
     constexpr static QColor LINE_COLOR = QColor(165, 165, 164);
 
     TransferFunction m_tfn = TransferFunction();
-    ColorMap m_cmap;
 
     QChart* m_chart = new QChart();
     QLineSeries* m_lineSeries = new QLineSeries();
