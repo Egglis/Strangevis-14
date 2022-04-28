@@ -18,7 +18,7 @@ enum class Nodes
 {
     NODE0,
     NODE1,
-    INVALID_NODE 
+    INVALID_NODE
 
 };
 
@@ -30,7 +30,7 @@ class ControlPoint : public QPointF
     ControlPoint(QPointF position);
     void setControlNode(Nodes node, QPointF pos);
     void setAllControlNodes(QList<QPointF> nodes);
-    QMap<Nodes, QPointF> getControlNodes() { return m_controlNodes; };
+    QMap<Nodes, QPointF>& getControlNodes() { return m_controlNodes; };
 
   private:
      QMap<Nodes, QPointF> m_controlNodes;
@@ -49,7 +49,7 @@ class TransferFunction
     const std::vector<GLfloat>& getColorMapData() const { return m_cmapData; };
     void interpolatePoints();
 
-    QList<ControlPoint> getControlPoints() { return m_controlPoints; };
+    QList<ControlPoint>& getControlPoints() { return m_controlPoints; };
     int indexOf(ControlPoint point) { return m_controlPoints.indexOf(point); };
     void replace(int index, ControlPoint point);
 

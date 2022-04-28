@@ -1,5 +1,7 @@
 #include "splinecontrolseries.h"
 
+#include <QDebug>
+
 namespace tfn
 {
 
@@ -46,12 +48,9 @@ bool SplineControlSeries::isVisible()
 
 void SplineControlSeries::updateControlNodes()
 {
-    ControlPoint cp =
-        static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index));
-    m_controlNodesSeries->replace(0,
-                                  cp.getControlNodes().value(Nodes::NODE0));
-    m_controlNodesSeries->replace(1,
-                                  cp.getControlNodes().value(Nodes::NODE1));
+    ControlPoint cp = m_tfn->getControlPoints().at(m_index);
+    m_controlNodesSeries->replace(0, cp.getControlNodes().value(Nodes::NODE0));
+    m_controlNodesSeries->replace(1, cp.getControlNodes().value(Nodes::NODE1));
     m_n0LineSeries->replace(0, cp);
     m_n1LineSeries->replace(0, cp);
     m_n0LineSeries->replace(1, cp.getControlNodes().value(Nodes::NODE0));
@@ -74,7 +73,6 @@ void SplineControlSeries::setClickedNode(const QPointF& point)
                 static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index))
                     .getControlNodes()
                     .key(point);
-
         }
     }
 };
@@ -85,7 +83,10 @@ bool SplineControlSeries::controlNodeReleased(QPointF point)
     {
         if (m_isLinked)
         {
-            m_tfn->setControlNodePos(m_index, m_currentClickedNode == Nodes::NODE0 ? Nodes::NODE1 : Nodes::NODE0,
+            m_tfn->setControlNodePos(m_index,
+                                     m_currentClickedNode == Nodes::NODE0
+                                         ? Nodes::NODE1
+                                         : Nodes::NODE0,
                                      point);
         }
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
@@ -100,9 +101,14 @@ bool SplineControlSeries::controlNodeMoved(QPointF point)
 {
     if (m_currentClickedNode != Nodes::INVALID_NODE && isVisible())
     {
+        qDebug() << point;
+        qDebug() << "NODE" << static_cast<int>(m_currentClickedNode);
         if (m_isLinked)
         {
-            m_tfn->setControlNodePos(m_index, m_currentClickedNode == Nodes::NODE0 ? Nodes::NODE1 : Nodes::NODE0,
+            m_tfn->setControlNodePos(m_index,
+                                     m_currentClickedNode == Nodes::NODE0
+                                         ? Nodes::NODE1
+                                         : Nodes::NODE0,
                                      point);
         }
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);

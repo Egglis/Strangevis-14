@@ -57,7 +57,8 @@ bool TransferFunction::removeControlPoint(ControlPoint cp)
     return false;
 }
 
-void TransferFunction::updateTransferFunction(){
+void TransferFunction::updateTransferFunction()
+{
     interpolatePoints();
     applyTransferFunction();
 }
@@ -66,11 +67,13 @@ void TransferFunction::applyTransferFunction()
 {
     for (int i = 0; i < m_interpolatedPoints.length(); i++)
     {
-        m_cmapData[(i * size::NUM_CHANNELS) + 3] = m_interpolatedPoints.at(i).y();
+        m_cmapData[(i * size::NUM_CHANNELS) + 3] =
+            m_interpolatedPoints.at(i).y();
     };
 }
 
-void TransferFunction::setColorMap(ColorMap cmap){
+void TransferFunction::setColorMap(ColorMap cmap)
+{
     m_cmapData = cmap.colorMapData();
 }
 
@@ -85,8 +88,10 @@ void TransferFunction::interpolatePoints()
         {
             const QPointF from = m_controlPoints.at(i);
             const QPointF target = m_controlPoints.at(i + 1);
-            QPointF cp0 = m_controlPoints[i].getControlNodes().value(Nodes::NODE0);
-            QPointF cp1 = m_controlPoints[i].getControlNodes().value(Nodes::NODE1);
+            QPointF cp0 =
+                m_controlPoints[i].getControlNodes().value(Nodes::NODE0);
+            QPointF cp1 =
+                m_controlPoints[i].getControlNodes().value(Nodes::NODE1);
 
             float perc = (t - from_x) / static_cast<float>(target_x - from_x);
             QPointF interpolatedPoint =
@@ -174,10 +179,10 @@ QPointF TransferFunction::clampToNeighbours(int index, ControlPoint point)
 
 void TransferFunction::setControlNodePos(int index, Nodes node, QPointF pos)
 {
-    if (index != m_controlPoints.length()-1)
+    if (index != m_controlPoints.length() - 1)
     {
-        ControlPoint cp0 = m_controlPoints.at(index);
-        ControlPoint cp1 = m_controlPoints.at(index + 1);
+        ControlPoint& cp0 = m_controlPoints[index];
+        ControlPoint& cp1 = m_controlPoints[index + 1];
         const QPointF max = QPointF(cp1.x(), qMax(cp0.y(), cp1.y()));
         const QPointF min = QPointF(cp0.x(), qMin(cp0.y(), cp1.y()));
         cp0.setControlNode(node, clampToDomain(pos, min, max));

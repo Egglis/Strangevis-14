@@ -79,4 +79,4 @@ class TransferFunctionGraph : public QChartView
 
 } // namespace tfn
 
-#endif
+#endif // TRANSFERFUNCTIONGRAPH_H
