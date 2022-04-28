@@ -4,10 +4,11 @@
 #include "volumerenderer.h"
 #include "../geometry/cubeplaneintersection.h"
 #include "../geometry/plane.h"
-#include "../properties/gradientproperties.h"
 #include "../properties/cameraproperties.h"
+#include "../properties/gradientproperties.h"
 #include "../properties/viewport.h"
 #include "../texturestore.h"
+#include "volumerenderer.h"
 
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -24,7 +25,7 @@ struct RenderProperties
     GradientMethod gradientMethod;
 };
 
-class RayCastingWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
+class RayCastingWidget : public QOpenGLWidget
 {
     Q_OBJECT
 

@@ -9,9 +9,6 @@
 RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
                                    std::unique_ptr<ITextureStore>& textureStore,
                                    QWidget* parent, Qt::WindowFlags f)
-    RenderProperties initialRenderProperties,
-    std::unique_ptr<ITextureStore>& textureStore, QWidget* parent,
-    Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
@@ -54,12 +51,11 @@ void RayCastingWidget::resizeGL(int w, int h)
     qreal aspectRatio = static_cast<qreal>(w) / static_cast<qreal>(h);
 
     m_camera.updateProjectionMatrix(aspectRatio);
-    m_viewPort.updateViewPort(w,h);
+    m_viewPort.updateViewPort(w, h);
 }
 
 void RayCastingWidget::paintGL()
 {
-    int location = -1;
     glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
