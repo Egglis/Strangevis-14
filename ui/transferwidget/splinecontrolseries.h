@@ -19,9 +19,9 @@ class SplineControlSeries : public QObject
     bool controlNodeMoved(QPointF point);
     void updateControlNodes();
     bool isVisible();
-    QLineSeries* getLineSeries(int n)
+    QLineSeries* getLineSeries(Nodes n)
     {
-        return n == 0 ? m_n0LineSeries : m_n1LineSeries;
+        return n == Nodes::NODE0 ? m_n0LineSeries : m_n1LineSeries;
     };
     QScatterSeries* getScatterSeries() { return m_controlNodesSeries; };
 
@@ -31,7 +31,7 @@ class SplineControlSeries : public QObject
   private:
     TransferFunction* m_tfn;
     ControlPoint* m_cp;
-    int m_currentClickedNode = -1;
+    Nodes m_currentClickedNode = Nodes::INVALID_NODE;
     bool m_isLinked = false;
     int m_index;
 

@@ -27,8 +27,8 @@ TransferFunctionGraph::TransferFunctionGraph(
 
     m_chart->addSeries(m_areaSeries);
     m_chart->addSeries(m_boundingBox);
-    m_chart->addSeries(m_splineControls->getLineSeries(tfn::nodes::NODE0));
-    m_chart->addSeries(m_splineControls->getLineSeries(tfn::nodes::NODE1));
+    m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE0));
+    m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE1));
     m_chart->addSeries(m_scatterSeries);
     m_chart->addSeries(m_splineControls->getScatterSeries());
 

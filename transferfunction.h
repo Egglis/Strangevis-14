@@ -13,23 +13,25 @@ namespace points
 constexpr static QPointF START_POINT = QPointF(0, 0);
 constexpr static QPointF END_POINT = QPointF(1, 1);
 }; // namespace points
-namespace nodes
+
+enum class Nodes
 {
-constexpr static int NUM_NODES = 2;
-constexpr static int NODE0 = 0;
-constexpr static int NODE1 = 1;
-} // namespace nodes
+    NODE0,
+    NODE1,
+    INVALID_NODE 
+
+};
 
 class ControlPoint : public QPointF
 {
   public:
     ControlPoint(QPointF position);
-    void setControlNode(int node, QPointF pos);
+    void setControlNode(Nodes node, QPointF pos);
     void setAllControlNodes(QList<QPointF> nodes);
-    QList<QPointF> getControlNodes() { return m_controlNodes; };
+    QMap<Nodes, QPointF> getControlNodes() { return m_controlNodes; };
 
   private:
-    QList<QPointF> m_controlNodes;
+     QMap<Nodes, QPointF> m_controlNodes;
 };
 
 class TransferFunction
@@ -47,7 +49,7 @@ class TransferFunction
     int indexOf(ControlPoint point) { return m_controlPoints.indexOf(point); };
     void replace(int index, ControlPoint point);
 
-    void setControlNodePos(int index, int node, QPointF pos);
+    void setControlNodePos(int index, Nodes node, QPointF pos);
 
     QList<QPointF> getInterpolatedPoints() { return m_interpolatedPoints; };
 

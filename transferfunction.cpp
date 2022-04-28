@@ -39,11 +39,11 @@ bool TransferFunction::addControlPoint(ControlPoint cp)
         {
             m_controlPoints.insert(i + 1, cp);
             setControlNodePos(
-                i, tfn::nodes::NODE0,
-                m_controlPoints[i].getControlNodes()[tfn::nodes::NODE0]);
+                i, Nodes::NODE0,
+                m_controlPoints[i].getControlNodes().value(Nodes::NODE0));
             setControlNodePos(
-                i, tfn::nodes::NODE1,
-                m_controlPoints[i].getControlNodes()[tfn::nodes::NODE1]);
+                i, Nodes::NODE1,
+                m_controlPoints[i].getControlNodes().value(Nodes::NODE1));
             break;
         }
     }
@@ -89,8 +89,8 @@ void TransferFunction::interpolatePoints()
         {
             const QPointF from = m_controlPoints.at(i);
             const QPointF target = m_controlPoints.at(i + 1);
-            QPointF cp0 = m_controlPoints[i].getControlNodes().at(0);
-            QPointF cp1 = m_controlPoints[i].getControlNodes().at(1);
+            QPointF cp0 = m_controlPoints[i].getControlNodes().value(Nodes::NODE0);
+            QPointF cp1 = m_controlPoints[i].getControlNodes().value(Nodes::NODE1);
 
             float perc = (t - from_x) / static_cast<float>(target_x - from_x);
             QPointF interpolatedPoint =
@@ -147,18 +147,18 @@ void TransferFunction::replace(int index, ControlPoint cp)
             clampToNeighbours(index, clampToDomain(cp, tfn::points::START_POINT,
                                                    tfn::points::END_POINT)));
 
-        setControlNodePos(index, tfn::nodes::NODE0,
-                          old_cp.getControlNodes()[tfn::nodes::NODE0] +
+        setControlNodePos(index, Nodes::NODE0,
+                          old_cp.getControlNodes().value(Nodes::NODE0) +
                               (cp - old_cp));
-        setControlNodePos(index, tfn::nodes::NODE1,
-                          old_cp.getControlNodes()[tfn::nodes::NODE1] +
+        setControlNodePos(index, Nodes::NODE1,
+                          old_cp.getControlNodes().value(Nodes::NODE1) +
                               (cp - old_cp));
 
         ControlPoint left_cp = m_controlPoints.at(index - 1);
-        setControlNodePos(index - 1, tfn::nodes::NODE0,
-                          left_cp.getControlNodes()[tfn::nodes::NODE0]);
-        setControlNodePos(index - 1, tfn::nodes::NODE1,
-                          left_cp.getControlNodes()[tfn::nodes::NODE1]);
+        setControlNodePos(index - 1, Nodes::NODE0,
+                          left_cp.getControlNodes().value(Nodes::NODE0));
+        setControlNodePos(index - 1, Nodes::NODE1,
+                          left_cp.getControlNodes().value(Nodes::NODE1));
     }
 };
 
@@ -176,7 +176,7 @@ QPointF TransferFunction::clampToNeighbours(int index, ControlPoint point)
     return QPointF(qMax(qMin(right.x(), point.x()), left.x()), point.y());
 };
 
-void TransferFunction::setControlNodePos(int index, int node, QPointF pos)
+void TransferFunction::setControlNodePos(int index, Nodes node, QPointF pos)
 {
     if (index != m_controlPoints.length()-1)
     {
@@ -192,21 +192,19 @@ ControlPoint::ControlPoint(QPointF position)
 {
     this->setX(position.x());
     this->setY(position.y());
-    m_controlNodes.append(position);
-    m_controlNodes.append(position);
+    m_controlNodes.insert(Nodes::NODE0, position);
+    m_controlNodes.insert(Nodes::NODE1, position);
 };
 
-void ControlPoint::setControlNode(int node, QPointF pos)
+void ControlPoint::setControlNode(Nodes node, QPointF pos)
 {
-    m_controlNodes.replace(node, pos);
+    m_controlNodes.insert(node, pos);
 };
 
 void ControlPoint::setAllControlNodes(QList<QPointF> nodes)
 {
-    for (int i = 0; i < m_controlNodes.length(); i++)
-    {
-        setControlNode(i, nodes.at(i));
-    }
+    setControlNode(Nodes::NODE0, nodes.at(0));
+    setControlNode(Nodes::NODE1, nodes.at(1));
 };
 
 } // namespace tfn

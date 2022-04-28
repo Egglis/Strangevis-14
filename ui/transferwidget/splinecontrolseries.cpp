@@ -10,7 +10,7 @@ SplineControlSeries::SplineControlSeries(TransferFunction* tfn) : m_tfn{tfn}
     m_controlNodesSeries->setBorderColor(Qt::green);
     m_controlNodesSeries->setColor(Qt::gray);
 
-    for (int i = 0; i < tfn::nodes::NUM_NODES; i++)
+    for (int i = 0; i < 2; i++)
     {
         m_controlNodes.append(QPointF(0, 0));
     }
@@ -48,20 +48,20 @@ void SplineControlSeries::updateControlNodes()
 {
     ControlPoint cp =
         static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index));
-    m_controlNodesSeries->replace(tfn::nodes::NODE0,
-                                  cp.getControlNodes().at(tfn::nodes::NODE0));
-    m_controlNodesSeries->replace(tfn::nodes::NODE1,
-                                  cp.getControlNodes().at(tfn::nodes::NODE1));
+    m_controlNodesSeries->replace(0,
+                                  cp.getControlNodes().value(Nodes::NODE0));
+    m_controlNodesSeries->replace(1,
+                                  cp.getControlNodes().value(Nodes::NODE1));
     m_n0LineSeries->replace(0, cp);
     m_n1LineSeries->replace(0, cp);
-    m_n0LineSeries->replace(1, cp.getControlNodes().at(tfn::nodes::NODE0));
-    m_n1LineSeries->replace(1, cp.getControlNodes().at(tfn::nodes::NODE1));
+    m_n0LineSeries->replace(1, cp.getControlNodes().value(Nodes::NODE0));
+    m_n1LineSeries->replace(1, cp.getControlNodes().value(Nodes::NODE1));
 }
 
 void SplineControlSeries::setClickedNode(const QPointF& point)
 {
 
-    if (m_currentClickedNode == -1)
+    if (m_currentClickedNode == Nodes::INVALID_NODE)
     {
         const Qt::MouseButtons pressedButton = QGuiApplication::mouseButtons();
         const Qt::KeyboardModifiers pressedKey =
@@ -73,7 +73,7 @@ void SplineControlSeries::setClickedNode(const QPointF& point)
             m_currentClickedNode =
                 static_cast<ControlPoint>(m_tfn->getControlPoints().at(m_index))
                     .getControlNodes()
-                    .indexOf(point);
+                    .key(point);
 
         }
     }
@@ -81,15 +81,15 @@ void SplineControlSeries::setClickedNode(const QPointF& point)
 
 bool SplineControlSeries::controlNodeReleased(QPointF point)
 {
-    if (m_currentClickedNode != -1 && isVisible())
+    if (m_currentClickedNode != Nodes::INVALID_NODE && isVisible())
     {
         if (m_isLinked)
         {
-            m_tfn->setControlNodePos(m_index, m_currentClickedNode == 0 ? 1 : 0,
+            m_tfn->setControlNodePos(m_index, m_currentClickedNode == Nodes::NODE0 ? Nodes::NODE1 : Nodes::NODE0,
                                      point);
         }
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
-        m_currentClickedNode = -1;
+        m_currentClickedNode = Nodes::INVALID_NODE;
         updateControlNodes();
         return true;
     }
@@ -98,11 +98,11 @@ bool SplineControlSeries::controlNodeReleased(QPointF point)
 
 bool SplineControlSeries::controlNodeMoved(QPointF point)
 {
-    if (m_currentClickedNode != -1 && isVisible())
+    if (m_currentClickedNode != Nodes::INVALID_NODE && isVisible())
     {
         if (m_isLinked)
         {
-            m_tfn->setControlNodePos(m_index, m_currentClickedNode == 0 ? 1 : 0,
+            m_tfn->setControlNodePos(m_index, m_currentClickedNode == Nodes::NODE0 ? Nodes::NODE1 : Nodes::NODE0,
                                      point);
         }
         m_tfn->setControlNodePos(m_index, m_currentClickedNode, point);
