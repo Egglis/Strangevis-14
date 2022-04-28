@@ -5,9 +5,11 @@
 #include "../transferfunction.h"
 #include "../transfertexture.h"
 #include "hintitem.h"
+#include "splinecontrolseries.h"
 
 #include <QApplication>
 #include <QGraphicsView>
+#include <QOpenGLFunctions>
 #include <QString>
 #include <QtCharts>
 #include <QtGlobal>
@@ -27,7 +29,6 @@ class TransferFunctionGraph : public QChartView
   public:
     TransferFunctionGraph(const std::shared_ptr<ISharedProperties> properties);
     void updateGraph();
-
     void setDisplayedColorMap(ColorMap cmap);
   public slots:
     void updateOrRemoveClickedIndex(const QPointF& point);
@@ -48,8 +49,12 @@ class TransferFunctionGraph : public QChartView
     void updatePlotSeries();
     void removeControlPoint(const QPointF& point);
     void updateControlPointHint(int index);
+    void constructBoundingBox();
+    void constructControlPointSeries();
+    void setupAxis();
 
     int m_currentClickedIndex = -1;
+    int m_previousClickedIndex = -1;
 
     // Styling options
     constexpr static int POINT_SIZE = 15;
@@ -60,7 +65,6 @@ class TransferFunctionGraph : public QChartView
     constexpr static QColor LINE_COLOR = QColor(165, 165, 164);
 
     TransferFunction m_tfn = TransferFunction();
-    ColorMap m_cmap;
 
     QChart* m_chart = new QChart();
     QLineSeries* m_lineSeries = new QLineSeries();
@@ -70,6 +74,7 @@ class TransferFunctionGraph : public QChartView
     QPen* m_pen = new QPen(LINE_COLOR);
     QLinearGradient m_gradient;
     HintItem* m_hint;
+    SplineControlSeries* m_splineControls;
 };
 
 } // namespace tfn
