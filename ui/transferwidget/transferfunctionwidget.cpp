@@ -32,7 +32,10 @@ TransferWidget::TransferWidget(
     v_layout->addWidget(m_selector,4);
     auto* button_layout = new QHBoxLayout();
     v_layout->addLayout(button_layout,1);
-    auto* button = new QPushButton("Hello World");
+    auto* button = new QPushButton("Reset");
+
+    connect(button, &QPushButton::pressed, m_tfnGraph, &TransferFunctionGraph::reset);
+
     auto checkbox = new QCheckBox("Overlay Histogram");
     button_layout->addWidget(button);
     button_layout->addWidget(checkbox);
