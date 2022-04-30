@@ -14,7 +14,8 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
-      m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort}
+      m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort},
+      m_planeRenderer{textureStore, m_camera, m_cubePlaneIntersection}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);
@@ -43,7 +44,7 @@ void RayCastingWidget::initializeGL()
     // initialize geometry
     Geometry::instance();
     m_volumeRenderer.compileShader();
-
+    m_planeRenderer.compileShader();
 }
 
 void RayCastingWidget::resizeGL(int w, int h)
@@ -61,6 +62,7 @@ void RayCastingWidget::paintGL()
 
     renderImGuizmo();
     m_volumeRenderer.paint();
+    m_planeRenderer.paint();
 
 }
 

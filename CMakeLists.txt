@@ -58,6 +58,7 @@ qt_add_executable(strangevis WIN32
     transfertexture.cpp
     renderers/raycastingwidget.cpp
     renderers/obliqueslicewidget.cpp
+    renderers/planerenderer.cpp
     renderers/volumerenderer.cpp
     properties/cameraproperties.cpp
     properties/sharedproperties.cpp
@@ -87,6 +88,8 @@ set(shaders_resource_files
     "shaders/cube-vs.glsl"
     "shaders/slice-fs.glsl"
     "shaders/slice-vs.glsl"
+    "shaders/plane-fs.glsl"
+    "shaders/plane-vs.glsl"
 )
 
 qt6_add_resources(strangevis "shaders"
