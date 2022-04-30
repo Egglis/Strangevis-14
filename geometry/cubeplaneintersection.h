@@ -32,6 +32,7 @@ class CubePlaneIntersection
     std::vector<QVector3D> cubeIntersectionVertices();
     bool hasLinePlaneIntersection(Edge e);
     bool hasRayPlaneIntersection(QVector3D rayDirection, QVector3D rayOrigin);
+    bool hasEdgeParallelToPlane(std::vector<QVector3D> intersections);
     QVector3D linePlaneIntersectionPoint(Edge e) const;
     Plane m_plane;
     std::vector<QVector3D> m_cubeIntersections;
