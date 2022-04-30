@@ -46,16 +46,40 @@ std::vector<QVector3D> CubePlaneIntersection::cubeIntersectionVertices()
             intersectionPoints.push_back(linePlaneIntersectionPoint(edge));
         }
     }
-    return std::move(intersectionPoints);
+    if (hasEdgeParallelToPlane(intersectionPoints))
+    {
+        /* Alternative Algorithm */
+    }
+    return intersectionPoints;
 }
 
+bool CubePlaneIntersection::hasEdgeParallelToPlane(
+    std::vector<QVector3D> intersections)
+{
+    if (intersections.size() > 0 && intersections.size() < 3)
+        return true;
+    std::sort(intersections.begin(), intersections.end(), edgeLessThan);
+    if (std::adjacent_find(intersections.begin(), intersections.end()) !=
+        intersections.end())
+        return true;
+    return false;
+}
 bool CubePlaneIntersection::hasLinePlaneIntersection(Edge e)
 {
     // Looks for intersection at ray cast from start towards end, and
     // from end towards start. If both have intersection, plane is
     // between them and the intersection is on the line segment.
-    return (hasRayPlaneIntersection(e.start(), e.direction()) &&
-            hasRayPlaneIntersection(e.end(), -e.direction()));
+    static int i = 0;
+    auto firstTest = hasRayPlaneIntersection(e.start(), e.direction());
+    auto secondTest = hasRayPlaneIntersection(e.end(), -e.direction());
+    if (m_plane.pointInPlane(e.start()))
+        qDebug() << "Start point in Plane" << i;
+    if (m_plane.pointInPlane(e.end()))
+        qDebug() << "End point in Plane" << i;
+    i++;
+    if (i == 10000)
+        i = 0;
+    return firstTest && secondTest;
 }
 
 bool CubePlaneIntersection::hasRayPlaneIntersection(QVector3D rayOrigin,
@@ -70,12 +94,17 @@ bool CubePlaneIntersection::hasRayPlaneIntersection(QVector3D rayOrigin,
                    denominator;
         return (t > epsilon);
     }
-    return false;
+    bool ret = m_plane.pointInPlane(rayOrigin);
+    if (ret)
+        qDebug() << "RayOrigin in Plane";
+    return ret;
 }
 
 QVector3D CubePlaneIntersection::linePlaneIntersectionPoint(Edge e) const
 {
     double denominator = QVector3D::dotProduct(m_plane.normal(), e.direction());
+    if (std::abs(denominator) < 0.00001)
+        return e.parameterization(0);
     double t =
         QVector3D::dotProduct(m_plane.point() - e.start(), m_plane.normal()) /
         denominator;

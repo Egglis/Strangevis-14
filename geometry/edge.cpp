@@ -5,24 +5,21 @@ Edge::Edge(QVector3D a, QVector3D b) : m_a{a}, m_b{b}
 {
     // Use smallest x vertex in first slot. If equal, use smallest y. If equal,
     // use smallest z.
+    if (edgeLessThan(b,a))
+        std::swap(m_a, m_b);
+}
+
+bool edgeLessThan(QVector3D a, QVector3D b)
+{
     if (a.x() == b.x())
     {
         if (a.y() == b.y())
         {
-            if (a.z() > b.z())
-            {
-                std::swap(m_a, m_b);
-            }
+            return a.z() < b.z();
         }
-        else if (a.y() > b.y())
-        {
-            std::swap(m_a, m_b);
-        }
+        return a.y() < b.y();
     }
-    else if (a.x() > b.x())
-    {
-        std::swap(m_a, m_b);
-    }
+    return a.x() < b.x();
 }
 
 QVector3D Edge::parameterization(float t) const
