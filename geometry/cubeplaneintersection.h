@@ -6,7 +6,14 @@
 
 #include <QMatrix4x4>
 #include <QVector3D>
+#include <unordered_set>
+#include <QSet>
 
+enum class Intersection {
+    NONE,
+    SINGLE,
+    PARALLEL
+};
 
 class CubePlaneIntersection
 {
@@ -14,9 +21,9 @@ class CubePlaneIntersection
     CubePlaneIntersection(Plane plane);
     void changePlane(Plane plane);
     // Returns the intersections between a cube and a plane cutting the cube
-    const std::vector<QVector3D>& getCubeIntersections() const
+    std::vector<QVector3D> getCubeIntersections() const
     {
-        return m_cubeIntersections;
+        return std::vector<QVector3D>{m_cubeIntersections.begin(), m_cubeIntersections.end()};
     };
     // Matrix that rotates the cube intersection points into the XY plane
     QMatrix4x4 getModelRotationMatrix() const { return m_modelRotationMatrix; };
@@ -29,13 +36,13 @@ class CubePlaneIntersection
   private:
     void updateIntersections();
     Cube m_cube;
-    std::vector<QVector3D> cubeIntersectionVertices();
-    bool hasLinePlaneIntersection(Edge e);
-    bool hasRayPlaneIntersection(QVector3D rayDirection, QVector3D rayOrigin);
-    bool hasEdgeParallelToPlane(std::vector<QVector3D> intersections);
+    QSet<QVector3D> cubeIntersectionVertices();
+    Intersection hasLinePlaneIntersection(Edge e) const;
+    bool hasRayPlaneIntersection(QVector3D rayDirection, QVector3D rayOrigin) const;
+    bool hasEdgeParallelToPlane(Edge e) const;
     QVector3D linePlaneIntersectionPoint(Edge e) const;
     Plane m_plane;
-    std::vector<QVector3D> m_cubeIntersections;
+    QSet<QVector3D> m_cubeIntersections;
     QMatrix4x4 m_modelRotationMatrix;
     std::vector<unsigned short> m_sortedOrder;
 };
