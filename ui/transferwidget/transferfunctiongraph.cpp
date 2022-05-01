@@ -9,8 +9,9 @@ TransferFunctionGraph::TransferFunctionGraph(
 {
     m_chart->legend()->hide();
     m_chart->setBackgroundVisible(false);
-    m_chart->setTitle("TransferFunction");
-
+    m_chart->layout()->setContentsMargins(0, 0, 0, 0);
+    m_chart->setBackgroundRoundness(0);
+    m_chart->setContentsMargins(-30,-30,-30,-30);
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
@@ -31,6 +32,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE1));
     m_chart->addSeries(m_scatterSeries);
     m_chart->addSeries(m_splineControls->getScatterSeries());
+
 
     setupAxis();
 
