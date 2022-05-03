@@ -25,8 +25,10 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_splineControls->setVisible(false);
 
     constructBoundingBox();
+    constructHistogramSeries();
 
     m_chart->addSeries(m_areaSeries);
+    m_chart->addSeries(m_histogramSeries);
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE0));
     m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE1));
@@ -50,6 +52,35 @@ TransferFunctionGraph::TransferFunctionGraph(
             &m_properties.get()->transferFunction(),
             &TransferProperties::updateTransferFunction);
 };
+
+void TransferFunctionGraph::setHistogramData(std::vector<float> normalizedHistogramData) {
+
+    QList<QPointF> list;
+    std::vector<float> binnedData;
+    int div = 16;
+    int start = 5;
+    
+    for (int i = 0; i < normalizedHistogramData.size(); i+=div)
+    {
+        auto sum = std::reduce(normalizedHistogramData.begin()+i, normalizedHistogramData.end()-(normalizedHistogramData.size()-(i+div)));
+        binnedData.push_back(sum);
+    }
+    auto max = *std::max_element(binnedData.begin()+start, binnedData.end());
+    std::transform(binnedData.begin()+start, binnedData.end(), binnedData.begin()+start, std::bind(std::divides<float>(), std::placeholders::_1, max));
+    for(int i = start; i < binnedData.size(); i++){
+        list.push_back(QPointF(i/static_cast<float>(binnedData.size()), binnedData[i]));
+    }
+    if (m_histogramSeries->points().size() == 0) {
+        m_histogramSeries->append(list);
+        m_histogramSeries->setVisible(false);
+    } else {
+        m_histogramSeries->replace(list);
+    } 
+};
+
+void TransferFunctionGraph::setVisibleHistogram(bool checked){
+    m_histogramSeries->setVisible(checked);
+}
 
 void TransferFunctionGraph::reset(){
     m_tfn.reset();
@@ -83,6 +114,10 @@ void TransferFunctionGraph::constructControlPointSeries()
     m_areaSeries->setName("Gradient Display");
     m_areaSeries->setPen(*m_pen);
     m_areaSeries->setUpperSeries(m_lineSeries);
+}
+
+void TransferFunctionGraph::constructHistogramSeries(){
+    m_histogramSeries->setColor(QColor(60, 118, 181, 200));
 }
 
 void TransferFunctionGraph::updateGraph()

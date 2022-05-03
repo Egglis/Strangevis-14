@@ -42,6 +42,8 @@ TransferWidget::TransferWidget(
     m_layout->addWidget(m_tfnGraph, 3);
     m_layout->addLayout(v_layout, 1);
     setLayout(m_layout);
+
+    connect(checkbox, &QRadioButton::toggled, m_tfnGraph, &TransferFunctionGraph::setVisibleHistogram);
 };
 
 void TransferWidget::setSelectedColorMap(const QString& name)

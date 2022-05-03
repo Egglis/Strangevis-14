@@ -88,11 +88,13 @@ void TransferFunction::interpolatePoints()
         {
             const QPointF from = m_controlPoints.at(i);
             const QPointF target = m_controlPoints.at(i + 1);
+            if (target_x - from_x == 0) {
+                continue;
+            }
             QPointF cp0 =
                 m_controlPoints[i].getControlNodes().value(Nodes::NODE0);
             QPointF cp1 =
                 m_controlPoints[i].getControlNodes().value(Nodes::NODE1);
-
             float perc = (t - from_x) / static_cast<float>(target_x - from_x);
             QPointF interpolatedPoint =
                 deCasteljau(from, QPointF(cp0.x(), cp0.y()),
@@ -107,6 +109,15 @@ void TransferFunction::interpolatePoints()
 constexpr QPointF TransferFunction::deCasteljau(QPointF p0, QPointF p1,
                                                 QPointF p2, QPointF p3, float t)
 {
+
+    if (p0.x() == p3.x())
+    {
+        return p0.y() > p3.y() ? p0 : p3;
+    }
+
+    p0 = p0.y() == 1.0f ? QPointF(p0.x(), p0.y() - 0.001f) : p0;
+    p3 = p3.y() == 1.0f ? QPointF(p3.x(), p3.y() - 0.001f) : p3;
+
     float xa = getPt(p0.x(), p1.x(), t);
     float ya = getPt(p0.y(), p1.y(), t);
     float xb = getPt(p1.x(), p2.x(), t);
