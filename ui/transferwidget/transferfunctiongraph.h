@@ -36,6 +36,7 @@ class TransferFunctionGraph : public QChartView
     void addNewControlPoint(const QPointF& point);
     void reset();
     void setVisibleHistogram(bool checked);
+    void setHistogramScaling(int value);
   protected:
     void mouseReleaseEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
@@ -55,6 +56,7 @@ class TransferFunctionGraph : public QChartView
     void constructControlPointSeries();
     void constructHistogramSeries();
     void setupAxis();
+    void createHistogramSeries();
 
     int m_currentClickedIndex = -1;
     int m_previousClickedIndex = -1;
@@ -78,7 +80,13 @@ class TransferFunctionGraph : public QChartView
     QLinearGradient m_gradient;
     HintItem* m_hint;
     SplineControlSeries* m_splineControls;
+
     QLineSeries* m_histogramSeries = new QLineSeries();
+    QAreaSeries* m_histogramArea = new QAreaSeries();
+    std::vector<float> m_normalizedHistogramData;
+    std::vector<float> m_binnedData;
+    float m_histogramthreshold = 10.0f;
+    bool m_isDataLoaded = false;
 };
 
 } // namespace tfn

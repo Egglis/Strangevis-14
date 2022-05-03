@@ -11,7 +11,7 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_chart->setBackgroundVisible(false);
     m_chart->layout()->setContentsMargins(0, 0, 0, 0);
     m_chart->setBackgroundRoundness(0);
-    m_chart->setContentsMargins(-30,-30,-30,-30);
+    m_chart->setContentsMargins(-30, -30, -30, -30);
     m_gradient = QLinearGradient(QPointF(0, 0), QPointF(1, 0));
     m_gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
 
@@ -25,16 +25,14 @@ TransferFunctionGraph::TransferFunctionGraph(
     m_splineControls->setVisible(false);
 
     constructBoundingBox();
-    constructHistogramSeries();
 
     m_chart->addSeries(m_areaSeries);
-    m_chart->addSeries(m_histogramSeries);
+    m_chart->addSeries(m_histogramArea);
     m_chart->addSeries(m_boundingBox);
     m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE0));
     m_chart->addSeries(m_splineControls->getLineSeries(Nodes::NODE1));
     m_chart->addSeries(m_scatterSeries);
     m_chart->addSeries(m_splineControls->getScatterSeries());
-
 
     setupAxis();
 
@@ -51,38 +49,75 @@ TransferFunctionGraph::TransferFunctionGraph(
     connect(this, &TransferFunctionGraph::transferFunctionChanged,
             &m_properties.get()->transferFunction(),
             &TransferProperties::updateTransferFunction);
+
+    constructHistogramSeries();
 };
 
-void TransferFunctionGraph::setHistogramData(std::vector<float> normalizedHistogramData) {
-
-    QList<QPointF> list;
-    std::vector<float> binnedData;
-    int div = 16;
-    int start = 5;
-    
-    for (int i = 0; i < normalizedHistogramData.size(); i+=div)
+void TransferFunctionGraph::setHistogramScaling(int value)
+{
+    if (m_isDataLoaded)
     {
-        auto sum = std::reduce(normalizedHistogramData.begin()+i, normalizedHistogramData.end()-(normalizedHistogramData.size()-(i+div)));
-        binnedData.push_back(sum);
+        auto const max =
+            *std::max_element(m_binnedData.begin(), m_binnedData.end());
+        m_histogramthreshold = static_cast<float>(max * (std::logf(value) / 100.0f));
+        qDebug() << m_histogramthreshold;
+        createHistogramSeries();
     }
-    auto max = *std::max_element(binnedData.begin()+start, binnedData.end());
-    std::transform(binnedData.begin()+start, binnedData.end(), binnedData.begin()+start, std::bind(std::divides<float>(), std::placeholders::_1, max));
-    for(int i = start; i < binnedData.size(); i++){
-        list.push_back(QPointF(i/static_cast<float>(binnedData.size()), binnedData[i]));
-    }
-    if (m_histogramSeries->points().size() == 0) {
-        m_histogramSeries->append(list);
-        m_histogramSeries->setVisible(false);
-    } else {
-        m_histogramSeries->replace(list);
-    } 
-};
-
-void TransferFunctionGraph::setVisibleHistogram(bool checked){
-    m_histogramSeries->setVisible(checked);
 }
 
-void TransferFunctionGraph::reset(){
+void TransferFunctionGraph::setHistogramData(
+    std::vector<float> normalizedHistogramData)
+{
+    m_isDataLoaded = true;
+    m_normalizedHistogramData = normalizedHistogramData;
+    int div = 16;
+    for (int i = 0; i < m_normalizedHistogramData.size(); i += div)
+    {
+        auto sum =
+            std::reduce(m_normalizedHistogramData.begin() + i,
+                        m_normalizedHistogramData.end() -
+                            (m_normalizedHistogramData.size() - (i + div)));
+        m_binnedData.push_back(sum);
+    }
+    createHistogramSeries();
+}
+
+void TransferFunctionGraph::createHistogramSeries()
+{
+    QList<QPointF> list;
+    std::vector<float> data = m_binnedData;
+    std::vector<float> filteredData;
+    std::copy_if(data.begin(), data.end(), std::back_inserter(filteredData),
+                 [this](float i) { return i < m_histogramthreshold; });
+
+    if (!filteredData.size() == 0)
+    {
+        auto max = *std::max_element(filteredData.begin(),
+                                     filteredData.end());
+
+        std::transform(
+            data.begin(), data.end(), data.begin(),
+            std::bind(std::divides<float>(), std::placeholders::_1, max));
+
+        for (int i = 0; i < data.size(); i++)
+        {
+            list.push_back(
+                QPointF(i / static_cast<float>(data.size()), data[i]));
+        }
+        m_histogramSeries->points().size() == 0
+            ? m_histogramSeries->append(list)
+            : m_histogramSeries->replace(list);
+    }
+}
+
+void TransferFunctionGraph::setVisibleHistogram(bool checked)
+{
+    m_histogramSeries->setVisible(checked);
+    m_histogramArea->setVisible(checked);
+}
+
+void TransferFunctionGraph::reset()
+{
     m_tfn.reset();
     updateGraph();
     m_splineControls->setVisible(false);
@@ -116,8 +151,12 @@ void TransferFunctionGraph::constructControlPointSeries()
     m_areaSeries->setUpperSeries(m_lineSeries);
 }
 
-void TransferFunctionGraph::constructHistogramSeries(){
-    m_histogramSeries->setColor(QColor(60, 118, 181, 200));
+void TransferFunctionGraph::constructHistogramSeries()
+{
+    m_histogramArea->setUpperSeries(m_histogramSeries);
+    m_histogramSeries->setVisible(false);
+    m_histogramArea->setVisible(false);
+    m_histogramArea->setColor(QColor(60, 118, 181, 100));
 }
 
 void TransferFunctionGraph::updateGraph()
@@ -203,7 +242,7 @@ void TransferFunctionGraph::updateOrRemoveClickedIndex(const QPointF& point)
             m_splineControls->setAnchor(m_currentClickedIndex);
             m_splineControls->setVisible(
                 m_currentClickedIndex == m_previousClickedIndex &&
-                m_currentClickedIndex != m_tfn.getControlPoints().length()-1);
+                m_currentClickedIndex != m_tfn.getControlPoints().length() - 1);
         }
         else if (pressedButton == Qt::RightButton)
         {
