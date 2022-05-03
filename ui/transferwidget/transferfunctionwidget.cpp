@@ -18,7 +18,7 @@ TransferWidget::TransferWidget(
     m_layout = new QHBoxLayout();
     auto* v_layout = new QVBoxLayout();
     m_selector =
-        new ColorMapSelector(nullptr, m_colorMapStore->availableColorMaps());
+        new ColorMapSelector(nullptr, m_colorMapStore);
     m_tfnGraph = new TransferFunctionGraph(properties);
 
     connect(m_selector, &ColorMapSelector::currentTextChanged, this,
@@ -29,12 +29,13 @@ TransferWidget::TransferWidget(
 
     setSelectedColorMap(0);
 
-    v_layout->addWidget(m_selector,4);
+    v_layout->addWidget(m_selector, 4);
     auto* button_layout = new QHBoxLayout();
-    v_layout->addLayout(button_layout,1);
+    v_layout->addLayout(button_layout, 1);
     auto* button = new QPushButton("Reset");
 
-    connect(button, &QPushButton::pressed, m_tfnGraph, &TransferFunctionGraph::reset);
+    connect(button, &QPushButton::pressed, m_tfnGraph,
+            &TransferFunctionGraph::reset);
 
     auto checkbox = new QCheckBox("Overlay Histogram");
     button_layout->addWidget(button);
@@ -51,14 +52,34 @@ void TransferWidget::setSelectedColorMap(const QString& name)
     emit valueChanged(name);
 };
 
-ColorMapSelector::ColorMapSelector(QWidget* parent,
-                                   std::vector<QString> colorMaps)
+ColorMapSelector::ColorMapSelector(
+    QWidget* parent, const std::shared_ptr<const IColorMapStore> colorMapStore)
     : QListWidget(parent)
 {
-    for (const auto& colorMap : colorMaps)
+    for (const auto& colorMapName : colorMapStore->availableColorMaps())
     {
-        addItem(colorMap);
+        QListWidgetItem* item = new QListWidgetItem(colorMapName);
+        QLinearGradient gradient =
+            QLinearGradient(QPointF(0, 0), QPointF(1, 0));
+        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+        const auto colorMapData =
+            colorMapStore->colorMap(colorMapName).colorMapData();
+        for (int i = 0; i < tfn::size::NUM_POINTS; i++)
+        {
+            float r = colorMapData.at(i * tfn::size::NUM_CHANNELS);
+            float g = colorMapData.at(i * tfn::size::NUM_CHANNELS + 1);
+            float b = colorMapData.at(i * tfn::size::NUM_CHANNELS + 2);
+
+            QColor col;
+            col.setRgbF(r, g, b, 0.8f);
+            gradient.setColorAt(i / static_cast<float>(tfn::size::NUM_POINTS),
+                                col);
+        }
+        QBrush brush = QBrush(gradient);
+
+        item->setBackground(brush);
+        addItem(item);
     }
 };
-
 } // namespace tfn
