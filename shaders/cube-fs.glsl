@@ -47,9 +47,21 @@ void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
     tmax = min(t.x, t.y);
 }
 
+float calcDepth(vec3 pos)
+{
+	float far = gl_DepthRange.far; 
+	float near = gl_DepthRange.near;
+	vec4 clip_space_pos = viewMatrix * vec4(pos, 1.0);
+	float ndc_depth = clip_space_pos.z / clip_space_pos.w;
+	return (((far - near) * ndc_depth) + near + far) / 2.0;
+}
+
 void main(void)
 {
     // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
+
+    stepLength = 1.0f/1000;
+
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
     rayDirection.x *= aspectRatio;
@@ -70,22 +82,33 @@ void main(void)
     float rayLength = length(ray);
     vec3 stepVector = stepLength * ray / rayLength;
 
+    // Perlin Noise
+    rayStart += stepVector;//*(perlin_noise(rayEnd));
+
     vec3 position = rayStart;
-
     float maxIntensity = 0.0f;
-    while (rayLength > 0)
-    {
 
+    vec4 color = vec4(0,0,0,0);
+    while (rayLength > 0 && color.a < 1.0)
+    {
+        
         float intensity = texture(volumeTexture, position).r;
-        maxIntensity = max(intensity, maxIntensity);
+        vec3 gradient = calculateGradient(position);
+        vec4 c = texture(transferFunction, intensity);
+        
+        // Back to front color bledning
+        color.rgb = (c.a * c.rgb + (1 - c.a) * color.a * color.rgb);
+        color.a = c.a + (1 - c.a) * color.a;
+        
 
         rayLength -= stepLength;
         position += stepVector;
     }
 
-    vec4 color = texture(transferFunction, maxIntensity);
+    gl_FragDepth = calcDepth(position);
     fragmentColor = color;
 }
+
 
 vec3 calculateGradient(vec3 volumePosition)
 {

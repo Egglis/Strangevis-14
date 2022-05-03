@@ -75,12 +75,15 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
             m_mainWidget,
             &MainWindowWidget::toggleFileLoadingInProgressOverlay);
     setCentralWidget(m_mainWidget);
+    
+    m_textureStore->volume().load("C:/Users/egilb/Desktop/Github/strangevis-14/datasets/hand/hand.dat");
 }
 
 void MainWindow::fileOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Volume File",
                                                     QString(), "*.dat");
+    qDebug() << fileName;
 
     if (!fileName.isEmpty())
     {
