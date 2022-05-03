@@ -17,7 +17,9 @@ class ColorMapSelector : public QListWidget
 {
     Q_OBJECT
   public:
-    ColorMapSelector(QWidget* parent, std::vector<QString> options);
+    ColorMapSelector(
+        QWidget* parent,
+        const std::shared_ptr<const IColorMapStore> m_colorMapStore);
 };
 
 class TransferWidget : public QWidget
