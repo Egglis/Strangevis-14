@@ -60,7 +60,6 @@ void TransferFunctionGraph::setHistogramScaling(int value)
         auto const max =
             *std::max_element(m_binnedData.begin(), m_binnedData.end());
         m_histogramthreshold = static_cast<float>(max * (std::logf(value) / 100.0f));
-        qDebug() << m_histogramthreshold;
         createHistogramSeries();
     }
 }
@@ -85,9 +84,9 @@ void TransferFunctionGraph::setHistogramData(
 void TransferFunctionGraph::createHistogramSeries()
 {
     QList<QPointF> list;
-    std::vector<float> data = m_binnedData;
+    std::vector<float> dataCopy = m_binnedData;
     std::vector<float> filteredData;
-    std::copy_if(data.begin(), data.end(), std::back_inserter(filteredData),
+    std::copy_if(dataCopy.begin(), dataCopy.end(), std::back_inserter(filteredData),
                  [this](float i) { return i < m_histogramthreshold; });
 
     if (!filteredData.size() == 0)
@@ -96,13 +95,13 @@ void TransferFunctionGraph::createHistogramSeries()
                                      filteredData.end());
 
         std::transform(
-            data.begin(), data.end(), data.begin(),
+            dataCopy.begin(), dataCopy.end(), dataCopy.begin(),
             std::bind(std::divides<float>(), std::placeholders::_1, max));
 
-        for (int i = 0; i < data.size(); i++)
+        for (int i = 0; i < dataCopy.size(); i++)
         {
             list.push_back(
-                QPointF(i / static_cast<float>(data.size()), data[i]));
+                QPointF(i / static_cast<float>(dataCopy.size()), dataCopy[i]));
         }
         m_histogramSeries->points().size() == 0
             ? m_histogramSeries->append(list)
