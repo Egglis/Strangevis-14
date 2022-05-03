@@ -37,8 +37,7 @@ TransferWidget::TransferWidget(
     connect(button, &QPushButton::pressed, m_tfnGraph, &TransferFunctionGraph::reset);
 
     QSlider* histogramSlider = new QSlider(Qt::Vertical, this);
-    histogramSlider->setRange(0, 100);
-    histogramSlider->setValue(100);
+    m_tfnGraph->setHistogramSlider(histogramSlider);
     connect(histogramSlider, &QSlider::valueChanged, m_tfnGraph, &TransferFunctionGraph::setHistogramScaling);
 
     auto checkbox = new QCheckBox("Overlay Histogram");

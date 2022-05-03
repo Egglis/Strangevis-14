@@ -31,6 +31,7 @@ class TransferFunctionGraph : public QChartView
     void updateGraph();
     void setDisplayedColorMap(ColorMap cmap);
     void setHistogramData(std::vector<float> normalizedHistogramData);
+    void setHistogramSlider(QSlider* slider) {m_histogramSlider = slider; };
   public slots:
     void updateOrRemoveClickedIndex(const QPointF& point);
     void addNewControlPoint(const QPointF& point);
@@ -85,6 +86,7 @@ class TransferFunctionGraph : public QChartView
     QAreaSeries* m_histogramArea = new QAreaSeries();
     std::vector<float> m_normalizedHistogramData;
     std::vector<float> m_binnedData;
+    QSlider* m_histogramSlider;
     float m_histogramthreshold = 10.0f;
     bool m_isDataLoaded = false;
 };

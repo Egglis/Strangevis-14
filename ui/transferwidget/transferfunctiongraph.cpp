@@ -57,9 +57,9 @@ void TransferFunctionGraph::setHistogramScaling(int value)
 {
     if (m_isDataLoaded)
     {
-        auto const max =
+        float const max =
             *std::max_element(m_binnedData.begin(), m_binnedData.end());
-        m_histogramthreshold = static_cast<float>(max * (std::logf(value) / 100.0f));
+        m_histogramthreshold = value/(max*10.0f);
         createHistogramSeries();
     }
 }
@@ -69,7 +69,9 @@ void TransferFunctionGraph::setHistogramData(
 {
     m_isDataLoaded = true;
     m_normalizedHistogramData = normalizedHistogramData;
-    int div = 16;
+    int binSize = 256;
+    int div = normalizedHistogramData.size() / binSize;
+    m_binnedData.clear();
     for (int i = 0; i < m_normalizedHistogramData.size(); i += div)
     {
         auto sum =
@@ -79,6 +81,11 @@ void TransferFunctionGraph::setHistogramData(
         m_binnedData.push_back(sum);
     }
     createHistogramSeries();
+
+    auto max = *std::max_element(m_binnedData.begin(), m_binnedData.end());
+    m_histogramSlider->setRange(0, max*10);
+    m_histogramSlider->setTickInterval(1);
+    m_histogramSlider->setValue(m_histogramthreshold*10);
 }
 
 void TransferFunctionGraph::createHistogramSeries()
@@ -86,13 +93,13 @@ void TransferFunctionGraph::createHistogramSeries()
     QList<QPointF> list;
     std::vector<float> dataCopy = m_binnedData;
     std::vector<float> filteredData;
-    std::copy_if(dataCopy.begin(), dataCopy.end(), std::back_inserter(filteredData),
+    std::copy_if(dataCopy.begin(), dataCopy.end(),
+                 std::back_inserter(filteredData),
                  [this](float i) { return i < m_histogramthreshold; });
 
     if (!filteredData.size() == 0)
     {
-        auto max = *std::max_element(filteredData.begin(),
-                                     filteredData.end());
+        auto max = *std::max_element(filteredData.begin(), filteredData.end());
 
         std::transform(
             dataCopy.begin(), dataCopy.end(), dataCopy.begin(),
