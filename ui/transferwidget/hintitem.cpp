@@ -45,13 +45,20 @@ void HintItem::setText(const QString& text)
 void HintItem::setAnchor(QPointF point, QPointF offset)
 {
     m_anchor = point;
-    QPointF new_pos = m_chart->mapToPosition(point) + offset;
-    if ((new_pos + m_rect.topRight()).x() > tfn::graph::WIDTH)
-    {
-        const float m = (new_pos + m_rect.topRight()).x() - tfn::graph::WIDTH;
-        new_pos -= QPointF(m, 0);
-    }
+    QPointF new_pos = clampToChart(m_chart->mapToPosition(point) + offset);
     setPos(new_pos);
+};
+
+QPointF HintItem::clampToChart(QPointF point){
+    if ((point + m_rect.topRight()).x() > m_chart->size().width())
+    {
+        point -= QPointF((point + m_rect.topRight()).x() - m_chart->size().width(), 0);
+    }
+    if ((point + m_rect.topRight()).y() < 0)
+    {
+        point -= QPointF(0, (point + m_rect.topRight()).y());
+    }
+    return point;
 };
 
 }; // namespace tfn

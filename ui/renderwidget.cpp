@@ -21,6 +21,10 @@ ExtendedParameterWidget::ExtendedParameterWidget(
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
+void ExtendedParameterWidget::histogramChanged(std::vector<float> normalizedHistogramData){
+    m_transferWidget.getGraph()->setHistogramData(normalizedHistogramData);
+}
+
 RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
     const std::shared_ptr<ISharedProperties> properties, QWidget* parent,

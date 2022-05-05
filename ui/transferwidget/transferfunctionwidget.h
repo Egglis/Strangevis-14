@@ -29,6 +29,7 @@ class TransferWidget : public QWidget
     TransferWidget(const std::shared_ptr<ISharedProperties> properties,
                    const std::shared_ptr<const IColorMapStore> colorMapStore,
                    QWidget* parent);
+  TransferFunctionGraph* getGraph() {return m_tfnGraph;};
   public slots:
     void setSelectedColorMap(const QString& name);
   signals:

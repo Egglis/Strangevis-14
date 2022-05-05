@@ -37,12 +37,19 @@ TransferWidget::TransferWidget(
     connect(button, &QPushButton::pressed, m_tfnGraph,
             &TransferFunctionGraph::reset);
 
+    QSlider* histogramSlider = new QSlider(Qt::Vertical, this);
+    m_tfnGraph->setHistogramSlider(histogramSlider);
+    connect(histogramSlider, &QSlider::valueChanged, m_tfnGraph, &TransferFunctionGraph::setHistogramScaling);
+
     auto checkbox = new QCheckBox("Overlay Histogram");
     button_layout->addWidget(button);
     button_layout->addWidget(checkbox);
-    m_layout->addWidget(m_tfnGraph, 3);
-    m_layout->addLayout(v_layout, 1);
+    m_layout->addWidget(histogramSlider, 1);
+    m_layout->addWidget(m_tfnGraph, 5);
+    m_layout->addLayout(v_layout, 2);
     setLayout(m_layout);
+
+    connect(checkbox, &QRadioButton::toggled, m_tfnGraph, &TransferFunctionGraph::setVisibleHistogram);
 };
 
 void TransferWidget::setSelectedColorMap(const QString& name)

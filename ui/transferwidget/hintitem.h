@@ -18,6 +18,7 @@ class HintItem : public QGraphicsItem
 
     void setText(const QString& text);
     void setAnchor(QPointF point, QPointF offset);
+    QPointF clampToChart(QPointF point);
 
   private:
     QColor FILL_COLOR = QColor(178, 178, 178, 170);

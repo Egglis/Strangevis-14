@@ -39,6 +39,8 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     fileMenu->addAction(fileOpenAction);
 
     createHistogramWidget();
+
+
     QAction* openHistogramAction = new QAction("Open Histogram", this);
     connect(openHistogramAction, &QAction::triggered, this,
             &MainWindow::openHistogram);
@@ -59,6 +61,10 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipHorizontal);
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipVertical);
+    
+    connect(&m_textureStore->volume(), &Volume::histogramCalculated,
+            p_3dToolBarWidget, &ExtendedParameterWidget::histogramChanged);
+
 
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,

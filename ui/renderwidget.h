@@ -36,11 +36,15 @@ class RayCastingInteractor : public RayCastingWidget
 
 class ExtendedParameterWidget : public QWidget
 {
+  Q_OBJECT;
   public:
     ExtendedParameterWidget(
         const std::shared_ptr<ISharedProperties>& properties,
         const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
         QWidget* parent);
+  public slots:
+    void histogramChanged(std::vector<float> normalizedHistogramData);
+
 
   private:
     QVBoxLayout m_layout;
