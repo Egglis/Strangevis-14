@@ -69,15 +69,14 @@ void TransferFunctionGraph::setHistogramData(
 {
     m_isDataLoaded = true;
     m_normalizedHistogramData = normalizedHistogramData;
-    int binSize = 256;
-    int div = normalizedHistogramData.size() / binSize;
+    int binSize = 16;
     m_binnedData.clear();
-    for (int i = 0; i < m_normalizedHistogramData.size(); i += div)
+    for (int i = 0; i < m_normalizedHistogramData.size(); i += binSize)
     {
         auto sum =
             std::reduce(m_normalizedHistogramData.begin() + i,
                         m_normalizedHistogramData.end() -
-                            (m_normalizedHistogramData.size() - (i + div)));
+                            (m_normalizedHistogramData.size() - (i + binSize)));
         m_binnedData.push_back(sum);
     }
     createHistogramSeries();
