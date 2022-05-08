@@ -60,6 +60,7 @@ qt_add_executable(strangevis WIN32
     renderers/obliqueslicewidget.cpp
     renderers/planerenderer.cpp
     renderers/volumerenderer.cpp
+    renderers/slicingplanecontrols.cpp
     properties/cameraproperties.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp

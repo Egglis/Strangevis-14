@@ -27,13 +27,15 @@ void ExtendedParameterWidget::histogramChanged(std::vector<float> normalizedHist
 
 RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
-    const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
-    Qt::WindowFlags f) :
-    RayCastingWidget{
-          RenderProperties{1.0, QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))}, properties->transferFunction().colorMap(),
+    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
+    : RayCastingWidget{RenderProperties{
+                           1.0,
+                           QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))},
+                           properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->gradientMethod().method()},
-          textureStore, parent, f},
+                       textureStore, properties, parent, f},
       m_properties{properties}
 {
     connect(&m_properties.get()->clippingPlane(),

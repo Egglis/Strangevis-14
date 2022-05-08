@@ -8,6 +8,7 @@
 // clang-format on
 RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
                                    std::unique_ptr<ITextureStore>& textureStore,
+                                   std::shared_ptr<ISharedProperties> properties,
                                    QWidget* parent, Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
@@ -15,7 +16,8 @@ RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
       m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort},
-      m_planeRenderer{textureStore, m_camera}
+      m_planeRenderer{textureStore, m_camera},
+      m_slicingPlaneControls{properties, m_camera}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);
@@ -62,7 +64,6 @@ void RayCastingWidget::paintGL()
     renderImGuizmo();
     m_volumeRenderer.paint();
     m_planeRenderer.paint();
-
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
@@ -90,8 +91,10 @@ void RayCastingWidget::renderImGuizmo()
 
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(true);
-    ImGuizmo::ViewManipulate(m_camera.rotationMatrix().data(), 2.0f * sqrt(3.0f),
-                             ImVec2(0, 0), ImVec2(128, 128), 0);
+    ImGuizmo::ViewManipulate(m_camera.rotationMatrix().data(),
+                             2.0f * sqrt(3.0f), ImVec2(0, 0), ImVec2(128, 128),
+                             0);
+    m_slicingPlaneControls.paint();
     ImGui::Render();
     QtImGui::render(m_imGuiReference);
 }

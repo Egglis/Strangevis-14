@@ -6,9 +6,11 @@
 #include "../properties/cameraproperties.h"
 #include "../properties/gradientproperties.h"
 #include "../properties/viewport.h"
+#include "../properties/sharedproperties.h"
 #include "../texturestore.h"
 #include "planerenderer.h"
 #include "volumerenderer.h"
+#include "slicingplanecontrols.h"
 
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -31,6 +33,7 @@ class RayCastingWidget : public QOpenGLWidget
   public:
     RayCastingWidget(RenderProperties initialProperties,
                      std::unique_ptr<ITextureStore>& textureStore,
+                     std::shared_ptr<ISharedProperties>,
                      QWidget* parent = nullptr,
                      Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -63,6 +66,7 @@ class RayCastingWidget : public QOpenGLWidget
     QtImGui::RenderRef m_imGuiReference;
     VolumeRenderer m_volumeRenderer;
     PlaneRenderer m_planeRenderer;
+    SlicingPlaneControls m_slicingPlaneControls;
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
