@@ -3,6 +3,12 @@
 #include <QMatrix4x4>
 
 
+Plane::Plane()
+    : m_planeNormal{0.f,0.f,1.f}, m_planePoint{0.f,0.f,0.f}
+{
+    m_planeEquation = derivePlaneEquation();
+}
+
 Plane::Plane(QVector4D planeEquation)
     : m_planeEquation{planeEquation}, m_planeNormal{m_planeEquation}
 {

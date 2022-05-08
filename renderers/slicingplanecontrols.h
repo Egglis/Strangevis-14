@@ -6,6 +6,7 @@
 
 #include <QMatrix4x4>
 #include <QVector4D>
+#include <QTimer>
 
 // clang-format off
 #include <imgui.h>
@@ -17,7 +18,10 @@ class SlicingPlaneControls
   public:
     SlicingPlaneControls(std::shared_ptr<ISharedProperties> properties,
                          const CameraProperties& camera)
-        : m_properties{properties}, m_camera{camera} {};
+        : m_properties{properties}, m_camera{camera} {
+          m_resetTranslationMatrixTimer.callOnTimeout([this](){m_translationMatrix.setToIdentity();});
+          m_resetTranslationMatrixTimer.setInterval(1000);
+        };
     void paint();
 
   private:
@@ -26,9 +30,9 @@ class SlicingPlaneControls
     std::shared_ptr<ISharedProperties> m_properties;
     QMatrix4x4 m_rotationMatrix;
     QMatrix4x4 m_translationMatrix;
-    const ImGuizmo::MODE m_mode{ImGuizmo::WORLD};
     const CameraProperties& m_camera;
     Plane m_clippingPlane{QVector4D{0,0,1,0}};
+    QTimer m_resetTranslationMatrixTimer{};
 };
 
 #endif // SLICINGPLANECONTROLS_H

@@ -5,6 +5,7 @@
 #include "parameterwidget.h"
 
 #include <QCheckBox>
+#include <QPushButton>
 #include <QDial>
 #include <QHBoxLayout>
 #include <QWheelEvent>
@@ -41,10 +42,12 @@ class ObliqueSliceRotationWidget : public QWidget
   signals:
     void flipVertical(bool flip);
     void flipHorizontal(bool flip);
+    void resetClippingPlane();
 
   private:
     QCheckBox m_flipHorizontalCheckbox;
     QCheckBox m_flipVerticalCheckbox;
+    QPushButton m_resetClippingPlane;
     QHBoxLayout m_layout;
     ParameterWidget m_parameterWidget;
 };

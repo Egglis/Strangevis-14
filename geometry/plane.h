@@ -7,6 +7,7 @@
 class Plane
 {
   public:
+    Plane();
     Plane(QVector4D planeEquation);
     Plane(QVector3D vertex0, QVector3D vertex1, QVector3D vertex2);
 

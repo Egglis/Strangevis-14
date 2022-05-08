@@ -65,4 +65,8 @@ void SlicingPlaneControls::manipulateTranslation()
     clippingPlane.translate(trans);
 
     m_properties->clippingPlane().updateClippingPlane(clippingPlane);
+    if (ImGuizmo::IsUsing())
+    {
+        m_resetTranslationMatrixTimer.start();
+    }
 }
