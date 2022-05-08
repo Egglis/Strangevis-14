@@ -51,6 +51,7 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
+    setMouseTracking(true);
 }
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
@@ -58,20 +59,27 @@ void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
     m_currentPosition = p_event->position();
 
     m_previousPosition = m_currentPosition;
+    update();
 }
 
 void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
 {
-    m_currentPosition = p_event->position();
-
-    if (p_event->buttons() & Qt::LeftButton)
+    if (!ImGuizmo::IsOver())
     {
-        if (m_currentPosition != m_previousPosition)
+        m_currentPosition = p_event->position();
+        if (p_event->buttons() & Qt::LeftButton)
         {
-            rotateCamera();
+            if (m_currentPosition != m_previousPosition)
+            {
+                rotateCamera();
+            }
         }
+        m_previousPosition = m_currentPosition;
     }
-    m_previousPosition = m_currentPosition;
+    else
+    {
+        update();
+    }
 }
 
 // Scrolling wheel event
