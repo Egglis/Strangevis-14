@@ -2,33 +2,9 @@
 
 #include "../geometry.h"
 
-#include <ImGui.h>
-#include <ImGuizmo.h>
-
-namespace
-{
-// We want to draw the plane the same size as the volume, plus a small margin.
-// The margin should be the same on every side
-// If a,b,c is scaling, and x,y,z is modelScale, this calculation ensures that
-// a*x-x == b*y-y == c*z-z. These differences are the margins, so they're the
-// same everywhere.
-QVector3D planeScalingFactor(QVector3D modelScale)
-{
-    float baseScaling = static_cast<float>(sqrt(2));
-    float minValue = std::min({modelScale.x(), modelScale.y(), modelScale.z()});
-    QVector3D scaling = {
-        minValue / modelScale.x() * (baseScaling - 1.0f) + 1.0f,
-        minValue / modelScale.y() * (baseScaling - 1.0f) + 1.0f,
-        minValue / modelScale.z() * (baseScaling - 1.0f) + 1.0f};
-    return scaling * modelScale;
-}
-} // namespace
-
 PlaneRenderer::PlaneRenderer(const std::unique_ptr<ITextureStore>& textureStore,
-                             const CameraProperties& camera,
-                             const CubePlaneIntersection& cubePlaneIntersection)
-    : m_textureStore{textureStore}, m_camera{camera}, m_cubePlaneIntersection{
-                                                          cubePlaneIntersection}
+                             const CameraProperties& camera)
+    : m_textureStore{textureStore}, m_camera{camera}
 {
 }
 
@@ -68,15 +44,7 @@ void PlaneRenderer::paint()
 
 QMatrix4x4 PlaneRenderer::planeModelMatrix()
 {
-    const auto& plane = m_cubePlaneIntersection.plane();
-    QVector3D t = plane.d()*plane.normal();
     QMatrix4x4 modelMatrix{};
-    auto scaleFactor = planeScalingFactor(
-        m_textureStore->volume().scaleFactor());
-    modelMatrix.scale(scaleFactor);
-
-    modelMatrix.translate(-t);
-    modelMatrix.translate(t/scaleFactor);
-
+    modelMatrix.scale(m_textureStore->volume().scaleFactor());
     return modelMatrix;
 }
