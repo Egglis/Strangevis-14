@@ -15,8 +15,11 @@ class Plane
     QVector4D equation() const { return m_planeEquation; };
     float d() const { return m_planeEquation.w(); };
     bool pointInPlane(QVector3D) const;
+    void rotate(float angle, const QVector3D& vector);
+    void translate(const QVector3D& vector);
 
   private:
+    QVector4D derivePlaneEquation();
     QVector4D m_planeEquation;
     QVector3D m_planeNormal;
     QVector3D m_planePoint;
