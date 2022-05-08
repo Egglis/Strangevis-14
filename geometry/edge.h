@@ -23,4 +23,6 @@ class Edge
     QVector3D m_b;
 };
 
+bool edgeLessThan(QVector3D a, QVector3D b);
+
 #endif // EDGE_H

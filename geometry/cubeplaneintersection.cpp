@@ -5,6 +5,17 @@
 #include <QMatrix4x4>
 #include <QVector>
 
+template<>
+struct std::hash<QVector3D>
+{
+    std::size_t operator()(QVector3D const& v) const noexcept
+    {
+        std::size_t h1 = std::hash<float>{}(v.x());
+        std::size_t h2 = std::hash<float>{}(v.y());
+        std::size_t h3 = std::hash<float>{}(v.z());
+        return h1 ^ h2 ^ h3;
+    }
+};
 CubePlaneIntersection::CubePlaneIntersection(Plane plane)
     : m_cube{}, m_plane{plane}
 {
@@ -23,10 +34,11 @@ void CubePlaneIntersection::updateIntersections()
 
     if (m_cubeIntersections.size() > 2)
     {
+        auto intersections = getCubeIntersections();
         auto rotationMatrix =
-            rotateToXYPlaneRotationMatrix(m_cubeIntersections);
+            rotateToXYPlaneRotationMatrix(intersections);
         m_modelRotationMatrix = rotationMatrix;
-        m_sortedOrder = convexHullGiftWrapping(m_cubeIntersections);
+        m_sortedOrder = convexHullGiftWrapping(intersections);
     }
     else
     {
@@ -36,30 +48,52 @@ void CubePlaneIntersection::updateIntersections()
     }
 }
 
-std::vector<QVector3D> CubePlaneIntersection::cubeIntersectionVertices()
+QSet<QVector3D> CubePlaneIntersection::cubeIntersectionVertices()
 {
-    std::vector<QVector3D> intersectionPoints{};
+    QSet<QVector3D> intersectionPoints{};
     for (const auto& edge : m_cube.edges())
     {
-        if (hasLinePlaneIntersection(edge))
+        switch (hasLinePlaneIntersection(edge))
         {
-            intersectionPoints.push_back(linePlaneIntersectionPoint(edge));
+        case Intersection::SINGLE:
+        {
+            intersectionPoints.insert(linePlaneIntersectionPoint(edge));
+            break;
+        }
+        case Intersection::PARALLEL:
+        {
+            intersectionPoints.insert(edge.start());
+            intersectionPoints.insert(edge.end());
+            break;
+        }
+        default:
+            break;
         }
     }
-    return std::move(intersectionPoints);
+    return intersectionPoints;
 }
 
-bool CubePlaneIntersection::hasLinePlaneIntersection(Edge e)
+bool CubePlaneIntersection::hasEdgeParallelToPlane(Edge e) const {
+    return m_plane.pointInPlane(e.start()) && m_plane.pointInPlane(e.end());
+}
+Intersection CubePlaneIntersection::hasLinePlaneIntersection(Edge e) const
 {
     // Looks for intersection at ray cast from start towards end, and
     // from end towards start. If both have intersection, plane is
     // between them and the intersection is on the line segment.
-    return (hasRayPlaneIntersection(e.start(), e.direction()) &&
-            hasRayPlaneIntersection(e.end(), -e.direction()));
+    auto singleIntersection =
+        hasRayPlaneIntersection(e.start(), e.direction()) &&
+        hasRayPlaneIntersection(e.end(), -e.direction());
+    auto parallel = hasEdgeParallelToPlane(e);
+    if (singleIntersection)
+        return Intersection::SINGLE;
+    if (parallel)
+        return Intersection::PARALLEL;
+    return Intersection::NONE;
 }
 
 bool CubePlaneIntersection::hasRayPlaneIntersection(QVector3D rayOrigin,
-                                                    QVector3D rayDirection)
+                                                    QVector3D rayDirection) const
 {
     double epsilon = 0.000001;
     double denominator = QVector3D::dotProduct(m_plane.normal(), rayDirection);
@@ -76,6 +110,8 @@ bool CubePlaneIntersection::hasRayPlaneIntersection(QVector3D rayOrigin,
 QVector3D CubePlaneIntersection::linePlaneIntersectionPoint(Edge e) const
 {
     double denominator = QVector3D::dotProduct(m_plane.normal(), e.direction());
+    if (std::abs(denominator) < 0.00001)
+        return e.parameterization(0);
     double t =
         QVector3D::dotProduct(m_plane.point() - e.start(), m_plane.normal()) /
         denominator;
