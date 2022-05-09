@@ -22,6 +22,8 @@ Plane::Plane(QVector3D vertex0, QVector3D vertex1, QVector3D vertex2)
 {
     m_planeNormal =
         QVector3D::crossProduct(vertex1 - vertex0, vertex2 - vertex1);
+    if(m_planeNormal.z() < 0)
+        m_planeNormal = -m_planeNormal;
     m_planePoint = vertex0;
     m_planeEquation = derivePlaneEquation();
 }
