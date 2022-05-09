@@ -57,8 +57,3 @@ QVector4D Plane::derivePlaneEquation()
            0.001);
     return equation;
 }
-
-bool Plane::pointInPlane(QVector3D point) const
-{
-    return std::abs(QVector3D::dotProduct(point, m_planeNormal.normalized()) - d()) < 0.0001;
-}
