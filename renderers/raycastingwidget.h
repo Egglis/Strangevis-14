@@ -5,6 +5,7 @@
 #include "../geometry/plane.h"
 #include "../properties/sharedproperties.h"
 #include "../properties/viewport.h"
+#include "../properties/rendersettingsproperties.h"
 #include "../texturestore.h"
 #include "planerenderer.h"
 #include "slicingplanecontrols.h"
@@ -22,6 +23,7 @@ struct RenderProperties
     QVector3D cameraPosition;
     QString transferFunction;
     Plane clippingPlane;
+    RenderSettings renderSettings;
 };
 
 class RayCastingWidget : public QOpenGLWidget
@@ -44,6 +46,7 @@ class RayCastingWidget : public QOpenGLWidget
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
     void changeTransferFunction(QString transferFunctionName);
+    void changeRenderSettings(RenderSettings renderSettings);
 
   private:
     void renderImGuizmo();
@@ -53,6 +56,7 @@ class RayCastingWidget : public QOpenGLWidget
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    RenderSettings m_renderSettings;
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;

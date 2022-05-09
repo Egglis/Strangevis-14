@@ -17,6 +17,12 @@ uniform int width;
 uniform int height;
 uniform int depth;
 
+uniform float ambientInt;
+uniform float diffuseInt;
+uniform float specInt;
+uniform float specCoeff;
+uniform bool specOff;
+
 float stepLength = 0.01;
 
 struct Ray
@@ -47,6 +53,31 @@ void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
     tmax = min(t.x, t.y);
 }
 
+vec3 ShadeBlinnPhong (vec3 pos, vec3 clr)
+{
+
+  vec3 gradient_normal =  calculateGradient(pos);
+  
+  if(gradient_normal != vec3(0, 0, 0))
+  {    
+    gradient_normal = normalize(gradient_normal);
+    
+    vec3 light_direction = normalize(-rayOrigin);
+    vec3 eye_direction   = normalize(rayOrigin);
+    vec3 halfway_vector  = normalize(eye_direction + light_direction);
+  
+    float dot_diff = max(0, dot(gradient_normal, light_direction));
+    float dot_spec = max(0, dot(halfway_vector, gradient_normal));
+   
+    clr = (clr * (ambientInt + diffuseInt * dot_diff));
+    if(specOff) {
+        clr = clr + vec3(0.6,0.6,0.6) * specInt * pow(dot_spec, specCoeff);
+    } 
+  }
+
+  return clr;
+}
+
 float calcDepth(vec3 pos)
 {
 	float far = gl_DepthRange.far; 
@@ -60,7 +91,7 @@ void main(void)
 {
     // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
 
-    stepLength = 1.0f/1000;
+    stepLength = 1.0f/depth;
 
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
@@ -82,24 +113,29 @@ void main(void)
     float rayLength = length(ray);
     vec3 stepVector = stepLength * ray / rayLength;
 
-    // Perlin Noise
-    rayStart += stepVector;//*(perlin_noise(rayEnd));
+    rayStart += stepVector;
 
     vec3 position = rayStart;
     float maxIntensity = 0.0f;
 
-    vec4 color = vec4(0,0,0,0);
-    while (rayLength > 0 && color.a < 1.0)
+    vec4 color = vec4(0.0);
+    while (rayLength > 0)
     {
         
         float intensity = texture(volumeTexture, position).r;
         vec3 gradient = calculateGradient(position);
-        vec4 c = texture(transferFunction, intensity);
-        
-        // Back to front color bledning
-        color.rgb = (c.a * c.rgb + (1 - c.a) * color.a * color.rgb);
-        color.a = c.a + (1 - c.a) * color.a;
-        
+        vec4 src = texture(transferFunction, intensity);
+
+        if(src.a > 0.0){            
+            src.rgb = ShadeBlinnPhong(position, src.rgb);
+
+            src.a = 1.0 - exp(-src.a * rayLength);
+
+            src.rgb = src.rgb * src.a;
+            color = color + (1.0 - color.a) * src;
+            
+            if(color.a > 0.99) break;
+        }
 
         rayLength -= stepLength;
         position += stepVector;

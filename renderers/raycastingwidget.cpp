@@ -17,9 +17,9 @@ RayCastingWidget::RayCastingWidget(
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
-      m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort},
-      m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
-                                                   properties, m_camera}
+      m_volumeRenderer{textureStore, m_renderSettings, m_camera, m_openGLExtra,
+                       m_viewPort} m_planeRenderer{textureStore, m_camera},
+      m_slicingPlaneControls{properties, m_camera}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);
@@ -60,7 +60,7 @@ void RayCastingWidget::resizeGL(int w, int h)
 
 void RayCastingWidget::paintGL()
 {
-    glClearColor(0,0,0, 0.0f);
+    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (m_textureStore->volume().loadingInProgress())
@@ -77,10 +77,15 @@ void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
     update();
 }
 
-
 void RayCastingWidget::changeTransferFunction(QString transferFunction)
 {
     m_transferFunctionName = transferFunction;
+    update();
+}
+
+void RayCastingWidget::changeRenderSettings(RenderSettings renderSettings)
+{
+    m_renderSettings = renderSettings;
     update();
 }
 
@@ -91,9 +96,8 @@ void RayCastingWidget::renderImGuizmo()
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(true);
     auto rotationMatrix = m_camera.rotationMatrix();
-    ImGuizmo::ViewManipulate(rotationMatrix.data(),
-                             2.0f * sqrt(3.0f), ImVec2(0, 0), ImVec2(128, 128),
-                             0);
+    ImGuizmo::ViewManipulate(rotationMatrix.data(), 2.0f * sqrt(3.0f),
+                             ImVec2(0, 0), ImVec2(128, 128), 0);
     m_camera.rotateCamera(rotationMatrix);
     m_slicingPlaneControls.paint();
     ImGui::Render();

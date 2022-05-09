@@ -3,6 +3,7 @@
 
 #include "clippingplaneproperties.h"
 #include "transferproperties.h"
+#include "rendersettingsproperties.h"
 
 #include <QObject>
 #include <QVector3D>
@@ -16,6 +17,9 @@ class ISharedProperties
 
     virtual tfn::TransferProperties& transferFunction() = 0;
     virtual const tfn::TransferProperties& transferFunction() const = 0;
+
+    virtual RenderSettingsProperties& renderSettings() = 0;
+    virtual const RenderSettingsProperties& renderSettings() const = 0;
 };
 class SharedProperties : public QObject, public ISharedProperties
 {
@@ -29,9 +33,13 @@ class SharedProperties : public QObject, public ISharedProperties
     virtual tfn::TransferProperties& transferFunction() {return m_transferFunction; };
     virtual const tfn::TransferProperties& transferFunction() const {return m_transferFunction; };
 
+      virtual RenderSettingsProperties& renderSettings() {return m_renderSettings; };
+    virtual const RenderSettingsProperties& renderSettings() const {return m_renderSettings; };
+
   private:
     ClippingPlaneProperties m_clippingPlane;
     tfn::TransferProperties m_transferFunction;
+    RenderSettingsProperties m_renderSettings;
 };
 
 #endif // SHAREDPROPERTIES_H
