@@ -6,7 +6,16 @@ RenderSettingsWidget::RenderSettingsWidget(
 {
     m_renderSettings = {};
     m_layout = new QVBoxLayout();
+    
 
+    setupSettings();
+    setupWidgets();
+    updateRenderSettings();
+
+    this->setLayout(m_layout);
+}
+
+void RenderSettingsWidget::setupSettings(){
     m_floatSliders.insert("ambientInt", new FloatSlider("Ambient Intensity", 0.1f));
     m_floatSliders.insert("diffuseInt", new FloatSlider("Diffuse Intensity", 1.5f));
     m_floatSliders.insert("specInt", new FloatSlider("Specular Intensity", 0.0f));
@@ -15,23 +24,24 @@ RenderSettingsWidget::RenderSettingsWidget(
     m_floatSliders["specCoeff"]->setBounds(0.0f, 100.0f);
 
     m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", false));
-
-    setupWidgets();
-    updateRenderSettings();
-
-    this->setLayout(m_layout);
-}
+    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection", false));
+};
 
 
 void RenderSettingsWidget::setupWidgets(){
-    for(auto w : m_boolCheckboxes.values()){
+    QList<QWidget*> order = QList<QWidget*>(Settings::NR_SETTINGS, new QWidget());
+    for(auto [key, w] : m_boolCheckboxes.toStdMap()){
         connect(w, &BoolCheckbox::valueChanged, this, &RenderSettingsWidget::updateRenderSettings);
-        m_layout->addWidget(w);
+        order.replace(Settings::ORDER[key],static_cast<QWidget*>(w));
     }
-    for(auto w : m_floatSliders.values()){
+    for(auto [key, w] : m_floatSliders.toStdMap()){
         connect(w, &SliderWidget::valueChanged, this, &RenderSettingsWidget::updateRenderSettings);
+        order.replace(Settings::ORDER[key],static_cast<QWidget*>(w));
+    }
+    for(auto w : order){
         m_layout->addWidget(w);
     }
+
 }
 
 void RenderSettingsWidget::updateRenderSettings(){

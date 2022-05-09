@@ -113,7 +113,6 @@ void MainWindow::createHistogramWidget()
 void MainWindow::createRenderSettingsWidget()
 {
     m_renderSetttingsWidget = new RenderSettingsWidget(m_properties);
-    m_renderSetttingsWidget->setAttribute(Qt::WA_QuitOnClose, false);
 }
 
 void MainWindow::openHistogram() { m_histogramWidget->show(); }

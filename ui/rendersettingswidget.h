@@ -12,6 +12,13 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+namespace Settings
+{
+constexpr static int NR_SETTINGS = 6;
+static std::map<QString, int> ORDER = {{"maxInt", 0},     {"ambientInt", 1},
+                                       {"diffuseInt", 2}, {"specOff", 3},
+                                       {"specInt", 4},    {"specCoeff", 5}};
+}; // namespace Settings
 class SliderWidget : public QWidget
 {
     Q_OBJECT
@@ -43,6 +50,7 @@ class FloatSlider : public SliderWidget
     float getValue();
   public slots:
     void setValue(float value);
+
   private:
     float intToFloat(int value);
     int floatToInt(float value);
@@ -80,6 +88,7 @@ class RenderSettingsWidget : public QWidget
 
   private:
     void setupWidgets();
+    void setupSettings();
     const std::shared_ptr<ISharedProperties> m_properties;
 
     QVBoxLayout* m_layout;

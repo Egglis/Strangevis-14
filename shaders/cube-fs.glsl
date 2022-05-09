@@ -17,11 +17,13 @@ uniform int width;
 uniform int height;
 uniform int depth;
 
+// Render Settings:
 uniform float ambientInt;
 uniform float diffuseInt;
 uniform float specInt;
 uniform float specCoeff;
 uniform bool specOff;
+uniform bool maxInt;
 
 float stepLength = 0.01;
 
@@ -87,6 +89,7 @@ float calcDepth(vec3 pos)
 	return (((far - near) * ndc_depth) + near + far) / 2.0;
 }
 
+
 void main(void)
 {
     // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
@@ -119,26 +122,35 @@ void main(void)
     float maxIntensity = 0.0f;
 
     vec4 color = vec4(0.0);
+    
     while (rayLength > 0)
     {
         
         float intensity = texture(volumeTexture, position).r;
-        vec3 gradient = calculateGradient(position);
-        vec4 src = texture(transferFunction, intensity);
 
-        if(src.a > 0.0){            
-            src.rgb = ShadeBlinnPhong(position, src.rgb);
+        if(maxInt) {
+            maxIntensity = max(intensity, maxIntensity);
+        } else {
+            vec3 gradient = calculateGradient(position);
+            vec4 src = texture(transferFunction, intensity);
 
-            src.a = 1.0 - exp(-src.a * rayLength);
+            if(src.a > 0.0){            
+                src.rgb = ShadeBlinnPhong(position, src.rgb);
 
-            src.rgb = src.rgb * src.a;
-            color = color + (1.0 - color.a) * src;
-            
-            if(color.a > 0.99) break;
+                src.a = 1.0 - exp(-src.a * rayLength);
+                src.rgb = src.rgb * src.a;
+                color = color + (1.0 - color.a) * src;
+                
+                if(color.a > 0.99) break;
+            }
         }
 
         rayLength -= stepLength;
         position += stepVector;
+    }
+
+    if(maxInt) {
+        color = texture(transferFunction, maxIntensity);
     }
 
     gl_FragDepth = calcDepth(position);
@@ -161,41 +173,15 @@ vec3 calculateGradient(vec3 volumePosition)
     float dy = 1.0f / height;
     float dz = 1.0f / depth;
 
-    if (gradientMethod == 0) // Central Difference
-    {
-        gradient.x = 1.0f / (2 * dx) *
-                     (texture(volumeTexture, vec3(x + dx, y, z)).r -
-                      texture(volumeTexture, vec3(x - dx, y, z)).r);
-        gradient.y = 1.0f / (2 * dy) *
-                     (texture(volumeTexture, vec3(x, y + dy, z)).r -
-                      texture(volumeTexture, vec3(x, y - dy, z)).r);
-        gradient.z = 1.0f / (2 * dz) *
-                     (texture(volumeTexture, vec3(x, y, z + dz)).r -
-                      texture(volumeTexture, vec3(x, y, z - dz)).r);
-    }
-    if (gradientMethod == 1) // Forward Difference
-    {
-        gradient.x = 1 / dx *
-                     (texture(volumeTexture, vec3(x + dx, y, z)).r -
-                      texture(volumeTexture, vec3(x, y, z)).r);
-        gradient.y = 1 / dy *
-                     (texture(volumeTexture, vec3(x, y + dy, z)).r -
-                      texture(volumeTexture, vec3(x, y, z)).r);
-        gradient.z = 1 / dz *
-                     (texture(volumeTexture, vec3(x, y, z + dz)).r -
-                      texture(volumeTexture, vec3(x, y, z)).r);
-    }
-    if (gradientMethod == 2) // Backward Difference
-    {
-        gradient.x = 1 / dx *
-                     (texture(volumeTexture, vec3(x, y, z)).r -
-                      texture(volumeTexture, vec3(x - dx, y, z)).r);
-        gradient.y = 1 / dy *
-                     (texture(volumeTexture, vec3(x, y, z)).r -
-                      texture(volumeTexture, vec3(x, y - dy, z)).r);
-        gradient.z = 1 / dz *
-                     (texture(volumeTexture, vec3(x, y, z)).r -
-                      texture(volumeTexture, vec3(x, y, z - dz)).r);
-    }
+
+    gradient.x = 1.0f / (2 * dx) *
+                (texture(volumeTexture, vec3(x + dx, y, z)).r -
+                texture(volumeTexture, vec3(x - dx, y, z)).r);
+    gradient.y = 1.0f / (2 * dy) *
+                (texture(volumeTexture, vec3(x, y + dy, z)).r -
+                texture(volumeTexture, vec3(x, y - dy, z)).r);
+    gradient.z = 1.0f / (2 * dz) *
+                (texture(volumeTexture, vec3(x, y, z + dz)).r -
+                texture(volumeTexture, vec3(x, y, z - dz)).r);
     return gradient;
 }
