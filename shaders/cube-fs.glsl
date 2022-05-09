@@ -59,7 +59,6 @@ void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
 
 vec3 ShadeBlinnPhong (vec3 pos, vec3 ld, vec3 vd, vec3 clr)
 {
-
     vec3 normal = calculateGradient(pos);
     if(normal != vec3(0,0,0)){
 
@@ -68,12 +67,15 @@ vec3 ShadeBlinnPhong (vec3 pos, vec3 ld, vec3 vd, vec3 clr)
         vec3 eyeDir = normalize(vd);
 
         float dotDiff = max(0, dot(lightDir, normal));
+
         float specularValue = 0.0;
-        if(specOff) {
+        if(dotDiff > 0.0 && specOff){
             vec3 H = normalize(lightDir + eyeDir);
             float specAngle = max(0, dot(normal, H));
             specularValue = pow(specAngle, specCoeff);
         }
+
+        
         vec3 specular = vec3(1,1,1)*specInt*specularValue;
 
         clr = clr * (ambientInt + (diffuseInt * dotDiff));
@@ -98,8 +100,7 @@ void main(void)
 {
     // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
 
-    stepLength = 1.0f/stepSize;
-
+    stepLength = 1.0f/float(textureSize(volumeTexture, 0).x);
 
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
@@ -130,7 +131,6 @@ void main(void)
 
     while (rayLength > 0)
     {
-        
         float intensity = texture(volumeTexture, position).r;
 
         if(maxInt) {
@@ -138,13 +138,11 @@ void main(void)
         } else {
             vec3 gradient = calculateGradient(position);
             vec4 src = texture(transferFunction, intensity);
-            vec3 lightDir = rayOrigin - position;
             vec3 viewDir = rayOrigin - position;
 
             if(src.a > 0.0){          
                 
-                
-                src.rgb = ShadeBlinnPhong(position, -lightDir, viewDir, src.rgb);
+                src.rgb = ShadeBlinnPhong(position, -viewDir, viewDir, src.rgb);
 
                 src.a = 1.0 - exp(-src.a * rayLength);
                 src.rgb = src.rgb * src.a;

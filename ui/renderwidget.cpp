@@ -51,6 +51,7 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
+
     connect(&m_properties.get()->renderSettings(),
             &RenderSettingsProperties::renderSettingsChanged, this,
             &RayCastingInteractor::changeRenderSettings);

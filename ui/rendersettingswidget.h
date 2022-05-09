@@ -14,14 +14,9 @@
 
 namespace Settings
 {
-static QList<QString> SETTINGS_ORDER({
-    "maxInt",
-    "stepSize",
-    "ambientInt",
-    "diffuseInt",
-    "specOff",
-    "specInt",    
-    "specCoeff"});
+static QList<QString> SETTINGS_ORDER({"maxInt", "stepSize", "ambientInt",
+                                      "diffuseInt", "specOff", "specInt",
+                                      "specCoeff"});
 }; // namespace Settings
 
 class SliderWidget : public QWidget
@@ -46,13 +41,14 @@ class SliderWidget : public QWidget
     void valueChanged(int value);
 };
 
-class IntSlider : public SliderWidget {
-  Q_OBJECT
+class IntSlider : public SliderWidget
+{
+    Q_OBJECT
   public:
     IntSlider(QString name, int value, QWidget* parent = nullptr);
     int getValue() { return m_slider->value(); };
   public slots:
-    void setValue(int value) { m_slider->setValue(value); } ;
+    void setValue(int value) { m_slider->setValue(value); };
 };
 
 class FloatSlider : public SliderWidget
