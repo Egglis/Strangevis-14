@@ -5,7 +5,6 @@
 #include "ui/histogramwidget.h"
 #include "ui/mainwindowwidget.h"
 #include "ui/obliquesliceinteractor.h"
-#include "ui/parameterwidget.h"
 #include "ui/rectangulargridlayout.h"
 #include "ui/renderwidget.h"
 #include "ui/transferwidget/transferfunctionwidget.h"
@@ -56,7 +55,7 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     ObliqueSliceInteractor* p_2dRenderWidget =
         new ObliqueSliceInteractor(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
-        new ObliqueSliceRotationWidget(m_properties, this);
+        new ObliqueSliceRotationWidget(this);
 
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipHorizontal);

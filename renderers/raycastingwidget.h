@@ -4,7 +4,6 @@
 #include "../geometry/cubeplaneintersection.h"
 #include "../geometry/plane.h"
 #include "../properties/cameraproperties.h"
-#include "../properties/gradientproperties.h"
 #include "../properties/viewport.h"
 #include "../properties/sharedproperties.h"
 #include "../texturestore.h"
@@ -23,7 +22,6 @@ struct RenderProperties
     QVector3D cameraPosition;
     QString transferFunction;
     Plane clippingPlane;
-    GradientMethod gradientMethod;
 };
 
 class RayCastingWidget : public QOpenGLWidget
@@ -45,7 +43,6 @@ class RayCastingWidget : public QOpenGLWidget
     void rotateCamera(qreal angle, QVector3D axis);
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
-    void changeGradientMethod(GradientMethod method);
     void changeTransferFunction(QString transferFunctionName);
 
   private:
@@ -56,7 +53,6 @@ class RayCastingWidget : public QOpenGLWidget
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
-    GradientMethod m_gradientMethod;
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
