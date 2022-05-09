@@ -9,7 +9,7 @@ class CameraProperties
     CameraProperties();
     QMatrix4x4 projectionMatrix() const { return m_projectionMatrix; };
     QMatrix4x4 rotationMatrix() const { return m_rotationMatrix; };
-    QMatrix4x4 viewMatrix() const { return m_viewMatrix; };
+    QMatrix4x4 viewMatrix() const;
     QMatrix4x4 projectionViewMatrix() const
     {
         return projectionMatrix() * viewMatrix();
@@ -20,13 +20,14 @@ class CameraProperties
   public slots:
     void updateProjectionMatrix(float aspectRatio);
     void rotateCamera(float angle, QVector3D axis);
+    void rotateCamera(QMatrix4x4 deltaMatrix);
     void moveCamera(QVector3D translation);
     void zoomCamera(float zoomFactor);
 
   private:
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_rotationMatrix;
-    QMatrix4x4 m_viewMatrix;
+    QVector3D m_translation;
     float m_zoom{1};
 
     constexpr static float m_nearPlane = 0.5;
