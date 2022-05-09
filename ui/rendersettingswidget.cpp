@@ -22,27 +22,39 @@ void RenderSettingsWidget::setupSettings(){
     m_floatSliders.insert("specCoeff", new FloatSlider("Specular Coefficient", 80.0f));
 
     m_floatSliders["specCoeff"]->setBounds(0.0f, 100.0f);
+    m_floatSliders["specCoeff"]->setValue(80.0f);
+    
 
-    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", false));
+    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", true));
     m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection", false));
+
+    m_intSliders.insert("stepSize", new IntSlider("Ray Casting Slizes", 257));
+    m_intSliders["stepSize"]->setSliderBounds(0, 1000);
+    m_intSliders["stepSize"]->setValue(257);
 };
 
 
 void RenderSettingsWidget::setupWidgets(){
-    QList<QWidget*> order = QList<QWidget*>(Settings::NR_SETTINGS, new QWidget());
+    
+    QList<QWidget*> order = QList<QWidget*>(Settings::SETTINGS_ORDER.length(), new QWidget());
     for(auto [key, w] : m_boolCheckboxes.toStdMap()){
         connect(w, &BoolCheckbox::valueChanged, this, &RenderSettingsWidget::updateRenderSettings);
-        order.replace(Settings::ORDER[key],static_cast<QWidget*>(w));
+        order.replace(Settings::SETTINGS_ORDER.indexOf(key), static_cast<QWidget*>(w));
     }
     for(auto [key, w] : m_floatSliders.toStdMap()){
         connect(w, &SliderWidget::valueChanged, this, &RenderSettingsWidget::updateRenderSettings);
-        order.replace(Settings::ORDER[key],static_cast<QWidget*>(w));
+        order.replace(Settings::SETTINGS_ORDER.indexOf(key), static_cast<QWidget*>(w));
     }
+    for(auto [key, w] : m_intSliders.toStdMap()){
+        connect(w, &SliderWidget::valueChanged, this, &RenderSettingsWidget::updateRenderSettings);
+        order.replace(Settings::SETTINGS_ORDER.indexOf(key), static_cast<QWidget*>(w));
+    }
+
     for(auto w : order){
         m_layout->addWidget(w);
     }
-
 }
+
 
 void RenderSettingsWidget::updateRenderSettings(){
     for(auto s : m_floatSliders.keys()){
@@ -50,6 +62,9 @@ void RenderSettingsWidget::updateRenderSettings(){
     }
     for(auto s : m_boolCheckboxes.keys()) {
         m_renderSettings[s] = std::make_pair(SettingTypes::BOOL, static_cast<std::any>(m_boolCheckboxes[s]->getValue()));
+    }
+    for(auto s : m_intSliders.keys()) {
+        m_renderSettings[s] = std::make_pair(SettingTypes::INT, static_cast<std::any>(m_intSliders[s]->getValue()));
     }
     m_properties->renderSettings().updateRenderSettings(m_renderSettings);
 }
@@ -65,6 +80,8 @@ BoolCheckbox::BoolCheckbox(QString name, bool value, QWidget* parent)
     m_layout.addWidget(m_varLabel);
     m_layout.addWidget(m_radioButton);
 }
+
+
 
 SliderWidget::SliderWidget(QWidget* parent) : QWidget(parent), m_layout{this} {
     m_varLabel = new QLabel(this);
@@ -86,6 +103,21 @@ void SliderWidget::setSliderBounds(int min, int max){
     m_slider->setMaximum(m_sliderMaximum);
     m_slider->setMinimum(m_sliderMinimum);
 };
+
+IntSlider::IntSlider(QString name, int value, QWidget* parent) : SliderWidget{parent} {
+    m_varLabel->setText(name);
+    auto updateLabel = [this](int value) {
+        QString s;
+        s.setNum(value);
+        m_valLabel->setText(s);
+    };
+
+    connect(m_slider, &QSlider::valueChanged, updateLabel);
+    connect(m_slider, &QSlider::valueChanged, this,
+            &IntSlider::valueChanged);
+
+    setValue(value);
+}
 
 FloatSlider::FloatSlider(QString name, float value, QWidget* parent) : SliderWidget{parent}
 {
@@ -128,6 +160,7 @@ int FloatSlider::floatToInt(float value)
 void FloatSlider::setBounds(float min, float max) {
     m_lowerBound = min;
     m_upperBound = max;
+    setValue(getValue());
 };
 
 void FloatSlider::setValue(float value)

@@ -75,9 +75,10 @@ void VolumeRenderer::setUniforms()
         case SettingTypes::BOOL:
             m_cubeProgram.setUniformValue(location, std::any_cast<bool>(pair.second));
             break;
+        case SettingTypes::INT:
+            m_cubeProgram.setUniformValue(location, std::any_cast<int>(pair.second));
         }
     }
-
 }
 
 void VolumeRenderer::bindTextures()

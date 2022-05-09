@@ -14,11 +14,16 @@
 
 namespace Settings
 {
-constexpr static int NR_SETTINGS = 6;
-static std::map<QString, int> ORDER = {{"maxInt", 0},     {"ambientInt", 1},
-                                       {"diffuseInt", 2}, {"specOff", 3},
-                                       {"specInt", 4},    {"specCoeff", 5}};
+static QList<QString> SETTINGS_ORDER({
+    "maxInt",
+    "stepSize",
+    "ambientInt",
+    "diffuseInt",
+    "specOff",
+    "specInt",    
+    "specCoeff"});
 }; // namespace Settings
+
 class SliderWidget : public QWidget
 {
     Q_OBJECT
@@ -39,6 +44,15 @@ class SliderWidget : public QWidget
     int m_sliderMinimum = 0;
   signals:
     void valueChanged(int value);
+};
+
+class IntSlider : public SliderWidget {
+  Q_OBJECT
+  public:
+    IntSlider(QString name, int value, QWidget* parent = nullptr);
+    int getValue() { return m_slider->value(); };
+  public slots:
+    void setValue(int value) { m_slider->setValue(value); } ;
 };
 
 class FloatSlider : public SliderWidget
@@ -95,6 +109,7 @@ class RenderSettingsWidget : public QWidget
     RenderSettings m_renderSettings;
     QMap<QString, FloatSlider*> m_floatSliders;
     QMap<QString, BoolCheckbox*> m_boolCheckboxes;
+    QMap<QString, IntSlider*> m_intSliders;
 };
 
 #endif
