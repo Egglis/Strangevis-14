@@ -63,12 +63,11 @@ void RayCastingWidget::paintGL()
     glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (!m_textureStore->volume().loadingInProgress())
-    {
-        renderImGuizmo();
-        m_volumeRenderer.paint();
-        m_planeRenderer.paint();
-    }
+    if (m_textureStore->volume().loadingInProgress())
+        return;
+    renderImGuizmo();
+    m_volumeRenderer.paint();
+    m_planeRenderer.paint();
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)

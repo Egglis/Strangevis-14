@@ -55,10 +55,13 @@ void ObliqueSliceRenderWidget::initializeGL()
 void ObliqueSliceRenderWidget::paintGL()
 {
 
-    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    if (m_textureStore->volume().loadingInProgress())
+        return;
+
+    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
     m_sliceProgram.bind();
     QMatrix4x4 modelViewMatrix =
         m_aspectRatioMatrix * m_viewMatrix *
