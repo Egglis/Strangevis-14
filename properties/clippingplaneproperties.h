@@ -9,10 +9,12 @@ class ClippingPlaneProperties : public QObject
 {
     Q_OBJECT
   public:
+    ClippingPlaneProperties(){};
     ClippingPlaneProperties(Plane clippingPlane);
     const Plane& plane() const { return m_clippingPlane; };
   public slots:
     void updateClippingPlane(Plane clippingPlane);
+    void reset();
 
   signals:
     void clippingPlaneChanged(Plane clippingPlane);

@@ -47,16 +47,20 @@ void ObliqueSliceInteractor::wheelEvent(QWheelEvent* event)
 ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
     const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
     : QWidget(parent), m_flipHorizontalCheckbox{tr("Flip Horizontal")},
-      m_flipVerticalCheckbox{tr("Flip Vertical")}, m_layout{this},
+      m_flipVerticalCheckbox{tr("Flip Vertical")},
+      m_resetClippingPlane{tr("Reset Slice")}, m_layout{this},
       m_parameterWidget(properties, this)
 {
     connect(&m_flipHorizontalCheckbox, &QCheckBox::stateChanged, this,
             &ObliqueSliceRotationWidget::flipHorizontal);
     connect(&m_flipVerticalCheckbox, &QCheckBox::stateChanged, this,
             &ObliqueSliceRotationWidget::flipVertical);
+    connect(&m_resetClippingPlane, &QPushButton::clicked, this,
+            &ObliqueSliceRotationWidget::resetClippingPlane);
     QHBoxLayout* checkboxLayout = new QHBoxLayout();
     checkboxLayout->addWidget(&m_flipHorizontalCheckbox);
     checkboxLayout->addWidget(&m_flipVerticalCheckbox);
+    checkboxLayout->addWidget(&m_resetClippingPlane);
     m_layout.addLayout(checkboxLayout);
     m_layout.addWidget(&m_parameterWidget);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);

@@ -33,4 +33,5 @@ void CameraProperties::moveCamera(QVector3D translation)
 void CameraProperties::zoomCamera(float zoomFactor)
 {
     m_viewMatrix.scale(zoomFactor);
+    m_zoom *= zoomFactor;
 }

@@ -17,7 +17,7 @@ class RayCastingInteractor : public RayCastingWidget
 
   public:
     RayCastingInteractor(std::unique_ptr<ITextureStore>& textureStore,
-                         const std::shared_ptr<ISharedProperties> properties,
+                         std::shared_ptr<ISharedProperties> properties,
                          QWidget* parent = nullptr,
                          Qt::WindowFlags f = Qt::WindowFlags());
 

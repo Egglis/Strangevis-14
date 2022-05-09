@@ -14,6 +14,8 @@ class CameraProperties
     {
         return projectionMatrix() * viewMatrix();
     };
+    float zoomFactor() const { return m_zoom; };
+
     float focalLength() const { return m_focalLength; };
   public slots:
     void updateProjectionMatrix(float aspectRatio);
@@ -25,6 +27,7 @@ class CameraProperties
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_rotationMatrix;
     QMatrix4x4 m_viewMatrix;
+    float m_zoom{1};
 
     constexpr static float m_nearPlane = 0.5;
     constexpr static float m_farPlane = 32.0;

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "properties/clippingplaneproperties.h"
 #include "properties/sharedproperties.h"
 #include "ui/histogramwidget.h"
 #include "ui/mainwindowwidget.h"
@@ -61,7 +62,9 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipHorizontal);
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipVertical,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipVertical);
-    
+    connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::resetClippingPlane,
+            &m_properties->clippingPlane(), &ClippingPlaneProperties::reset);
+
     connect(&m_textureStore->volume(), &Volume::histogramCalculated,
             p_3dToolBarWidget, &ExtendedParameterWidget::histogramChanged);
 

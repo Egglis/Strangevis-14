@@ -19,18 +19,20 @@ class Volume : public QObject, protected QOpenGLExtraFunctions
 
     void bind();
     void release();
+    QVector3D scaleFactor() const;
+    bool loadingInProgress() const {return m_loadingInProgress;};
   signals:
     void volumeLoaded();
     void loadingStartedOrStopped(bool started);
     void histogramCalculated(std::vector<float> histogramData);
 
   private:
-    QVector3D scaleFactor() const;
     std::vector<unsigned short> m_volumeData;
     QVector3D m_dims;
     QVector3D m_spacing;
     QOpenGLTexture m_volumeTexture;
     bool m_updateNeeded;
+    bool m_loadingInProgress{false};
 };
 
 class VolumeLoader : public QThread

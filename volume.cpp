@@ -33,6 +33,10 @@ void Volume::load(const QString& fileName)
             [this](QVector3D spacing) { m_spacing = spacing; });
     connect(volumeLoader, &VolumeLoader::histogramCalculated, this,
             &Volume::histogramCalculated);
+    connect(volumeLoader, &VolumeLoader::loadingStartedOrStopped, this,
+            [this](bool loadingInProgress) {
+                m_loadingInProgress = loadingInProgress;
+            });
     volumeLoader->start();
 }
 

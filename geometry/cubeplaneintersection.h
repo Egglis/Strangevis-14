@@ -32,6 +32,7 @@ class CubePlaneIntersection
     {
         return m_sortedOrder;
     };
+    const Plane& plane() const {return m_plane;};
 
   private:
     void updateIntersections();

@@ -27,13 +27,15 @@ void ExtendedParameterWidget::histogramChanged(std::vector<float> normalizedHist
 
 RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
-    const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
-    Qt::WindowFlags f) :
-    RayCastingWidget{
-          RenderProperties{1.0, QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))}, properties->transferFunction().colorMap(),
+    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
+    : RayCastingWidget{RenderProperties{
+                           1.0,
+                           QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))},
+                           properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->gradientMethod().method()},
-          textureStore, parent, f},
+                       textureStore, properties, parent, f},
       m_properties{properties}
 {
     connect(&m_properties.get()->clippingPlane(),
@@ -51,6 +53,7 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
+    setMouseTracking(true);
 }
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
@@ -58,20 +61,27 @@ void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
     m_currentPosition = p_event->position();
 
     m_previousPosition = m_currentPosition;
+    update();
 }
 
 void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
 {
-    m_currentPosition = p_event->position();
-
-    if (p_event->buttons() & Qt::LeftButton)
+    if (!ImGuizmo::IsOver())
     {
-        if (m_currentPosition != m_previousPosition)
+        m_currentPosition = p_event->position();
+        if (p_event->buttons() & Qt::LeftButton)
         {
-            rotateCamera();
+            if (m_currentPosition != m_previousPosition)
+            {
+                rotateCamera();
+            }
         }
+        m_previousPosition = m_currentPosition;
     }
-    m_previousPosition = m_currentPosition;
+    else
+    {
+        update();
+    }
 }
 
 // Scrolling wheel event
