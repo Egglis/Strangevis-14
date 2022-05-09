@@ -2,17 +2,12 @@
 #define RENDERSETTINGSPROPERTIES_H
 
 #include <QObject>
-#include <any>
 #include <QString>
+#include <any>
 
-enum class SettingTypes {
-  FLOAT,
-  INT,
-  BOOL
-};
+enum class SettingTypes { FLOAT, INT, BOOL };
 
 using RenderSettings = std::map<QString, std::pair<SettingTypes, std::any>>;
-
 class RenderSettingsProperties : public QObject
 {
     Q_OBJECT

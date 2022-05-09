@@ -42,7 +42,7 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
 
     createHistogramWidget();
 
-    QAction* renderSettings = new QAction("Render Setting", this);
+    QAction* renderSettings = new QAction("Render Settings", this);
 
     QAction* openHistogramAction = new QAction("Open Histogram", this);
     connect(openHistogramAction, &QAction::triggered, this,
@@ -84,18 +84,13 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
 
     setCentralWidget(m_mainWidget);
 
-    // TODO remove!
-    m_textureStore->volume().load(
-        "C:/Users/egilb/Desktop/Github/strangevis-14/datasets/hand/hand.dat");
+
 }
 
 void MainWindow::fileOpen()
 {
-    // TODO remove!
     QString fileName = QFileDialog::getOpenFileName(this, "Open Volume File",
                                                     QString(), "*.dat");
-    qDebug() << fileName;
-
     if (!fileName.isEmpty())
     {
         m_textureStore->volume().load(fileName);

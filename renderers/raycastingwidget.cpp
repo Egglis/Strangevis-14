@@ -18,8 +18,9 @@ RayCastingWidget::RayCastingWidget(
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
       m_volumeRenderer{textureStore, m_renderSettings, m_camera, m_openGLExtra,
-                       m_viewPort} m_planeRenderer{textureStore, m_camera},
-      m_slicingPlaneControls{properties, m_camera}
+                       m_viewPort},
+      m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
+                                                   properties, m_camera}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);

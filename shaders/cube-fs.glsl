@@ -148,19 +148,22 @@ void main(void)
                 src.rgb = src.rgb * src.a;
                 color = color + (1.0 - color.a) * src;
                 
-                if(color.a > 0.99) break;
+                if(color.a > 0.99) {
+                    gl_FragDepth = calcDepth(position);
+                    break;
+                }
             }
         }
 
         rayLength -= stepLength;
         position += stepVector;
+        gl_FragDepth = calcDepth(position);
     }
 
     if(maxInt) {
         color = texture(transferFunction, maxIntensity);
     }
 
-    gl_FragDepth = calcDepth(position);
     fragmentColor = color;
 }
 
