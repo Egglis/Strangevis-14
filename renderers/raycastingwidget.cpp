@@ -6,18 +6,20 @@
 #include <ImGui.h>
 #include <ImGuizmo.h>
 // clang-format on
-RayCastingWidget::RayCastingWidget(RenderProperties initialRenderProperties,
-                                   std::unique_ptr<ITextureStore>& textureStore,
-                                   std::shared_ptr<ISharedProperties> properties,
-                                   QWidget* parent, Qt::WindowFlags f)
+
+RayCastingWidget::RayCastingWidget(
+    RenderProperties initialRenderProperties,
+    std::unique_ptr<ITextureStore>& textureStore,
+    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
       m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort},
-      m_planeRenderer{textureStore, m_camera},
-      m_slicingPlaneControls{properties, m_camera}
+      m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
+                                                   properties, m_camera}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);
@@ -61,9 +63,12 @@ void RayCastingWidget::paintGL()
     glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    renderImGuizmo();
-    m_volumeRenderer.paint();
-    m_planeRenderer.paint();
+    if (!m_textureStore->volume().loadingInProgress())
+    {
+        renderImGuizmo();
+        m_volumeRenderer.paint();
+        m_planeRenderer.paint();
+    }
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
