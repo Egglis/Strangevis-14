@@ -36,7 +36,7 @@ class MainWindow : public QMainWindow
     const std::shared_ptr<tfn::IColorMapStore> m_colorMapStore;
     MainWindowWidget* m_mainWidget;
     HistogramWidget* m_histogramWidget;
-    RenderSettingsWidget* m_renderSetttingsWidget;
+    RenderSettingsWidget* m_renderSettingsWidget;
 
 };
 #endif // MAINWINDOW_H

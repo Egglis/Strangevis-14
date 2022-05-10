@@ -3,11 +3,10 @@
 
 #include <QObject>
 #include <QString>
-#include <any>
 
-enum class SettingTypes { FLOAT, INT, BOOL };
 
-using RenderSettings = std::map<QString, std::pair<SettingTypes, std::any>>;
+using RenderSettings = std::map<QString, std::variant<float, int, bool>>;
+
 class RenderSettingsProperties : public QObject
 {
     Q_OBJECT

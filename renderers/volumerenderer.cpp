@@ -65,19 +65,14 @@ void VolumeRenderer::setUniforms()
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
-    for(const auto& [key , pair]: m_renderSettings){
+    for (const auto& [key, value] : m_renderSettings)
+    {
         location = m_cubeProgram.uniformLocation(key);
-        switch (pair.first)
-        {
-        case SettingTypes::FLOAT:
-            m_cubeProgram.setUniformValue(location, std::any_cast<float>(pair.second));
-            break;
-        case SettingTypes::BOOL:
-            m_cubeProgram.setUniformValue(location, std::any_cast<bool>(pair.second));
-            break;
-        case SettingTypes::INT:
-            m_cubeProgram.setUniformValue(location, std::any_cast<int>(pair.second));
-        }
+        std::visit(
+            [this, location](const auto& arg) {
+                m_cubeProgram.setUniformValue(location, arg);
+            },
+            value);
     }
 }
 

@@ -73,21 +73,15 @@ void RenderSettingsWidget::updateRenderSettings()
 {
     for (auto s : m_floatSliders.keys())
     {
-        m_renderSettings[s] = std::make_pair(
-            SettingTypes::FLOAT,
-            static_cast<std::any>(m_floatSliders[s]->getValue()));
+        m_renderSettings[s] = m_floatSliders[s]->getValue();
     }
     for (auto s : m_boolCheckboxes.keys())
     {
-        m_renderSettings[s] = std::make_pair(
-            SettingTypes::BOOL,
-            static_cast<std::any>(m_boolCheckboxes[s]->getValue()));
+        m_renderSettings[s] = m_boolCheckboxes[s]->getValue();
     }
     for (auto s : m_intSliders.keys())
     {
-        m_renderSettings[s] =
-            std::make_pair(SettingTypes::INT,
-                           static_cast<std::any>(m_intSliders[s]->getValue()));
+        m_renderSettings[s] = m_intSliders[s]->getValue();
     }
     m_properties->renderSettings().updateRenderSettings(m_renderSettings);
 }
