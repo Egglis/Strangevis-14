@@ -26,6 +26,7 @@ uniform float specInt;
 uniform float specCoeff;
 uniform bool specOff;
 uniform bool maxInt;
+uniform bool headLight;
 
 uniform int stepSize;
 
@@ -73,7 +74,9 @@ vec3 ShadeBlinnPhong (vec3 pos, vec3 ld, vec3 vd, vec3 clr)
 
         float specularValue = 0.0;
         if(dotDiff > 0.0 && specOff){
+
             vec3 H = normalize(lightDir + eyeDir);
+            if(H == vec3(0)) H = -lightDir;
             float specAngle = max(0, dot(normal, H));
             specularValue = pow(specAngle, specCoeff);
         }
@@ -142,8 +145,8 @@ void main(void)
             vec3 gradient = calculateGradient(position);
             vec4 src = texture(transferFunction, intensity);
             vec3 viewDir = rayOrigin - position;
-            vec3 lightDir = lightPosition - position;
-
+            vec3 lightDir = (headLight) ? rayOrigin : (lightPosition - position);
+            
             if(src.a > 0.0){          
                 
                 src.rgb = ShadeBlinnPhong(position, -lightDir, viewDir, src.rgb);

@@ -13,6 +13,7 @@ Geometry::Geometry()
 {
     allocateQuad();
     allocateCube();
+    allocateLightSource();
 }
 
 void Geometry::allocateQuad()
@@ -74,7 +75,6 @@ void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
 }
 
 void Geometry::allocateLightSource() {
-    m_lightVertexBuffer.destroy();
     m_lightVertexBuffer.create();
     m_lightVertexBuffer.bind();
     m_lightVertexBuffer.allocate(sizeof(QVector3D));

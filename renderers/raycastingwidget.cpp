@@ -17,7 +17,7 @@ RayCastingWidget::RayCastingWidget(
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
-      m_lightRenderer{m_camera, m_viewPort},
+      m_lightRenderer{m_camera, m_viewPort, m_renderSettings},
       m_volumeRenderer{textureStore,  m_renderSettings, m_camera,
                        m_openGLExtra, m_viewPort,       m_lightRenderer},
       m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
@@ -47,8 +47,8 @@ void RayCastingWidget::moveLightSource(QVector3D vb)
     mat.setToIdentity();
     mat.translate(-0.5f * vb * (2.0f * sqrt(3.0f)));
     
-    const QMatrix4x4 lightTransformMatrix =
-        m_viewMatrix.inverted() * mat * m_viewMatrix;
+    const QMatrix4x4 lightTransformMatrix = 
+        m_camera.viewMatrix().inverted() * mat * m_camera.viewMatrix();
     m_lightRenderer.setLightTransform(lightTransformMatrix);
 }
 
@@ -82,7 +82,6 @@ void RayCastingWidget::paintGL()
     renderImGuizmo();
     m_volumeRenderer.paint();
     m_planeRenderer.paint();
-    // TODO set custome settings for light soruce
     m_lightRenderer.paint();
 }
 

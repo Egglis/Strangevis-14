@@ -128,6 +128,7 @@ void RayCastingInteractor::wheelEvent(QWheelEvent* p_event)
     zoomCamera(zoomScale);
 }
 
+
 void RayCastingInteractor::rotateCamera()
 {
     QVector3D va =

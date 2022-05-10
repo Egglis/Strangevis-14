@@ -14,7 +14,7 @@
 
 namespace Settings
 {
-static QList<QString> SETTINGS_ORDER({"maxInt", "stepSize", "ambientInt",
+static QList<QString> SETTINGS_ORDER({"maxInt", "headLight", "stepSize", "ambientInt",
                                       "diffuseInt", "specOff", "specInt",
                                       "specCoeff"});
 }; // namespace Settings

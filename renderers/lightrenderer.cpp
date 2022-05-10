@@ -1,8 +1,9 @@
 #include "lightrenderer.h"
 
 LightRenderer::LightRenderer(const CameraProperties& camera,
-                             const ViewPort& viewPort)
-    : m_camera{camera}, m_viewPort{viewPort}
+                             const ViewPort& viewPort,
+                             RenderSettings& renderSettings)
+    : m_camera{camera}, m_viewPort{viewPort}, m_renderSettings{renderSettings}
 {
 }
 
@@ -25,14 +26,22 @@ void LightRenderer::paint()
     int location;
     m_lightProgram.bind();
 
-    QMatrix4x4 modelViewProjectionMatrix =
-        m_camera.projectionMatrix() * m_camera.viewMatrix() * m_ligthTransform.inverted();
+    QMatrix4x4 modelViewProjectionMatrix = m_camera.projectionMatrix() *
+                                           m_camera.viewMatrix() *
+                                           m_ligthTransform.inverted();
 
     location = m_lightProgram.uniformLocation("modelViewProjectionMatrix");
     m_lightProgram.setUniformValue(location, modelViewProjectionMatrix);
 
     location = m_lightProgram.uniformLocation("viewportSize");
     m_lightProgram.setUniformValue(location, m_viewPort.viewPort());
+
+    location = m_lightProgram.uniformLocation("headLight");
+    std::visit(
+        [this, location](const auto& arg) {
+            m_lightProgram.setUniformValue(location, arg);
+        },
+        m_renderSettings["headLight"]);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_BLEND);
