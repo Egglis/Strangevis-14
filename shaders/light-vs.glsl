@@ -8,7 +8,7 @@ flat out vec2 center;
 flat out float pointSize;
 
 void main(void) {
-    const float size = 17.0;
+    const float size = 13.0;
     vec4 pos = modelViewProjectionMatrix * vec4(position, 1.0);
 
     center.xy = ((pos.xy / pos.w) + vec2(1.0)) * (viewportSize * 0.5);

@@ -45,6 +45,6 @@ class Geometry
     QOpenGLBuffer m_cubeIndexBuffer;
 
     QOpenGLBuffer m_lightVertexBuffer;
-    //QOpenGLBuffer m_lightIndexBuffer;
+    QOpenGLBuffer m_lightIndexBuffer;
 };
 #endif // GEOMETRY_H

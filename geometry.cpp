@@ -9,7 +9,9 @@ Geometry::Geometry()
       m_cubeVertexBuffer(QOpenGLBuffer::VertexBuffer),
       m_cubeIndexBuffer(QOpenGLBuffer::IndexBuffer),
       m_sliceCubeIntersectionCoordBuffer(QOpenGLBuffer::VertexBuffer),
-      m_sliceIndexBuffer(QOpenGLBuffer::IndexBuffer)
+      m_sliceIndexBuffer(QOpenGLBuffer::IndexBuffer),
+      m_lightVertexBuffer(QOpenGLBuffer::VertexBuffer),
+      m_lightIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
     allocateQuad();
     allocateCube();
@@ -78,6 +80,10 @@ void Geometry::allocateLightSource() {
     m_lightVertexBuffer.create();
     m_lightVertexBuffer.bind();
     m_lightVertexBuffer.allocate(sizeof(QVector3D));
+
+    m_lightIndexBuffer.create();
+    m_lightIndexBuffer.bind();
+    m_lightIndexBuffer.allocate(sizeof(QVector3D));
 }
 
 void Geometry::bindQuad()
@@ -115,6 +121,7 @@ void Geometry::drawObliqueSlice()
 
 void Geometry::bindLightSource() {
     m_lightVertexBuffer.bind();
+    m_lightIndexBuffer.bind();
 }
 
 void Geometry::drawLightSource() {
