@@ -73,6 +73,13 @@ void Geometry::allocateObliqueSlice(CubePlaneIntersection& intersection)
         static_cast<int>(sortedOrder.size() * sizeof(sortedOrder[0])));
 }
 
+void Geometry::allocateLightSource() {
+    m_lightVertexBuffer.destroy();
+    m_lightVertexBuffer.create();
+    m_lightVertexBuffer.bind();
+    m_lightVertexBuffer.allocate(sizeof(QVector3D));
+}
+
 void Geometry::bindQuad()
 {
     m_quadVertexBuffer.bind();
@@ -104,6 +111,14 @@ void Geometry::bindObliqueSliceIntersectionCoords()
 void Geometry::drawObliqueSlice()
 {
     glDrawElements(GL_TRIANGLE_FAN, m_sliceIndices, GL_UNSIGNED_SHORT, nullptr);
+}
+
+void Geometry::bindLightSource() {
+    m_lightVertexBuffer.bind();
+}
+
+void Geometry::drawLightSource() {
+    glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, nullptr);
 }
 
 Geometry& Geometry::instance()

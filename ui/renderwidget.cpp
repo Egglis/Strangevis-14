@@ -146,9 +146,9 @@ void RayCastingInteractor::rotateCamera()
 
 void RayCastingInteractor::moveLightSource()
 {
-    qDebug() << "Moving LS";
     QVector3D vb = arcballVector(m_currentPosition.x(), m_currentPosition.y());
     RayCastingWidget::moveLightSource(vb);
+    update();
 }
 
 QVector3D RayCastingInteractor::arcballVector(qreal x, qreal y)

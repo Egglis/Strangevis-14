@@ -30,9 +30,11 @@ class RayCastingInteractor : public RayCastingWidget
   private:
     void rotateCamera();
     void moveLightSource();
+    void setUpdateAfterMouseEventStops(bool update);
     const std::shared_ptr<ISharedProperties> m_properties;
     QPointF m_currentPosition;
     QPointF m_previousPosition;
+    QTimer* m_refreshTimer;
     bool m_light = false;
 };
 

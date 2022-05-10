@@ -30,6 +30,7 @@ void PlaneRenderer::paint()
     QMatrix4x4 modelViewProjectionMatrix = m_camera.projectionMatrix() *
                                            m_camera.viewMatrix() *
                                            planeModelMatrix();
+
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
 
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);

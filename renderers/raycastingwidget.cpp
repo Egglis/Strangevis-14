@@ -17,8 +17,9 @@ RayCastingWidget::RayCastingWidget(
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
-      m_volumeRenderer{textureStore, m_renderSettings, m_lpos, m_camera, m_openGLExtra,
-                       m_viewPort},
+      m_lightRenderer{m_camera, m_viewPort},
+      m_volumeRenderer{textureStore,  m_renderSettings, m_camera,
+                       m_openGLExtra, m_viewPort,       m_lightRenderer},
       m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
                                                    properties, m_camera}
 {
@@ -40,26 +41,15 @@ void RayCastingWidget::zoomCamera(float zoomFactor)
     update();
 }
 
-void RayCastingWidget::moveLightSource(QVector3D vb){
-    /*
-		vec3 v = arcballVector(m_xCurrent, m_yCurrent);
-		mat4 viewTransform = viewer()->viewTransform();
-
-		mat4 lightTransform = inverse(viewTransform)*translate(mat4(1.0f), -0.5f*v*m_distance)*viewTransform;
-		viewer()->setLightTransform(lightTransform);
-
-        const mat4 modelLightMatrix = viewer()->modelLightTransform();
-        const mat4 inverseModelLightMatrix = inverse(modelLightMatrix);
-
-        vec4 worldLightPosition = inverseModelLightMatrix * vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    */
+void RayCastingWidget::moveLightSource(QVector3D vb)
+{
     QMatrix4x4 mat;
     mat.setToIdentity();
-    mat.translate(-0.5f*vb*2.0f*sqrt(3.0f));
-    QMatrix4x4 modelLightMatrix = m_viewMatrix.inverted()*mat*m_viewMatrix;
-    QVector4D lpos = modelLightMatrix.inverted() * QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
-    m_lpos = lpos;
-    qDebug() << lpos;
+    mat.translate(-0.5f * vb * (2.0f * sqrt(3.0f)));
+    
+    const QMatrix4x4 lightTransformMatrix =
+        m_viewMatrix.inverted() * mat * m_viewMatrix;
+    m_lightRenderer.setLightTransform(lightTransformMatrix);
 }
 
 void RayCastingWidget::initializeGL()
@@ -71,6 +61,7 @@ void RayCastingWidget::initializeGL()
     Geometry::instance();
     m_volumeRenderer.compileShader();
     m_planeRenderer.compileShader();
+    m_lightRenderer.compileShader();
 }
 
 void RayCastingWidget::resizeGL(int w, int h)
@@ -91,6 +82,8 @@ void RayCastingWidget::paintGL()
     renderImGuizmo();
     m_volumeRenderer.paint();
     m_planeRenderer.paint();
+    // TODO set custome settings for light soruce
+    m_lightRenderer.paint();
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)

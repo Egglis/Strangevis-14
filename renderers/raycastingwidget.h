@@ -15,6 +15,7 @@
 #include <QOpenGLWidget>
 #include <QtImGui.h>
 
+class LightRenderer;
 
 struct RenderProperties
 {
@@ -56,22 +57,23 @@ class RayCastingWidget : public QOpenGLWidget
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    ViewPort m_viewPort;
+
     RenderSettings m_renderSettings;
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
     CameraProperties m_camera;
-    ViewPort m_viewPort;
-
-    QVector4D m_lpos;
 
     QtImGui::RenderRef m_imGuiReference;
     VolumeRenderer m_volumeRenderer;
     PlaneRenderer m_planeRenderer;
+    LightRenderer m_lightRenderer;
     SlicingPlaneControls m_slicingPlaneControls;
+    
 
     qreal m_nearPlane = 0.5;
-    qreal m_farPlane = 32.0;
+    qreal m_farPlane = 70.0;
     qreal m_fov = 60.0;
     const GLfloat m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0);
 };

@@ -60,8 +60,8 @@ qt_add_executable(strangevis WIN32
     renderers/obliqueslicewidget.cpp
     renderers/planerenderer.cpp
     renderers/volumerenderer.cpp
-    renderers/lightrenderer.cpp
     renderers/slicingplanecontrols.cpp
+    renderers/lightrenderer.cpp
     properties/cameraproperties.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
@@ -88,6 +88,8 @@ qt_add_executable(strangevis WIN32
 set(shaders_resource_files
     "shaders/cube-fs.glsl"
     "shaders/cube-vs.glsl"
+    "shaders/light-vs.glsl"
+    "shaders/light-fs.glsl"
     "shaders/slice-fs.glsl"
     "shaders/slice-vs.glsl"
     "shaders/plane-fs.glsl"

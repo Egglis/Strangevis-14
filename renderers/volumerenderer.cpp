@@ -4,10 +4,12 @@
 
 VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
-    RenderSettings& settings, QVector4D& lpos, const CameraProperties& camera,
-    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
-    : m_textureStore{textureStore}, m_lpos{lpos}, m_renderSettings{settings},
-      m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
+    RenderSettings& settings, const CameraProperties& camera,
+    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort,
+    LightRenderer& lightRenderer)
+    : m_textureStore{textureStore}, m_renderSettings{settings},
+      m_lightRenderer{lightRenderer}, m_camera{camera},
+      m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
 {
 }
 
@@ -65,8 +67,10 @@ void VolumeRenderer::setUniforms()
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
-    location = m_cubeProgram.uniformLocation("lpos");
-    m_cubeProgram.setUniformValue(location, QVector3D(m_lpos.x(), m_lpos.y(), m_lpos.z()));
+    QVector4D lightPosition = m_lightRenderer.getLightTransform().inverted() * QVector4D(0,0,0,1);
+    location = m_cubeProgram.uniformLocation("lightPosition");
+    m_cubeProgram.setUniformValue(location, QVector3D(lightPosition.x(), lightPosition.y(), lightPosition.z()));
+    qDebug() << QVector3D(lightPosition.x(), lightPosition.y(), lightPosition.z()) << lightPosition;
 
     for (const auto& [key, value] : m_renderSettings)
     {
