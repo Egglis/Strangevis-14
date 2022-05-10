@@ -1,9 +1,8 @@
 #include "lightrenderer.h"
 
 LightRenderer::LightRenderer(const CameraProperties& camera,
-                             const ViewPort& viewPort,
                              RenderSettings& renderSettings)
-    : m_camera{camera}, m_viewPort{viewPort}, m_renderSettings{renderSettings}
+    : m_camera{camera}, m_renderSettings{renderSettings}
 {
 }
 
@@ -32,9 +31,6 @@ void LightRenderer::paint()
 
     location = m_lightProgram.uniformLocation("modelViewProjectionMatrix");
     m_lightProgram.setUniformValue(location, modelViewProjectionMatrix);
-
-    location = m_lightProgram.uniformLocation("viewportSize");
-    m_lightProgram.setUniformValue(location, m_viewPort.viewPort());
 
     location = m_lightProgram.uniformLocation("headLight");
     std::visit(
