@@ -53,7 +53,23 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
+
+    m_refreshTimer = nullptr;
     setMouseTracking(true);
+    setUpdateAfterMouseEventStops(true);
+}
+
+void RayCastingInteractor::setUpdateAfterMouseEventStops(bool update)
+{
+    if (m_refreshTimer != nullptr)
+        delete m_refreshTimer;
+    m_refreshTimer = new QTimer{};
+    m_refreshTimer->setInterval(10);
+    m_refreshTimer->setSingleShot(true);
+    if (update)
+        m_refreshTimer->callOnTimeout([this]() { this->update(); });
+    else
+        m_refreshTimer->callOnTimeout([this]() {});
 }
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
@@ -82,6 +98,8 @@ void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
     {
         update();
     }
+    if (m_refreshTimer != nullptr)
+        m_refreshTimer->start();
 }
 
 // Scrolling wheel event
