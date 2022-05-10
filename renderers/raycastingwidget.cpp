@@ -90,9 +90,11 @@ void RayCastingWidget::renderImGuizmo()
 
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(true);
-    ImGuizmo::ViewManipulate(m_camera.rotationMatrix().data(),
+    auto rotationMatrix = m_camera.rotationMatrix();
+    ImGuizmo::ViewManipulate(rotationMatrix.data(),
                              2.0f * sqrt(3.0f), ImVec2(0, 0), ImVec2(128, 128),
                              0);
+    m_camera.rotateCamera(rotationMatrix);
     m_slicingPlaneControls.paint();
     ImGui::Render();
     QtImGui::render(m_imGuiReference);

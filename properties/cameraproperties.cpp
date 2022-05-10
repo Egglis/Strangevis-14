@@ -2,10 +2,7 @@
 
 #include <QVector3D>
 
-CameraProperties::CameraProperties()
-{
-    updateProjectionMatrix(16.0f / 9.0f);
-}
+CameraProperties::CameraProperties() { updateProjectionMatrix(16.0f / 9.0f); }
 
 void CameraProperties::updateProjectionMatrix(float aspectRatio)
 {
@@ -16,22 +13,34 @@ void CameraProperties::updateProjectionMatrix(float aspectRatio)
 void CameraProperties::rotateCamera(float angle, QVector3D axis)
 {
 
-    QMatrix4x4 inverseViewMatrix = m_viewMatrix.inverted();
+    QMatrix4x4 inverseViewMatrix = viewMatrix().inverted();
     QVector4D transformedAxis = inverseViewMatrix * QVector4D(axis,
     0.0f);
-    m_viewMatrix.rotate(angle,
-    transformedAxis.toVector3D());
     m_rotationMatrix.rotate(angle, transformedAxis.toVector3D());
 
 }
 
+void CameraProperties::rotateCamera(QMatrix4x4 rotationMatrix)
+{
+    m_rotationMatrix = rotationMatrix;
+    m_rotationMatrix.setColumn(3,QVector4D{0,0,0,1});
+}
+
 void CameraProperties::moveCamera(QVector3D translation)
 {
-    m_viewMatrix.translate(translation);
+    m_translation += translation;
 }
 
 void CameraProperties::zoomCamera(float zoomFactor)
 {
-    m_viewMatrix.scale(zoomFactor);
     m_zoom *= zoomFactor;
+}
+
+QMatrix4x4 CameraProperties::viewMatrix() const
+{
+    QMatrix4x4 view{};
+    view.translate(m_translation);
+    view *= m_rotationMatrix;
+    view.scale(m_zoom);
+    return view;
 }

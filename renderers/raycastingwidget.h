@@ -3,18 +3,18 @@
 
 #include "../geometry/cubeplaneintersection.h"
 #include "../geometry/plane.h"
-#include "../properties/cameraproperties.h"
-#include "../properties/viewport.h"
 #include "../properties/sharedproperties.h"
+#include "../properties/viewport.h"
 #include "../texturestore.h"
 #include "planerenderer.h"
-#include "volumerenderer.h"
 #include "slicingplanecontrols.h"
+#include "volumerenderer.h"
 
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
 #include <QtImGui.h>
+
 
 struct RenderProperties
 {
