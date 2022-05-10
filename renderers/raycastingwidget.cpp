@@ -50,6 +50,7 @@ void RayCastingWidget::moveLightSource(QVector3D vb)
     const QMatrix4x4 lightTransformMatrix = 
         m_camera.viewMatrix().inverted() * mat * m_camera.viewMatrix();
     m_lightRenderer.setLightTransform(lightTransformMatrix);
+    update();
 }
 
 void RayCastingWidget::initializeGL()
