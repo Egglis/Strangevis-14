@@ -5,7 +5,6 @@
 #include "../geometry/plane.h"
 #include "../properties/sharedproperties.h"
 #include "../properties/viewport.h"
-#include "../properties/rendersettingsproperties.h"
 #include "../texturestore.h"
 #include "planerenderer.h"
 #include "slicingplanecontrols.h"
