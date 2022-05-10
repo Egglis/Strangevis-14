@@ -65,14 +65,14 @@ qt_add_executable(strangevis WIN32
     properties/cameraproperties.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp
-    properties/gradientproperties.cpp
     properties/transferproperties.cpp
+    properties/rendersettingsproperties.cpp
     ui/renderwidget.cpp
     ui/rectangulargridlayout.cpp
     ui/obliquesliceinteractor.cpp
-    ui/parameterwidget.cpp
     ui/mainwindowwidget.cpp
     ui/histogramwidget.cpp
+    ui/rendersettingswidget.cpp
     ui/transferwidget/transferfunctiongraph.cpp
     ui/transferwidget/transferfunctionwidget.cpp
     ui/transferwidget/hintitem.cpp

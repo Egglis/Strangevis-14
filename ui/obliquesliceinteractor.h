@@ -2,7 +2,6 @@
 #define OBLIQUESLICEINTERACTOR_H
 
 #include "../renderers/obliqueslicewidget.h"
-#include "parameterwidget.h"
 
 #include <QCheckBox>
 #include <QPushButton>
@@ -35,9 +34,7 @@ class ObliqueSliceRotationWidget : public QWidget
 {
     Q_OBJECT
   public:
-    ObliqueSliceRotationWidget(
-        const std::shared_ptr<ISharedProperties>& properties,
-        QWidget* parent = nullptr);
+    ObliqueSliceRotationWidget(QWidget* parent = nullptr);
 
   signals:
     void flipVertical(bool flip);
@@ -49,7 +46,6 @@ class ObliqueSliceRotationWidget : public QWidget
     QCheckBox m_flipVerticalCheckbox;
     QPushButton m_resetClippingPlane;
     QHBoxLayout m_layout;
-    ParameterWidget m_parameterWidget;
 };
 
 #endif // OBLIQUESLICEINTERACTOR_H

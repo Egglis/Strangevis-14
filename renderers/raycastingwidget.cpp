@@ -100,15 +100,15 @@ void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
     update();
 }
 
-void RayCastingWidget::changeGradientMethod(GradientMethod method)
-{
-    m_gradientMethod = method;
-    update();
-}
-
 void RayCastingWidget::changeTransferFunction(QString transferFunction)
 {
     m_transferFunctionName = transferFunction;
+    update();
+}
+
+void RayCastingWidget::changeRenderSettings(RenderSettings renderSettings)
+{
+    m_renderSettings = renderSettings;
     update();
 }
 
@@ -119,9 +119,8 @@ void RayCastingWidget::renderImGuizmo()
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(true);
     auto rotationMatrix = m_camera.rotationMatrix();
-    ImGuizmo::ViewManipulate(rotationMatrix.data(),
-                             2.0f * sqrt(3.0f), ImVec2(0, 0), ImVec2(128, 128),
-                             0);
+    ImGuizmo::ViewManipulate(rotationMatrix.data(), 2.0f * sqrt(3.0f),
+                             ImVec2(0, 0), ImVec2(128, 128), 0);
     m_camera.rotateCamera(rotationMatrix);
     m_slicingPlaneControls.paint();
     ImGui::Render();

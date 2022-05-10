@@ -96,7 +96,7 @@ std::vector<QVector2D> rotateToXYPlane(const std::vector<QVector3D>& input)
     std::transform(input.begin(), input.end(), vertexPositions.begin(),
                    [&transformationMatrix](QVector3D texCoord) {
                        auto newVertexPosition = transformationMatrix.map(texCoord);
-                       assert(std::abs(newVertexPosition.z()) < 0.001);
+                       assert(std::abs(newVertexPosition.z()) < 0.1);
                        return QVector2D(newVertexPosition);
                    });
 

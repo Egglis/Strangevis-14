@@ -53,8 +53,7 @@ void VolumeRenderer::setUniforms()
     location = m_cubeProgram.uniformLocation("focalLength");
     m_cubeProgram.setUniformValue(location, m_camera.focalLength());
     location = m_cubeProgram.uniformLocation("viewportSize");
-    m_cubeProgram.setUniformValue(
-        location, m_viewPort.viewPort());
+    m_cubeProgram.setUniformValue(location, m_viewPort.viewPort());
     location = m_cubeProgram.uniformLocation("aspectRatio");
     m_cubeProgram.setUniformValue(location, m_viewPort.aspectRatio());
 

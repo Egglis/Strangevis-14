@@ -5,8 +5,8 @@
 #include "ui/histogramwidget.h"
 #include "ui/mainwindowwidget.h"
 #include "ui/obliquesliceinteractor.h"
-#include "ui/parameterwidget.h"
 #include "ui/rectangulargridlayout.h"
+#include "ui/rendersettingswidget.h"
 #include "ui/renderwidget.h"
 #include "ui/transferwidget/transferfunctionwidget.h"
 
@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
+#include <QSizePolicy>
 
 MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
                        std::shared_ptr<tfn::IColorMapStore> colorMapStore,
@@ -41,6 +42,7 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
 
     createHistogramWidget();
 
+    QAction* renderSettings = new QAction("Render Settings", this);
 
     QAction* openHistogramAction = new QAction("Open Histogram", this);
     connect(openHistogramAction, &QAction::triggered, this,
@@ -48,6 +50,9 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     fileMenu->addAction(openHistogramAction);
 
     menuBar()->addMenu(fileMenu);
+    menuBar()->addAction(renderSettings);
+    connect(renderSettings, &QAction::triggered, this,
+            &MainWindow::openRenderSettings);
 
     RayCastingInteractor* p_3dRenderWidget =
         new RayCastingInteractor(m_textureStore, m_properties, this);
@@ -56,7 +61,7 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     ObliqueSliceInteractor* p_2dRenderWidget =
         new ObliqueSliceInteractor(m_textureStore, m_properties, this);
     ObliqueSliceRotationWidget* p_2dToolBarWidget =
-        new ObliqueSliceRotationWidget(m_properties, this);
+        new ObliqueSliceRotationWidget(this);
 
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
             p_2dRenderWidget, &ObliqueSliceRenderWidget::flipHorizontal);
@@ -68,21 +73,24 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     connect(&m_textureStore->volume(), &Volume::histogramCalculated,
             p_3dToolBarWidget, &ExtendedParameterWidget::histogramChanged);
 
-
     m_mainWidget =
         new MainWindowWidget(p_3dRenderWidget, p_3dToolBarWidget,
                              p_2dRenderWidget, p_2dToolBarWidget, this);
     connect(&m_textureStore->volume(), &Volume::loadingStartedOrStopped,
             m_mainWidget,
             &MainWindowWidget::toggleFileLoadingInProgressOverlay);
+
+    createRenderSettingsWidget();
+
     setCentralWidget(m_mainWidget);
+
+
 }
 
 void MainWindow::fileOpen()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open Volume File",
                                                     QString(), "*.dat");
-
     if (!fileName.isEmpty())
     {
         m_textureStore->volume().load(fileName);
@@ -97,4 +105,12 @@ void MainWindow::createHistogramWidget()
     m_histogramWidget->setAttribute(Qt::WA_QuitOnClose, false);
 }
 
+void MainWindow::createRenderSettingsWidget()
+{
+    m_renderSettingsWidget = new RenderSettingsWidget(m_properties);
+    m_renderSettingsWidget->setAttribute(Qt::WA_QuitOnClose, false);
+}
+
 void MainWindow::openHistogram() { m_histogramWidget->show(); }
+
+void MainWindow::openRenderSettings() { m_renderSettingsWidget->show(); }

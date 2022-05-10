@@ -4,11 +4,11 @@
 #include "../properties/sharedproperties.h"
 #include "../renderers/raycastingwidget.h"
 #include "../texturestore.h"
-#include "parameterwidget.h"
 #include "transferwidget/transferfunctionwidget.h"
 
 #include <QMatrix4x4>
 #include <QVBoxLayout>
+#include <QTimer>
 #include <memory>
 
 class RayCastingInteractor : public RayCastingWidget
