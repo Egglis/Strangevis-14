@@ -29,9 +29,11 @@ class RayCastingInteractor : public RayCastingWidget
 
   private:
     void rotateCamera();
+    void moveLightSource();
     const std::shared_ptr<ISharedProperties> m_properties;
     QPointF m_currentPosition;
     QPointF m_previousPosition;
+    bool m_light = false;
 };
 
 class ExtendedParameterWidget : public QWidget

@@ -10,7 +10,12 @@
 class VolumeRenderer
 {
   public:
-    VolumeRenderer(const std::unique_ptr<ITextureStore>& textureStore, const CameraProperties& camera, QOpenGLExtraFunctions& openGLextra, const ViewPort& viewPort);
+    VolumeRenderer(const std::unique_ptr<ITextureStore>& textureStore,
+                   RenderSettings& settings,
+                   QVector4D& lpos,
+                   const CameraProperties& camera,
+                   QOpenGLExtraFunctions& openGLextra,
+                   const ViewPort& viewPort);
     void paint();
     void compileShader();
 
@@ -21,6 +26,7 @@ class VolumeRenderer
 
     QOpenGLShaderProgram m_cubeProgram;
     const CameraProperties& m_camera;
+    QVector4D& m_lpos;
     const ViewPort& m_viewPort;
     const std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLExtraFunctions& m_openGLExtra;

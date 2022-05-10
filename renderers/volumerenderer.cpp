@@ -4,8 +4,10 @@
 
 VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
-    const CameraProperties& camera, QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
-    : m_textureStore{textureStore}, m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
+    RenderSettings& settings, QVector4D& lpos, const CameraProperties& camera,
+    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
+    : m_textureStore{textureStore}, m_lpos{lpos}, m_renderSettings{settings},
+      m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
 {
 }
 
@@ -63,6 +65,19 @@ void VolumeRenderer::setUniforms()
     m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
+
+    location = m_cubeProgram.uniformLocation("lpos");
+    m_cubeProgram.setUniformValue(location, QVector3D(m_lpos.x(), m_lpos.y(), m_lpos.z()));
+
+    for (const auto& [key, value] : m_renderSettings)
+    {
+        location = m_cubeProgram.uniformLocation(key);
+        std::visit(
+            [this, location](const auto& arg) {
+                m_cubeProgram.setUniformValue(location, arg);
+            },
+            value);
+    }
 }
 
 void VolumeRenderer::bindTextures()

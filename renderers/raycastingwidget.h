@@ -44,6 +44,7 @@ class RayCastingWidget : public QOpenGLWidget
     virtual void paintGL();
   protected slots:
     void rotateCamera(qreal angle, QVector3D axis);
+    void moveLightSource(QVector3D vb);
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
     void changeGradientMethod(GradientMethod method);
@@ -63,6 +64,8 @@ class RayCastingWidget : public QOpenGLWidget
     CubePlaneIntersection m_cubePlaneIntersection;
     CameraProperties m_camera;
     ViewPort m_viewPort;
+
+    QVector4D m_lpos;
 
     QtImGui::RenderRef m_imGuiReference;
     VolumeRenderer m_volumeRenderer;

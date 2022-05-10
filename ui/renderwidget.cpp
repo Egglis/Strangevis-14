@@ -59,8 +59,8 @@ RayCastingInteractor::RayCastingInteractor(
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
 {
     m_currentPosition = p_event->position();
-
     m_previousPosition = m_currentPosition;
+
     update();
 }
 
@@ -73,7 +73,14 @@ void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
         {
             if (m_currentPosition != m_previousPosition)
             {
-                rotateCamera();
+                if (p_event->modifiers() == Qt::ShiftModifier)
+                {
+                    moveLightSource();
+                }
+                else
+                {
+                    rotateCamera();
+                }
             }
         }
         m_previousPosition = m_currentPosition;
@@ -115,6 +122,13 @@ void RayCastingInteractor::rotateCamera()
 
         RayCastingWidget::rotateCamera(angle, axis);
     }
+}
+
+void RayCastingInteractor::moveLightSource()
+{
+    qDebug() << "Moving LS";
+    QVector3D vb = arcballVector(m_currentPosition.x(), m_currentPosition.y());
+    RayCastingWidget::moveLightSource(vb);
 }
 
 QVector3D RayCastingInteractor::arcballVector(qreal x, qreal y)

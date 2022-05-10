@@ -17,7 +17,8 @@ RayCastingWidget::RayCastingWidget(
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
-      m_volumeRenderer{textureStore, m_camera, m_openGLExtra, m_viewPort},
+      m_volumeRenderer{textureStore, m_renderSettings, m_lpos, m_camera, m_openGLExtra,
+                       m_viewPort},
       m_planeRenderer{textureStore, m_camera}, m_slicingPlaneControls{
                                                    properties, m_camera}
 {
@@ -37,6 +38,28 @@ void RayCastingWidget::zoomCamera(float zoomFactor)
 {
     m_camera.zoomCamera(zoomFactor);
     update();
+}
+
+void RayCastingWidget::moveLightSource(QVector3D vb){
+    /*
+		vec3 v = arcballVector(m_xCurrent, m_yCurrent);
+		mat4 viewTransform = viewer()->viewTransform();
+
+		mat4 lightTransform = inverse(viewTransform)*translate(mat4(1.0f), -0.5f*v*m_distance)*viewTransform;
+		viewer()->setLightTransform(lightTransform);
+
+        const mat4 modelLightMatrix = viewer()->modelLightTransform();
+        const mat4 inverseModelLightMatrix = inverse(modelLightMatrix);
+
+        vec4 worldLightPosition = inverseModelLightMatrix * vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    */
+    QMatrix4x4 mat;
+    mat.setToIdentity();
+    mat.translate(-0.5f*vb*2.0f*sqrt(3.0f));
+    QMatrix4x4 modelLightMatrix = m_viewMatrix.inverted()*mat*m_viewMatrix;
+    QVector4D lpos = modelLightMatrix.inverted() * QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
+    m_lpos = lpos;
+    qDebug() << lpos;
 }
 
 void RayCastingWidget::initializeGL()
