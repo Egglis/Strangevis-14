@@ -2,15 +2,21 @@
 #define VOLUMERENDERER_H
 
 #include "../properties/cameraproperties.h"
+#include "../properties/rendersettingsproperties.h"
 #include "../properties/viewport.h"
 #include "../texturestore.h"
-#include <QOpenGLShaderProgram>
+
 #include <QOpenGLExtraFunctions>
+#include <QOpenGLShaderProgram>
 
 class VolumeRenderer
 {
   public:
-    VolumeRenderer(const std::unique_ptr<ITextureStore>& textureStore, const CameraProperties& camera, QOpenGLExtraFunctions& openGLextra, const ViewPort& viewPort);
+    VolumeRenderer(const std::unique_ptr<ITextureStore>& textureStore,
+                   RenderSettings& settings,
+                   const CameraProperties& camera,
+                   QOpenGLExtraFunctions& openGLextra,
+                   const ViewPort& viewPort);
     void paint();
     void compileShader();
 
@@ -24,6 +30,7 @@ class VolumeRenderer
     const ViewPort& m_viewPort;
     const std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLExtraFunctions& m_openGLExtra;
+    RenderSettings& m_renderSettings;
 };
 
 #endif // VOLUMERENDERER_H

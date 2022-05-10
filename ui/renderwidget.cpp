@@ -20,7 +20,9 @@ ExtendedParameterWidget::ExtendedParameterWidget(
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
-void ExtendedParameterWidget::histogramChanged(std::vector<float> normalizedHistogramData){
+void ExtendedParameterWidget::histogramChanged(
+    std::vector<float> normalizedHistogramData)
+{
     m_transferWidget.getGraph()->setHistogramData(normalizedHistogramData);
 }
 
@@ -32,10 +34,12 @@ RayCastingInteractor::RayCastingInteractor(
                            1.0,
                            QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))},
                            properties->transferFunction().colorMap(),
-                           properties->clippingPlane().plane()},
+                           properties->clippingPlane().plane(),
+                           properties->renderSettings().renderSettings()},
                        textureStore, properties, parent, f},
       m_properties{properties}
 {
+
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged, this,
             [this](const Plane& plane) { updateClippingPlane(plane); });
@@ -47,6 +51,10 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::colorMapChanged, this,
             &RayCastingInteractor::changeTransferFunction);
+
+    connect(&m_properties.get()->renderSettings(),
+            &RenderSettingsProperties::renderSettingsChanged, this,
+            &RayCastingInteractor::changeRenderSettings);
 
     m_refreshTimer = nullptr;
     setMouseTracking(true);

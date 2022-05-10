@@ -4,8 +4,10 @@
 
 VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
-    const CameraProperties& camera, QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
-    : m_textureStore{textureStore}, m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
+    RenderSettings& settings, const CameraProperties& camera,
+    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
+    : m_textureStore{textureStore}, m_renderSettings{settings},
+      m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
 {
 }
 
@@ -51,8 +53,7 @@ void VolumeRenderer::setUniforms()
     location = m_cubeProgram.uniformLocation("focalLength");
     m_cubeProgram.setUniformValue(location, m_camera.focalLength());
     location = m_cubeProgram.uniformLocation("viewportSize");
-    m_cubeProgram.setUniformValue(
-        location, m_viewPort.viewPort());
+    m_cubeProgram.setUniformValue(location, m_viewPort.viewPort());
     location = m_cubeProgram.uniformLocation("aspectRatio");
     m_cubeProgram.setUniformValue(location, m_viewPort.aspectRatio());
 
@@ -63,6 +64,16 @@ void VolumeRenderer::setUniforms()
     m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
+
+    for (const auto& [key, value] : m_renderSettings)
+    {
+        location = m_cubeProgram.uniformLocation(key);
+        std::visit(
+            [this, location](const auto& arg) {
+                m_cubeProgram.setUniformValue(location, arg);
+            },
+            value);
+    }
 }
 
 void VolumeRenderer::bindTextures()
