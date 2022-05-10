@@ -9,6 +9,7 @@
 
 #include <QMatrix4x4>
 #include <QVBoxLayout>
+#include <QTimer>
 #include <memory>
 
 class RayCastingInteractor : public RayCastingWidget
@@ -29,9 +30,12 @@ class RayCastingInteractor : public RayCastingWidget
 
   private:
     void rotateCamera();
+    void setUpdateAfterMouseEventStops(bool update);
     const std::shared_ptr<ISharedProperties> m_properties;
     QPointF m_currentPosition;
     QPointF m_previousPosition;
+    QTimer* m_refreshTimer;
+
 };
 
 class ExtendedParameterWidget : public QWidget
