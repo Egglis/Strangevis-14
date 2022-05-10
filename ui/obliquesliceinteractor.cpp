@@ -44,12 +44,10 @@ void ObliqueSliceInteractor::wheelEvent(QWheelEvent* event)
     zoomCamera(zoomScale);
 }
 
-ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
-    const std::shared_ptr<ISharedProperties>& properties, QWidget* parent)
+ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(QWidget* parent)
     : QWidget(parent), m_flipHorizontalCheckbox{tr("Flip Horizontal")},
       m_flipVerticalCheckbox{tr("Flip Vertical")},
-      m_resetClippingPlane{tr("Reset Slice")}, m_layout{this},
-      m_parameterWidget(properties, this)
+      m_resetClippingPlane{tr("Reset Slice")}, m_layout{this}
 {
     connect(&m_flipHorizontalCheckbox, &QCheckBox::stateChanged, this,
             &ObliqueSliceRotationWidget::flipHorizontal);
@@ -62,6 +60,5 @@ ObliqueSliceRotationWidget::ObliqueSliceRotationWidget(
     checkboxLayout->addWidget(&m_flipVerticalCheckbox);
     checkboxLayout->addWidget(&m_resetClippingPlane);
     m_layout.addLayout(checkboxLayout);
-    m_layout.addWidget(&m_parameterWidget);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }

@@ -2,7 +2,6 @@
 
 #include "../geometry.h"
 #include "../transfertexture.h"
-#include "parameterwidget.h"
 #include "transferwidget/transferfunctionwidget.h"
 
 #include <QHBoxLayout>
@@ -33,18 +32,13 @@ RayCastingInteractor::RayCastingInteractor(
                            1.0,
                            QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))},
                            properties->transferFunction().colorMap(),
-                           properties->clippingPlane().plane(),
-                           properties->gradientMethod().method()},
+                           properties->clippingPlane().plane()},
                        textureStore, properties, parent, f},
       m_properties{properties}
 {
     connect(&m_properties.get()->clippingPlane(),
             &ClippingPlaneProperties::clippingPlaneChanged, this,
             [this](const Plane& plane) { updateClippingPlane(plane); });
-
-    connect(&m_properties.get()->gradientMethod(),
-            &GradientProperties::gradientMethodChanged, this,
-            &RayCastingInteractor::changeGradientMethod);
 
     connect(&m_properties.get()->transferFunction(),
             &tfn::TransferProperties::transferFunctionChanged, this,

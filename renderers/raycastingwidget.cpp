@@ -77,11 +77,6 @@ void RayCastingWidget::updateClippingPlane(Plane clippingPlane)
     update();
 }
 
-void RayCastingWidget::changeGradientMethod(GradientMethod method)
-{
-    m_gradientMethod = method;
-    update();
-}
 
 void RayCastingWidget::changeTransferFunction(QString transferFunction)
 {

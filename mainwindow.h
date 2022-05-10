@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include "texturestore.h"
-#include "ui/parameterwidget.h"
 #include "ui/renderwidget.h"
 
 #include <QMainWindow>
