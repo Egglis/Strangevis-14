@@ -46,7 +46,8 @@ struct AABB
 
 vec3 calculateGradient(vec3 volumePosition);
 
-// Slab-intersection method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
+// Slab-intersection method from
+// https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
 void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
 {
     vec3 invDirection = 1.0 / ray.direction;
@@ -60,11 +61,11 @@ void rayBoxIntersection(Ray ray, AABB box, out float tmin, out float tmax)
     tmax = min(t.x, t.y);
 }
 
-
-vec3 ShadeBlinnPhong (vec3 pos, vec3 ld, vec3 vd, vec3 clr)
+vec3 ShadeBlinnPhong(vec3 pos, vec3 ld, vec3 vd, vec3 clr)
 {
     vec3 normal = calculateGradient(pos);
-    if(normal != vec3(0,0,0)){
+    if (normal != vec3(0, 0, 0))
+    {
 
         normal = normalize(normal);
         vec3 lightDir = normalize(ld);
@@ -73,43 +74,44 @@ vec3 ShadeBlinnPhong (vec3 pos, vec3 ld, vec3 vd, vec3 clr)
         float dotDiff = max(0, dot(lightDir, normal));
 
         float specularValue = 0.0;
-        if(dotDiff > 0.0 && specOff){
+        if (dotDiff > 0.0 && specOff)
+        {
 
             vec3 H = normalize(lightDir + eyeDir);
-            if(H == vec3(0)) H = -lightDir;
+            if (H == vec3(0))
+                H = -lightDir;
             float specAngle = max(0, dot(normal, H));
             specularValue = pow(specAngle, specCoeff);
         }
 
-        
-        vec3 specular = vec3(1,1,1)*specInt*specularValue;
+        vec3 specular = vec3(1, 1, 1) * specInt * specularValue;
 
         clr = clr * (ambientInt + (diffuseInt * dotDiff));
         clr = clr + specular;
     }
 
-  return clr;
+    return clr;
 }
 
-// From INF251 project, converts a ray position into OpenGL z-value 
+// From INF251 project, converts a ray position into OpenGL z-value
 float calcDepth(vec3 pos)
 {
-	float far = gl_DepthRange.far; 
-	float near = gl_DepthRange.near;
-	vec4 clip_space_pos = viewMatrix * vec4(pos, 1.0);
-	float ndc_depth = clip_space_pos.z / clip_space_pos.w;
-	return (((far - near) * ndc_depth) + near + far) / 2.0;
+    float far = gl_DepthRange.far;
+    float near = gl_DepthRange.near;
+    vec4 clip_space_pos = viewMatrix * vec4(pos, 1.0);
+    float ndc_depth = clip_space_pos.z / clip_space_pos.w;
+    return (((far - near) * ndc_depth) + near + far) / 2.0;
 }
-
 
 void main(void)
 {
-    // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
-    if(defaultSliceNr) {
-        stepLength = 1.0f/float(textureSize(volumeTexture, 0).x);
-    } else {
-        stepLength = 1.0f/float(sliceNr);
-    }
+    // Ray-direction calculated by method from
+    // https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
+
+    int dSliceNr = int(textureSize(volumeTexture, 0).x);
+
+    stepLength =
+            defaultSliceNr ? 1.0f / float(dSliceNr) : 1.0f / float(sliceNr);
 
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
@@ -123,7 +125,7 @@ void main(void)
     vec3 bottom = vec3(modelMatrix * vec4(-1, -1, -1, 0));
     AABB boundingBox = AABB(top, bottom);
     rayBoxIntersection(castingRay, boundingBox, tmin, tmax);
-    
+
     vec3 rayStart = (rayOrigin + rayDirection * tmin - bottom) / (top - bottom);
     vec3 rayEnd = (rayOrigin + rayDirection * tmax - bottom) / (top - bottom);
 
@@ -142,23 +144,31 @@ void main(void)
     {
         float intensity = texture(volumeTexture, position).r;
 
-        if(maxInt) {
+        if (maxInt)
+        {
             maxIntensity = max(intensity, maxIntensity);
-        } else {
+        }
+        else
+        {
             vec3 gradient = calculateGradient(position);
             vec4 src = texture(transferFunction, intensity);
             vec3 viewDir = rayOrigin - position;
-            vec3 lightDir = (headLight) ? rayOrigin : (lightPosition - position);
-            
-            if(src.a > 0.0){          
-                
-                src.rgb = ShadeBlinnPhong(position, -lightDir, viewDir, src.rgb);
+            vec3 lightDir =
+                (headLight) ? rayOrigin : (lightPosition - position);
 
-                src.a = 1.0 - exp(-src.a * rayLength);
+            if (src.a > 0.0)
+            {
+
+                src.rgb =
+                    ShadeBlinnPhong(position, -lightDir, viewDir, src.rgb);
+
+                src.a =
+                        1.0 - exp(-src.a * rayLength * dSliceNr / sliceNr);
                 src.rgb = src.rgb * src.a;
                 color = color + (1.0 - color.a) * src;
-                
-                if(color.a > 0.99) {
+
+                if (color.a > 0.99)
+                {
                     gl_FragDepth = calcDepth(position);
                     break;
                 }
@@ -170,13 +180,13 @@ void main(void)
         gl_FragDepth = calcDepth(position);
     }
 
-    if(maxInt) {
+    if (maxInt)
+    {
         color = texture(transferFunction, maxIntensity);
     }
 
     fragmentColor = color;
 }
-
 
 vec3 calculateGradient(vec3 volumePosition)
 {
@@ -193,15 +203,14 @@ vec3 calculateGradient(vec3 volumePosition)
     float dy = 1.0f / height;
     float dz = 1.0f / depth;
 
-
     gradient.x = 1.0f / (2 * dx) *
-                (texture(volumeTexture, vec3(x + dx, y, z)).r -
-                texture(volumeTexture, vec3(x - dx, y, z)).r);
+                 (texture(volumeTexture, vec3(x + dx, y, z)).r -
+                  texture(volumeTexture, vec3(x - dx, y, z)).r);
     gradient.y = 1.0f / (2 * dy) *
-                (texture(volumeTexture, vec3(x, y + dy, z)).r -
-                texture(volumeTexture, vec3(x, y - dy, z)).r);
+                 (texture(volumeTexture, vec3(x, y + dy, z)).r -
+                  texture(volumeTexture, vec3(x, y - dy, z)).r);
     gradient.z = 1.0f / (2 * dz) *
-                (texture(volumeTexture, vec3(x, y, z + dz)).r -
-                texture(volumeTexture, vec3(x, y, z - dz)).r);
+                 (texture(volumeTexture, vec3(x, y, z + dz)).r -
+                  texture(volumeTexture, vec3(x, y, z - dz)).r);
     return gradient;
 }
