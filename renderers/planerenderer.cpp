@@ -5,7 +5,8 @@
 PlaneRenderer::PlaneRenderer(const std::unique_ptr<ITextureStore>& textureStore,
                              const CameraProperties& camera,
                              RenderSettings& renderSettings)
-    : m_textureStore{textureStore}, m_camera{camera}, m_renderSettings{renderSettings}
+    : m_textureStore{textureStore}, m_camera{camera}, m_renderSettings{
+                                                          renderSettings}
 {
 }
 
@@ -35,9 +36,11 @@ void PlaneRenderer::paint()
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);
 
-    std::visit([this](const auto& arg){
-        m_planeProgram.setUniformValue("hideSlice", arg);
-    }, m_renderSettings["hideSlice"]);
+    std::visit(
+        [this](const auto& arg) {
+            m_planeProgram.setUniformValue("hideSlice", arg);
+        },
+        m_renderSettings["hideSlice"]);
 
     Geometry::instance().bindObliqueSliceIntersectionCoords();
     location = m_planeProgram.attributeLocation("vertexPosition");

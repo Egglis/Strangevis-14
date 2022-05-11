@@ -44,7 +44,6 @@ void LightRenderer::paint()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthMask(GL_FALSE);
 
-
     Geometry::instance().bindLightSource();
     location = m_lightProgram.attributeLocation("position");
     m_lightProgram.enableAttributeArray(location);

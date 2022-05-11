@@ -67,7 +67,7 @@ void VolumeRenderer::setUniforms()
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
 
-    QVector4D lightPosition = m_lightRenderer.getLightTransform().inverted() * QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
+    const QVector4D lightPosition = m_lightRenderer.getLightTransform().inverted() * QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
     location = m_cubeProgram.uniformLocation("lightPosition");
     m_cubeProgram.setUniformValue(location, QVector3D(lightPosition.x(), lightPosition.y(), lightPosition.z()));
 

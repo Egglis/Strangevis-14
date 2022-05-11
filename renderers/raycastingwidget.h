@@ -75,7 +75,7 @@ class RayCastingWidget : public QOpenGLWidget
     
 
     qreal m_nearPlane = 0.5;
-    qreal m_farPlane = 70.0;
+    qreal m_farPlane = 32.0;
     qreal m_fov = 60.0;
     const GLfloat m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0);
 };
