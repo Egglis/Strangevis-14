@@ -3,8 +3,10 @@
 #include "../geometry.h"
 
 PlaneRenderer::PlaneRenderer(const std::unique_ptr<ITextureStore>& textureStore,
-                             const CameraProperties& camera)
-    : m_textureStore{textureStore}, m_camera{camera}
+                             const CameraProperties& camera,
+                             RenderSettings& renderSettings)
+    : m_textureStore{textureStore}, m_camera{camera}, m_renderSettings{
+                                                          renderSettings}
 {
 }
 
@@ -32,10 +34,12 @@ void PlaneRenderer::paint()
                                            planeModelMatrix();
     
     //qDebug() << modelViewProjectionMatrix;
-
+    
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
-
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);
+
+    m_planeProgram.setUniformValue("hideSlice", std::get<bool>(m_renderSettings["hideSlice"]));
+
     Geometry::instance().bindObliqueSliceIntersectionCoords();
     location = m_planeProgram.attributeLocation("vertexPosition");
     m_planeProgram.enableAttributeArray(location);

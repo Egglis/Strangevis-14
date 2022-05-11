@@ -17,9 +17,9 @@ RenderSettingsWidget::RenderSettingsWidget(
 void RenderSettingsWidget::setupSettings()
 {
     m_floatSliders.insert("ambientInt",
-                          new FloatSlider("Ambient Intensity", 0.1f));
+                          new FloatSlider("Ambient Intensity:", 0.1f));
     m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Diffuse Intensity", 1.5f));
+                          new FloatSlider("Diffuse Intensity:", 1.5f));
     m_floatSliders.insert("specInt",
                           new FloatSlider("Specular Intensity:", 1.0f));
 
@@ -35,10 +35,29 @@ void RenderSettingsWidget::setupSettings()
     m_boolCheckboxes.insert("sliceModel", new BoolCheckbox("Show slicing on model:", true));
     m_boolCheckboxes.insert("sliceSide", new BoolCheckbox("Swap slicing side", false));
 
+    m_boolCheckboxes.insert("headLight", new BoolCheckbox("Use Head Light:", false));
+    m_boolCheckboxes.insert("hideSlice", new BoolCheckbox("Hide Slice:", false));
+    m_boolCheckboxes.insert("defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
+
+    IntSlider* sliceNr = new IntSlider("Number of slices:", 257);
+    sliceNr->setSliderBounds(1, 1000);
+    sliceNr->setValue(257);
+    sliceNr->hide();
+    m_intSliders.insert("sliceNr", sliceNr);
+
+    connect(m_boolCheckboxes["defaultSliceNr"], &BoolCheckbox::valueChanged, [this] (bool vis) {
+        m_intSliders["sliceNr"]->setVisible(!vis);
+    });
+
+    connect(m_boolCheckboxes["specOff"], &BoolCheckbox::valueChanged, [this](bool vis) {
+        m_floatSliders["specInt"]->setVisible(vis);
+        m_floatSliders["specCoeff"]->setVisible(vis);
+    });
+
     connect(m_boolCheckboxes["sliceModel"], &BoolCheckbox::valueChanged, [this](const bool vis) {
         m_boolCheckboxes["sliceSide"]->setVisible(vis);
     });
-}
+};
 
 void RenderSettingsWidget::setupWidgets()
 {
