@@ -31,6 +31,10 @@ void RenderSettingsWidget::setupSettings()
 
     m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights:", true));
     m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection:", false));
+
+    m_boolCheckboxes.insert("sliceModel", new BoolCheckbox("Show slicing on model:", true));
+    m_boolCheckboxes.insert("sliceSide", new BoolCheckbox("Swap slicing side", false));
+
     m_boolCheckboxes.insert("headLight", new BoolCheckbox("Use Head Light:", false));
     m_boolCheckboxes.insert("hideSlice", new BoolCheckbox("Hide Slice:", false));
     m_boolCheckboxes.insert("defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
@@ -48,6 +52,10 @@ void RenderSettingsWidget::setupSettings()
     connect(m_boolCheckboxes["specOff"], &BoolCheckbox::valueChanged, [this](bool vis) {
         m_floatSliders["specInt"]->setVisible(vis);
         m_floatSliders["specCoeff"]->setVisible(vis);
+    });
+
+    connect(m_boolCheckboxes["sliceModel"], &BoolCheckbox::valueChanged, [this](const bool vis) {
+        m_boolCheckboxes["sliceSide"]->setVisible(vis);
     });
 };
 

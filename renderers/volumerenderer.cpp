@@ -6,10 +6,10 @@ VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
     RenderSettings& settings, const CameraProperties& camera,
     QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort,
-    LightRenderer& lightRenderer)
+    LightRenderer& lightRenderer, const Plane& plane)
     : m_textureStore{textureStore}, m_renderSettings{settings},
       m_lightRenderer{lightRenderer}, m_camera{camera},
-      m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
+      m_openGLExtra{openGLExtra}, m_viewPort{viewPort}, m_plane{plane}
 {
 }
 
@@ -66,6 +66,11 @@ void VolumeRenderer::setUniforms()
     m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
+
+    location = m_cubeProgram.uniformLocation("planeNormal");
+    m_cubeProgram.setUniformValue(location, m_plane.normal());
+    location = m_cubeProgram.uniformLocation("planePoint");
+    m_cubeProgram.setUniformValue(location, m_plane.point());
 
     const QVector4D lightPosition = m_lightRenderer.getLightTransform().inverted() * QVector4D(0.0f, 0.0f, 0.0f, 1.0f);
     location = m_cubeProgram.uniformLocation("lightPosition");

@@ -7,15 +7,18 @@ layout(location = 1) uniform sampler1D transferFunction;
 
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform mat4 modelViewProjectionMatrix;
 uniform vec2 viewportSize;
 uniform float aspectRatio;
 uniform float focalLength;
 uniform vec3 rayOrigin;
 
-uniform int gradientMethod;
 uniform int width;
 uniform int height;
 uniform int depth;
+
+uniform vec3 planeNormal;
+uniform vec3 planePoint;
 
 uniform vec3 lightPosition;
 
@@ -26,6 +29,8 @@ uniform float specInt;
 uniform float specCoeff;
 uniform bool specOff;
 uniform bool maxInt;
+uniform bool sliceModel;
+uniform bool sliceSide;
 uniform bool headLight;
 uniform bool defaultSliceNr;
 uniform int sliceNr;
@@ -155,6 +160,19 @@ void main(void)
             vec3 viewDir = rayOrigin - position;
             vec3 lightDir =
                 (headLight) ? rayOrigin : (lightPosition - position);
+
+            if(sliceModel) {
+                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
+                if(sliceSide) {
+                    if(num >= 0.0){
+                        src = vec4(0,0,0,0);
+                    }
+                } else {
+                    if(num <= 0.0){
+                        src = vec4(0,0,0,0);
+                    }
+                }
+            }
 
             if (src.a > 0.0)
             {

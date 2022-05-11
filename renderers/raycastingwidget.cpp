@@ -17,9 +17,14 @@ RayCastingWidget::RayCastingWidget(
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
       m_imGuiReference{nullptr}, m_viewPort{width(), height()},
+      m_volumeRenderer{textureStore,
+                       m_renderSettings,
+                       m_camera,
+                       m_openGLExtra,
+                       m_viewPort,
+                       m_lightRenderer,
+                       m_cubePlaneIntersection.plane()},
       m_lightRenderer{m_camera, m_renderSettings},
-      m_volumeRenderer{textureStore,  m_renderSettings, m_camera,
-                       m_openGLExtra, m_viewPort,       m_lightRenderer},
       m_planeRenderer{textureStore, m_camera, m_renderSettings},
       m_slicingPlaneControls{properties, m_camera}
 {
