@@ -15,6 +15,7 @@
 #include <QOpenGLWidget>
 #include <QtImGui.h>
 
+class LightRenderer;
 
 struct RenderProperties
 {
@@ -42,6 +43,8 @@ class RayCastingWidget : public QOpenGLWidget
     virtual void paintGL();
   protected slots:
     void rotateCamera(qreal angle, QVector3D axis);
+    void moveLightSource(QVector3D vb);
+    void updateLightTransformMatrix();
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
     void changeTransferFunction(QString transferFunctionName);
@@ -55,17 +58,21 @@ class RayCastingWidget : public QOpenGLWidget
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    QMatrix4x4 m_lightTranslation;
+    ViewPort m_viewPort;
+
     RenderSettings m_renderSettings;
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
     CameraProperties m_camera;
-    ViewPort m_viewPort;
 
     QtImGui::RenderRef m_imGuiReference;
     VolumeRenderer m_volumeRenderer;
     PlaneRenderer m_planeRenderer;
+    LightRenderer m_lightRenderer;
     SlicingPlaneControls m_slicingPlaneControls;
+    
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;

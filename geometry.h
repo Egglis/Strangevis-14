@@ -24,11 +24,15 @@ class Geometry
     void bindObliqueSliceIntersectionCoords();
     void drawObliqueSlice();
 
+    void bindLightSource();
+    void drawLightSource();
+
     void allocateObliqueSlice(CubePlaneIntersection& intersection);
 
   private:
     void allocateQuad();
     void allocateCube();
+    void allocateLightSource();
 
     GLsizei m_sliceIndices;
     QOpenGLBuffer m_sliceCubeIntersectionCoordBuffer;
@@ -39,5 +43,8 @@ class Geometry
 
     QOpenGLBuffer m_cubeVertexBuffer;
     QOpenGLBuffer m_cubeIndexBuffer;
+
+    QOpenGLBuffer m_lightVertexBuffer;
+    QOpenGLBuffer m_lightIndexBuffer;
 };
 #endif // GEOMETRY_H

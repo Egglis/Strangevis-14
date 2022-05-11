@@ -22,8 +22,10 @@ RayCastingWidget::RayCastingWidget(
                        m_camera,
                        m_openGLExtra,
                        m_viewPort,
+                       m_lightRenderer,
                        m_cubePlaneIntersection.plane()},
-      m_planeRenderer{textureStore, m_camera},
+      m_lightRenderer{m_camera, m_renderSettings},
+      m_planeRenderer{textureStore, m_camera, m_renderSettings},
       m_slicingPlaneControls{properties, m_camera}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
@@ -36,11 +38,30 @@ RayCastingWidget::RayCastingWidget(
 void RayCastingWidget::rotateCamera(qreal angle, QVector3D axis)
 {
     m_camera.rotateCamera(qRadiansToDegrees(angle), axis);
+    updateLightTransformMatrix();
     update();
 }
 void RayCastingWidget::zoomCamera(float zoomFactor)
 {
     m_camera.zoomCamera(zoomFactor);
+    updateLightTransformMatrix();
+    update();
+}
+
+void RayCastingWidget::moveLightSource(QVector3D vb)
+{
+    m_lightTranslation.setToIdentity();
+    m_lightTranslation.translate(-0.5f * vb * (2.0f * sqrt(3.0f)));
+    updateLightTransformMatrix();
+}
+
+void RayCastingWidget::updateLightTransformMatrix()
+{
+    const QMatrix4x4 lightTransformMatrix = m_camera.viewMatrix().inverted() *
+                                            m_lightTranslation *
+                                            m_camera.viewMatrix();
+
+    m_lightRenderer.setLightTransform(lightTransformMatrix);
     update();
 }
 
@@ -53,6 +74,7 @@ void RayCastingWidget::initializeGL()
     Geometry::instance();
     m_volumeRenderer.compileShader();
     m_planeRenderer.compileShader();
+    m_lightRenderer.compileShader();
 }
 
 void RayCastingWidget::resizeGL(int w, int h)
@@ -73,6 +95,7 @@ void RayCastingWidget::paintGL()
     renderImGuizmo();
     m_volumeRenderer.paint();
     m_planeRenderer.paint();
+    m_lightRenderer.paint();
 }
 
 void RayCastingWidget::updateClippingPlane(Plane clippingPlane)

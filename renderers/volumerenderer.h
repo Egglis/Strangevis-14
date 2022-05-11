@@ -4,6 +4,7 @@
 #include "../properties/cameraproperties.h"
 #include "../properties/rendersettingsproperties.h"
 #include "../properties/viewport.h"
+#include "lightrenderer.h"
 #include "../texturestore.h"
 #include "../geometry/plane.h"
 
@@ -18,7 +19,8 @@ class VolumeRenderer
                    const CameraProperties& camera,
                    QOpenGLExtraFunctions& openGLextra,
                    const ViewPort& viewPort,
-                   const Plane& plane
+                   const Plane& plane,
+                   LightRenderer& lightRenderer
                    );
     void paint();
     void compileShader();
@@ -34,7 +36,7 @@ class VolumeRenderer
     const std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLExtraFunctions& m_openGLExtra;
     RenderSettings& m_renderSettings;
-
+    LightRenderer& m_lightRenderer;
     const Plane& m_plane;
 };
 #endif // VOLUMERENDERER_H
