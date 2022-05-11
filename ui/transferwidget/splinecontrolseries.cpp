@@ -101,8 +101,6 @@ bool SplineControlSeries::controlNodeMoved(QPointF point)
 {
     if (m_currentClickedNode != Nodes::INVALID_NODE && isVisible())
     {
-        qDebug() << point;
-        qDebug() << "NODE" << static_cast<int>(m_currentClickedNode);
         if (m_isLinked)
         {
             m_tfn->setControlNodePos(m_index,
