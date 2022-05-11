@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(strangevis VERSION 1.0.0 LANGUAGES CXX)
 enable_testing()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set path to our custom CMAKE scripts
@@ -78,6 +78,7 @@ qt_add_executable(strangevis WIN32
     ui/transferwidget/transferfunctionwidget.cpp
     ui/transferwidget/hintitem.cpp
     ui/transferwidget/splinecontrolseries.cpp
+    ui/lightcontrolsettingswidget.cpp
     geometry/cubeplaneintersection.cpp
     geometry/cube.cpp
     geometry/edge.cpp

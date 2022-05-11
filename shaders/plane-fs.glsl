@@ -2,10 +2,10 @@
 
 out vec4 fragmentColor;
 
-uniform bool hideSlice;
+uniform bool showSlice;
 
 
 void main(void)
 {
-    fragmentColor = (hideSlice) ? vec4(0) : vec4(0.3,0.3,0.3,0.3);
+    fragmentColor = showSlice ? vec4(0.3) : vec4(0);
 }

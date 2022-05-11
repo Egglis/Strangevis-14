@@ -15,9 +15,8 @@
 namespace Settings
 {
 static QList<QString>
-    SETTINGS_ORDER({"maxInt", "headLight", "hideSlice", "sliceModel",
-                    "sliceSide", "ambientInt", "diffuseInt", "specOff",
-                    "specInt", "specCoeff", "defaultSliceNr", "sliceNr"});
+    RENDER_SETTINGS_ORDER({"maxInt", "showSlice", "sliceModel",
+                    "sliceSide", "defaultSliceNr", "sliceNr"});
 }; // namespace Settings
 
 class SliderWidget : public QWidget

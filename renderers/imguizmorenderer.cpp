@@ -8,7 +8,7 @@
 #include <ImGuizmo.h>
 // clang-format on
 ImguizmoWidget::ImguizmoWidget(std::shared_ptr<ISharedProperties> properties,
-                               CameraProperties& camera, QWidget* renderWidget, QWidget* parent,
+                               CameraProperties& camera, QWidget* renderSettingsWidget, QWidget* lightSettingsWidget, QWidget* parent,
                                Qt::WindowFlags f)
     : QOpenGLWidget{parent, f}, m_camera{camera}, m_imGuiReference{nullptr},
       m_slicingPlaneControls{properties, m_camera}
@@ -20,13 +20,19 @@ ImguizmoWidget::ImguizmoWidget(std::shared_ptr<ISharedProperties> properties,
     connect(m_refreshTimer, &QTimer::timeout, [this](){update();});
     m_refreshTimer->start();
 
-    auto* vLayout = new QVBoxLayout(this);
-    auto* hLayout = new QHBoxLayout();
-    hLayout->addWidget(renderWidget, 1);
+    auto* hLayout = new QHBoxLayout(this);
+    auto* leftColumn = new QVBoxLayout();
+    leftColumn->addSpacing(256);
+    leftColumn->addStretch(3);
+    leftColumn->addWidget(renderSettingsWidget,1);
+    hLayout->addLayout(leftColumn);
     hLayout->addStretch(3);
-    vLayout->addSpacing(256);
-    vLayout->addStretch(3);
-    vLayout->addLayout(hLayout,1);
+
+    auto* rightColumn = new QVBoxLayout();
+    rightColumn->addWidget(lightSettingsWidget, 1);
+    rightColumn->addStretch(3);
+    rightColumn->addSpacing(2*256);
+    hLayout->addLayout(rightColumn);
 }
 
 void ImguizmoWidget::initializeGL()

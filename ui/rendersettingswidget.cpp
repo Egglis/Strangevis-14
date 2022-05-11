@@ -9,7 +9,7 @@ RenderSettingsWidget::RenderSettingsWidget(
     setupSettings();
     setupWidgets();
     m_layout->setSpacing(0);
-    m_layout->setContentsMargins(QMargins{0,0,0,0});
+    m_layout->setContentsMargins(QMargins{0, 0, 0, 0});
     updateRenderSettings();
 
     this->setLayout(m_layout);
@@ -17,73 +17,63 @@ RenderSettingsWidget::RenderSettingsWidget(
 
 void RenderSettingsWidget::setupSettings()
 {
-    m_floatSliders.insert("ambientInt",
-                          new FloatSlider("Ambient Intensity:", 0.1f));
-    m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Diffuse Intensity:", 1.5f));
-    m_floatSliders.insert("specInt",
-                          new FloatSlider("Specular Intensity:", 1.0f));
+    m_boolCheckboxes.insert(
+        "maxInt", new BoolCheckbox("Maximum intensity projection:", false));
 
+    m_boolCheckboxes.insert("sliceModel",
+                            new BoolCheckbox("Show slicing on model:", false));
+    m_boolCheckboxes.insert("sliceSide",
+                            new BoolCheckbox("Swap slicing side", false));
 
-    FloatSlider* specCoeff = new FloatSlider("Specular Coefficient:", 60.0f);
-    specCoeff->setBounds(0.0f, 100.0f);
-    specCoeff->setValue(60.0f);
-    m_floatSliders.insert("specCoeff", specCoeff);
-
-    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights:", true));
-    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection:", false));
-
-    m_boolCheckboxes.insert("sliceModel", new BoolCheckbox("Show slicing on model:", true));
-    m_boolCheckboxes.insert("sliceSide", new BoolCheckbox("Swap slicing side", false));
-
-    m_boolCheckboxes.insert("headLight", new BoolCheckbox("Use Head Light:", false));
-    m_boolCheckboxes.insert("hideSlice", new BoolCheckbox("Hide Slice:", false));
-    m_boolCheckboxes.insert("defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
+    m_boolCheckboxes.insert("showSlice",
+                            new BoolCheckbox("Show Slice:", true));
+    m_boolCheckboxes.insert(
+        "defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
 
     IntSlider* sliceNr = new IntSlider("Number of slices:", 257);
     sliceNr->setSliderBounds(1, 1000);
     sliceNr->setValue(257);
-    sliceNr->hide();
+    sliceNr->setEnabled(!m_boolCheckboxes["defaultSliceNr"]->getValue());
     m_intSliders.insert("sliceNr", sliceNr);
 
-    connect(m_boolCheckboxes["defaultSliceNr"], &BoolCheckbox::valueChanged, [this] (bool vis) {
-        m_intSliders["sliceNr"]->setVisible(!vis);
-    });
+    connect(m_boolCheckboxes["defaultSliceNr"], &BoolCheckbox::valueChanged,
+            [this](bool vis) { m_intSliders["sliceNr"]->setEnabled(!vis); });
 
-    connect(m_boolCheckboxes["specOff"], &BoolCheckbox::valueChanged, [this](bool vis) {
-        m_floatSliders["specInt"]->setVisible(vis);
-        m_floatSliders["specCoeff"]->setVisible(vis);
-    });
-
-    connect(m_boolCheckboxes["sliceModel"], &BoolCheckbox::valueChanged, [this](const bool vis) {
-        m_boolCheckboxes["sliceSide"]->setVisible(vis);
-    });
+    connect(m_boolCheckboxes["sliceModel"], &BoolCheckbox::valueChanged,
+            [this](const bool vis) {
+                m_boolCheckboxes["sliceSide"]->setEnabled(vis);
+            });
 };
 
 void RenderSettingsWidget::setupWidgets()
 {
-
-    QList<QWidget*> order =
-        QList<QWidget*>(Settings::SETTINGS_ORDER.length(), new QWidget());
+    QList<QWidget*> order = QList<QWidget*>(
+        Settings::RENDER_SETTINGS_ORDER.length(), new QWidget());
     for (auto [key, w] : m_boolCheckboxes.toStdMap())
     {
-        connect(w, &BoolCheckbox::valueChanged, this,
-                &RenderSettingsWidget::updateRenderSettings);
-        order.replace(Settings::SETTINGS_ORDER.indexOf(key),
+        connect(w, &BoolCheckbox::valueChanged, [this, key, w]() {
+            m_properties->renderSettings().updateSingleRenderSetting(
+                key, w->getValue());
+        });
+        order.replace(Settings::RENDER_SETTINGS_ORDER.indexOf(key),
                       static_cast<QWidget*>(w));
     }
     for (auto [key, w] : m_floatSliders.toStdMap())
     {
-        connect(w, &SliderWidget::valueChanged, this,
-                &RenderSettingsWidget::updateRenderSettings);
-        order.replace(Settings::SETTINGS_ORDER.indexOf(key),
+        connect(w, &SliderWidget::valueChanged, [this, key, w] (){
+            m_properties->renderSettings().updateSingleRenderSetting(
+                key, w->getValue());
+        });
+        order.replace(Settings::RENDER_SETTINGS_ORDER.indexOf(key),
                       static_cast<QWidget*>(w));
     }
     for (auto [key, w] : m_intSliders.toStdMap())
     {
-        connect(w, &SliderWidget::valueChanged, this,
-                &RenderSettingsWidget::updateRenderSettings);
-        order.replace(Settings::SETTINGS_ORDER.indexOf(key),
+        connect(w, &SliderWidget::valueChanged, [this, key, w] (){
+            m_properties->renderSettings().updateSingleRenderSetting(
+                key, w->getValue());
+        });
+        order.replace(Settings::RENDER_SETTINGS_ORDER.indexOf(key),
                       static_cast<QWidget*>(w));
     }
 
@@ -97,17 +87,16 @@ void RenderSettingsWidget::updateRenderSettings()
 {
     for (auto s : m_floatSliders.keys())
     {
-        m_renderSettings[s] = m_floatSliders[s]->getValue();
+        m_properties->renderSettings().updateSingleRenderSetting(s, m_floatSliders[s]->getValue());
     }
     for (auto s : m_boolCheckboxes.keys())
     {
-        m_renderSettings[s] = m_boolCheckboxes[s]->getValue();
+        m_properties->renderSettings().updateSingleRenderSetting(s, m_boolCheckboxes[s]->getValue());
     }
     for (auto s : m_intSliders.keys())
     {
-        m_renderSettings[s] = m_intSliders[s]->getValue();
+        m_properties->renderSettings().updateSingleRenderSetting(s, m_intSliders[s]->getValue());
     }
-    m_properties->renderSettings().updateRenderSettings(m_renderSettings);
 }
 
 BoolCheckbox::BoolCheckbox(QString name, bool value, QWidget* parent)

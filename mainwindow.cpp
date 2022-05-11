@@ -7,6 +7,7 @@
 #include "ui/obliquesliceinteractor.h"
 #include "ui/rectangulargridlayout.h"
 #include "ui/rendersettingswidget.h"
+#include "ui/lightcontrolsettingswidget.h"
 #include "ui/renderwidget.h"
 #include "ui/transferwidget/transferfunctionwidget.h"
 
@@ -52,7 +53,7 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     createRenderSettingsWidget();
 
     auto* p_3dRenderWidget =
-        new StackedRayCastingWidget(m_textureStore, m_properties, m_renderSettingsWidget, this);
+        new StackedRayCastingWidget(m_textureStore, m_properties, m_renderSettingsWidget, m_lightSettingsWidget, this);
     auto* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
     auto* p_2dRenderWidget =
@@ -104,6 +105,7 @@ void MainWindow::createHistogramWidget()
 void MainWindow::createRenderSettingsWidget()
 {
     m_renderSettingsWidget = new RenderSettingsWidget(m_properties);
+    m_lightSettingsWidget = new LightControlSettingsWidget(m_properties);
 }
 
 void MainWindow::openHistogram() { m_histogramWidget->show(); }

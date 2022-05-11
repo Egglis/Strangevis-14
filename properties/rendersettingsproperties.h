@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QString>
 
-
-using RenderSettings = std::map<QString, std::variant<float, int, bool>>;
+using RenderTypes = std::variant<float, int, bool>;
+using RenderSettings = std::map<QString, RenderTypes>;
 
 class RenderSettingsProperties : public QObject
 {
@@ -15,6 +15,7 @@ class RenderSettingsProperties : public QObject
     const RenderSettings& renderSettings() const { return m_renderSettings; };
   public slots:
     void updateRenderSettings(RenderSettings renderSettings);
+    void updateSingleRenderSetting(QString, RenderTypes);
 
   signals:
     void renderSettingsChanged(RenderSettings renderSettings);
