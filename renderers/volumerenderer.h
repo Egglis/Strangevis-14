@@ -19,8 +19,8 @@ class VolumeRenderer
                    const CameraProperties& camera,
                    QOpenGLExtraFunctions& openGLextra,
                    const ViewPort& viewPort,
-                   const Plane& plane,
-                   LightRenderer& lightRenderer
+                   LightRenderer& lightRenderer,
+                   const Plane& plane
                    );
     void paint();
     void compileShader();
