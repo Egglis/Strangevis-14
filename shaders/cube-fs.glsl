@@ -148,8 +148,19 @@ void main(void)
     while (rayLength > 0)
     {
         float intensity = texture(volumeTexture, position).r;
+        bool skip = false;
 
-        if (maxInt)
+        if(sliceModel) {
+                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
+                if(sliceSide) {
+                    skip = (num >= 0.0); 
+                } else {
+                    skip = (num <= 0.0);
+                }
+        }
+
+
+        if (maxInt && !skip)
         {
             maxIntensity = max(intensity, maxIntensity);
         }
@@ -161,18 +172,7 @@ void main(void)
             vec3 lightDir =
                 (headLight) ? rayOrigin : (lightPosition - position);
 
-            if(sliceModel) {
-                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
-                if(sliceSide) {
-                    if(num >= 0.0){
-                        src = vec4(0,0,0,0);
-                    }
-                } else {
-                    if(num <= 0.0){
-                        src = vec4(0,0,0,0);
-                    }
-                }
-            }
+            if(skip) src = vec4(0);
 
             if (src.a > 0.0)
             {

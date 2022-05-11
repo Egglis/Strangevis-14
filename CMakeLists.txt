@@ -62,6 +62,7 @@ qt_add_executable(strangevis WIN32
     renderers/volumerenderer.cpp
     renderers/slicingplanecontrols.cpp
     renderers/lightrenderer.cpp
+    renderers/imguizmorenderer.cpp
     properties/cameraproperties.cpp
     properties/sharedproperties.cpp
     properties/clippingplaneproperties.cpp

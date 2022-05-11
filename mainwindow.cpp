@@ -54,13 +54,13 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
     connect(renderSettings, &QAction::triggered, this,
             &MainWindow::openRenderSettings);
 
-    RayCastingInteractor* p_3dRenderWidget =
-        new RayCastingInteractor(m_textureStore, m_properties, this);
-    ExtendedParameterWidget* p_3dToolBarWidget =
+    auto* p_3dRenderWidget =
+        new StackedRayCastingWidget(m_textureStore, m_properties, this);
+    auto* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
-    ObliqueSliceInteractor* p_2dRenderWidget =
+    auto* p_2dRenderWidget =
         new ObliqueSliceInteractor(m_textureStore, m_properties, this);
-    ObliqueSliceRotationWidget* p_2dToolBarWidget =
+    auto* p_2dToolBarWidget =
         new ObliqueSliceRotationWidget(this);
 
     connect(p_2dToolBarWidget, &ObliqueSliceRotationWidget::flipHorizontal,
