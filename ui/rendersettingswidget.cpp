@@ -17,22 +17,23 @@ RenderSettingsWidget::RenderSettingsWidget(
 void RenderSettingsWidget::setupSettings()
 {
     m_floatSliders.insert("ambientInt",
-                          new FloatSlider("Ambient Intensity", 0.1f));
+                          new FloatSlider("Ambient Intensity:", 0.1f));
     m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Diffuse Intensity", 1.5f));
+                          new FloatSlider("Diffuse Intensity:", 1.5f));
     m_floatSliders.insert("specInt",
-                          new FloatSlider("Specular Intensity", 1.0f));
+                          new FloatSlider("Specular Intensity:", 1.0f));
     m_floatSliders.insert("specCoeff",
-                          new FloatSlider("Specular Coefficient", 60.0f));
+                          new FloatSlider("Specular Coefficient:", 60.0f));
 
     m_floatSliders["specCoeff"]->setBounds(0.0f, 100.0f);
     m_floatSliders["specCoeff"]->setValue(60.0f);
 
-    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", true));
-    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection", false));
+    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights:", true));
+    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection:", false));
     m_boolCheckboxes.insert("headLight", new BoolCheckbox("Use Head Light:", false));
+    m_boolCheckboxes.insert("hideSlice", new BoolCheckbox("Hide Slice:", false));
 
-    m_intSliders.insert("stepSize", new IntSlider("Nr Slices", 257));
+    m_intSliders.insert("stepSize", new IntSlider("Nr Slices:", 257));
     m_intSliders["stepSize"]->setSliderBounds(0, 1000);
     m_intSliders["stepSize"]->setValue(257);
 };

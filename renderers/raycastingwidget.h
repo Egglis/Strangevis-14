@@ -44,6 +44,7 @@ class RayCastingWidget : public QOpenGLWidget
   protected slots:
     void rotateCamera(qreal angle, QVector3D axis);
     void moveLightSource(QVector3D vb);
+    void updateLightTransformMatrix();
     void zoomCamera(float zoomFactor);
     void updateClippingPlane(Plane clippingPlane);
     void changeTransferFunction(QString transferFunctionName);
@@ -57,6 +58,7 @@ class RayCastingWidget : public QOpenGLWidget
     QOpenGLShaderProgram m_cubeProgram;
     QMatrix4x4 m_projectionMatrix;
     QMatrix4x4 m_viewMatrix;
+    QMatrix4x4 m_lightTranslation;
     ViewPort m_viewPort;
 
     RenderSettings m_renderSettings;
