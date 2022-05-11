@@ -13,7 +13,7 @@ class ImguizmoWidget : public QOpenGLWidget
 {
     Q_OBJECT
   public:
-    ImguizmoWidget(std::shared_ptr<ISharedProperties>, CameraProperties& camera,
+    ImguizmoWidget(std::shared_ptr<ISharedProperties>, CameraProperties& camera, QWidget* renderSettings,
                    QWidget* parent = nullptr,
                    Qt::WindowFlags f = Qt::WindowFlags());
 

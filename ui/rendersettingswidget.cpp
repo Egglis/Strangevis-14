@@ -6,9 +6,10 @@ RenderSettingsWidget::RenderSettingsWidget(
 {
     m_renderSettings = {};
     m_layout = new QVBoxLayout();
-
     setupSettings();
     setupWidgets();
+    m_layout->setSpacing(0);
+    m_layout->setContentsMargins(QMargins{0,0,0,0});
     updateRenderSettings();
 
     this->setLayout(m_layout);

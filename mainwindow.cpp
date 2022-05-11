@@ -42,20 +42,17 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
 
     createHistogramWidget();
 
-    QAction* renderSettings = new QAction("Render Settings", this);
-
     QAction* openHistogramAction = new QAction("Open Histogram", this);
     connect(openHistogramAction, &QAction::triggered, this,
             &MainWindow::openHistogram);
     fileMenu->addAction(openHistogramAction);
 
     menuBar()->addMenu(fileMenu);
-    menuBar()->addAction(renderSettings);
-    connect(renderSettings, &QAction::triggered, this,
-            &MainWindow::openRenderSettings);
+
+    createRenderSettingsWidget();
 
     auto* p_3dRenderWidget =
-        new StackedRayCastingWidget(m_textureStore, m_properties, this);
+        new StackedRayCastingWidget(m_textureStore, m_properties, m_renderSettingsWidget, this);
     auto* p_3dToolBarWidget =
         new ExtendedParameterWidget(m_properties, m_colorMapStore, this);
     auto* p_2dRenderWidget =
@@ -80,7 +77,6 @@ MainWindow::MainWindow(std::shared_ptr<ISharedProperties> properties,
             m_mainWidget,
             &MainWindowWidget::toggleFileLoadingInProgressOverlay);
 
-    createRenderSettingsWidget();
 
     setCentralWidget(m_mainWidget);
 
@@ -108,9 +104,6 @@ void MainWindow::createHistogramWidget()
 void MainWindow::createRenderSettingsWidget()
 {
     m_renderSettingsWidget = new RenderSettingsWidget(m_properties);
-    m_renderSettingsWidget->setAttribute(Qt::WA_QuitOnClose, false);
 }
 
 void MainWindow::openHistogram() { m_histogramWidget->show(); }
-
-void MainWindow::openRenderSettings() { m_renderSettingsWidget->show(); }
