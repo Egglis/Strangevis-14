@@ -64,7 +64,7 @@ class RayCastingWidget : public QOpenGLWidget
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
-    CameraProperties m_camera;
+    CameraProperties& m_camera;
 
     VolumeRenderer m_volumeRenderer;
     PlaneRenderer m_planeRenderer;

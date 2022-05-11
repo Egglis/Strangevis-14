@@ -23,7 +23,7 @@ RayCastingWidget::RayCastingWidget(
                        m_lightRenderer,
                        m_cubePlaneIntersection.plane()},
       m_lightRenderer{m_camera, m_renderSettings},
-      m_planeRenderer{textureStore, m_camera, m_renderSettings},
+      m_planeRenderer{textureStore, m_camera, m_renderSettings}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);

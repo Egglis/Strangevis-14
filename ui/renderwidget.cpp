@@ -9,6 +9,44 @@
 #include <QWheelEvent>
 #include <QtMath>
 
+StackedRayCastingWidget::StackedRayCastingWidget(
+    std::unique_ptr<ITextureStore>& textureStore,
+    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    Qt::WindowFlags f)
+    : QWidget{parent}, m_camera{}
+{
+    m_rayCastingWidget =
+        new RayCastingInteractor{textureStore, properties, m_camera, this, f};
+    m_imguizmoWidget = new ImguizmoWidget{properties, m_camera, this, f};
+    m_imguizmoWidget->setAttribute(Qt::WA_TranslucentBackground);
+    m_imguizmoWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    m_layout = new QStackedLayout(this);
+    m_layout->setStackingMode(QStackedLayout::StackAll);
+    m_layout->addWidget(m_imguizmoWidget);
+    m_layout->addWidget(m_rayCastingWidget);
+    setMouseTracking(true);
+
+    connect(m_imguizmoWidget, &ImguizmoWidget::updateScene,
+            [this]() { m_rayCastingWidget->update(); });
+}
+void StackedRayCastingWidget::mousePressEvent(QMouseEvent* p_event)
+{
+    m_rayCastingWidget->mousePressEvent(p_event);
+    m_imguizmoWidget->update();
+}
+
+void StackedRayCastingWidget::mouseMoveEvent(QMouseEvent* p_event)
+{
+    m_rayCastingWidget->mouseMoveEvent(p_event);
+    m_imguizmoWidget->update();
+}
+
+void StackedRayCastingWidget::wheelEvent(QWheelEvent* p_event)
+{
+    m_rayCastingWidget->wheelEvent(p_event);
+    m_imguizmoWidget->update();
+}
+
 ExtendedParameterWidget::ExtendedParameterWidget(
     const std::shared_ptr<ISharedProperties>& properties,
     const std::shared_ptr<const tfn::IColorMapStore> colorMapStore,
@@ -28,15 +66,19 @@ void ExtendedParameterWidget::histogramChanged(
 
 RayCastingInteractor::RayCastingInteractor(
     std::unique_ptr<ITextureStore>& textureStore,
-    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
-    Qt::WindowFlags f)
+    std::shared_ptr<ISharedProperties> properties, CameraProperties& camera,
+    QWidget* parent, Qt::WindowFlags f)
     : RayCastingWidget{RenderProperties{
                            1.0,
                            QVector3D{0, 0, -2.0f * static_cast<float>(sqrt(3))},
                            properties->transferFunction().colorMap(),
                            properties->clippingPlane().plane(),
                            properties->renderSettings().renderSettings()},
-                       textureStore, properties, parent, f},
+                       textureStore,
+                       properties,
+                       camera,
+                       parent,
+                       f},
       m_properties{properties}
 {
 
@@ -56,22 +98,6 @@ RayCastingInteractor::RayCastingInteractor(
             &RenderSettingsProperties::renderSettingsChanged, this,
             &RayCastingInteractor::changeRenderSettings);
 
-    m_refreshTimer = nullptr;
-    setMouseTracking(true);
-    setUpdateAfterMouseEventStops(true);
-}
-
-void RayCastingInteractor::setUpdateAfterMouseEventStops(bool update)
-{
-    if (m_refreshTimer != nullptr)
-        delete m_refreshTimer;
-    m_refreshTimer = new QTimer{};
-    m_refreshTimer->setInterval(10);
-    m_refreshTimer->setSingleShot(true);
-    if (update)
-        m_refreshTimer->callOnTimeout([this]() { this->update(); });
-    else
-        m_refreshTimer->callOnTimeout([this]() {});
 }
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
@@ -103,12 +129,6 @@ void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
         }
         m_previousPosition = m_currentPosition;
     }
-    else
-    {
-        update();
-    }
-    if (m_refreshTimer != nullptr)
-        m_refreshTimer->start();
 }
 
 // Scrolling wheel event
