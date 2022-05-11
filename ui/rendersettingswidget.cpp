@@ -17,23 +17,38 @@ RenderSettingsWidget::RenderSettingsWidget(
 void RenderSettingsWidget::setupSettings()
 {
     m_floatSliders.insert("ambientInt",
-                          new FloatSlider("Ambient Intensity", 0.1f));
+                          new FloatSlider("Ambient Intensity:", 0.1f));
     m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Diffuse Intensity", 1.5f));
+                          new FloatSlider("Diffuse Intensity:", 1.5f));
     m_floatSliders.insert("specInt",
-                          new FloatSlider("Specular Intensity", 0.0f));
-    m_floatSliders.insert("specCoeff",
-                          new FloatSlider("Specular Coefficient", 80.0f));
+                          new FloatSlider("Specular Intensity:", 1.0f));
 
-    m_floatSliders["specCoeff"]->setBounds(0.0f, 100.0f);
-    m_floatSliders["specCoeff"]->setValue(80.0f);
 
-    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", false));
-    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection", false));
+    FloatSlider* specCoeff = new FloatSlider("Specular Coefficient:", 60.0f);
+    specCoeff->setBounds(0.0f, 100.0f);
+    specCoeff->setValue(60.0f);
+    m_floatSliders.insert("specCoeff", specCoeff);
 
-    m_intSliders.insert("stepSize", new IntSlider("Nr Slices", 257));
-    m_intSliders["stepSize"]->setSliderBounds(0, 1000);
-    m_intSliders["stepSize"]->setValue(257);
+    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights:", true));
+    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection:", false));
+    m_boolCheckboxes.insert("headLight", new BoolCheckbox("Use Head Light:", false));
+    m_boolCheckboxes.insert("hideSlice", new BoolCheckbox("Hide Slice:", false));
+    m_boolCheckboxes.insert("defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
+
+    IntSlider* sliceNr = new IntSlider("Number of slices:", 257);
+    sliceNr->setSliderBounds(1, 1000);
+    sliceNr->setValue(257);
+    sliceNr->hide();
+    m_intSliders.insert("sliceNr", sliceNr);
+
+    connect(m_boolCheckboxes["defaultSliceNr"], &BoolCheckbox::valueChanged, [this] (bool vis) {
+        m_intSliders["sliceNr"]->setVisible(!vis);
+    });
+
+    connect(m_boolCheckboxes["specOff"], &BoolCheckbox::valueChanged, [this](bool vis) {
+        m_floatSliders["specInt"]->setVisible(vis);
+        m_floatSliders["specCoeff"]->setVisible(vis);
+    });
 };
 
 void RenderSettingsWidget::setupWidgets()

@@ -77,8 +77,8 @@ void RayCastingInteractor::setUpdateAfterMouseEventStops(bool update)
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)
 {
     m_currentPosition = p_event->position();
-
     m_previousPosition = m_currentPosition;
+
     update();
 }
 
@@ -91,7 +91,14 @@ void RayCastingInteractor::mouseMoveEvent(QMouseEvent* p_event)
         {
             if (m_currentPosition != m_previousPosition)
             {
-                rotateCamera();
+                if (p_event->modifiers() == Qt::ShiftModifier)
+                {
+                    moveLightSource();
+                }
+                else
+                {
+                    rotateCamera();
+                }
             }
         }
         m_previousPosition = m_currentPosition;
@@ -119,6 +126,17 @@ void RayCastingInteractor::wheelEvent(QWheelEvent* p_event)
         zoomScale = zoomScale * 1.1;
     }
     zoomCamera(zoomScale);
+}
+
+void RayCastingInteractor::moveLightSource()
+{
+    std::visit(
+        [this](const auto& arg) {
+            if (!arg)
+                RayCastingWidget::moveLightSource(arcballVector(
+                    m_currentPosition.x(), m_currentPosition.y()));
+        },
+        m_properties.get()->renderSettings().renderSettings().at("headLight"));
 }
 
 void RayCastingInteractor::rotateCamera()
