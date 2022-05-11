@@ -27,8 +27,8 @@ uniform float specCoeff;
 uniform bool specOff;
 uniform bool maxInt;
 uniform bool headLight;
-
-uniform int stepSize;
+uniform bool defaultSliceNr;
+uniform int sliceNr;
 
 float stepLength = 0.01;
 
@@ -105,8 +105,11 @@ float calcDepth(vec3 pos)
 void main(void)
 {
     // Ray-direction calculated by method from https://martinopilia.com/posts/2018/09/17/volume-raycasting.html
-
-    stepLength = 1.0f/float(textureSize(volumeTexture, 0).x);
+    if(defaultSliceNr) {
+        stepLength = 1.0f/float(textureSize(volumeTexture, 0).x);
+    } else {
+        stepLength = 1.0f/float(sliceNr);
+    }
 
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;

@@ -39,7 +39,6 @@ void PlaneRenderer::paint()
         m_planeProgram.setUniformValue("hideSlice", arg);
     }, m_renderSettings["hideSlice"]);
 
-
     Geometry::instance().bindObliqueSliceIntersectionCoords();
     location = m_planeProgram.attributeLocation("vertexPosition");
     m_planeProgram.enableAttributeArray(location);
