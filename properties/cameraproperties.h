@@ -8,11 +8,15 @@ class CameraProperties
   public:
     CameraProperties();
     QMatrix4x4 projectionMatrix() const { return m_projectionMatrix; };
+    QMatrix4x4 orthoProjectionMatrix() const {return m_orthoProjectionMatrix; };
     QMatrix4x4 rotationMatrix() const { return m_rotationMatrix; };
     QMatrix4x4 viewMatrix() const;
     QMatrix4x4 projectionViewMatrix() const
     {
         return projectionMatrix() * viewMatrix();
+    };
+    QMatrix4x4 orthoProjectionViewMatrix() const {
+        return orthoProjectionMatrix() * viewMatrix();  
     };
     float zoomFactor() const { return m_zoom; };
 
@@ -26,6 +30,7 @@ class CameraProperties
 
   private:
     QMatrix4x4 m_projectionMatrix;
+    QMatrix4x4 m_orthoProjectionMatrix;
     QMatrix4x4 m_rotationMatrix;
     QVector3D m_translation;
     float m_zoom{1};

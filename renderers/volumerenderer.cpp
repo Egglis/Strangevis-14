@@ -5,9 +5,11 @@
 VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
     RenderSettings& settings, const CameraProperties& camera,
-    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort, const Plane& plane)
-    : m_textureStore{textureStore}, m_renderSettings{settings}, m_camera{camera},
-      m_openGLExtra{openGLExtra}, m_viewPort{viewPort}, m_plane{plane}
+    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort,
+    const Plane& plane)
+    : m_textureStore{textureStore},
+      m_renderSettings{settings}, m_camera{camera}, m_openGLExtra{openGLExtra},
+      m_viewPort{viewPort}, m_plane{plane}
 {
 }
 
@@ -33,8 +35,14 @@ void VolumeRenderer::paint()
 void VolumeRenderer::setUniforms()
 {
     int location = -1;
-    auto modelViewProjectionMatrix = m_camera.projectionViewMatrix() *
+    auto modelViewProjectionMatrix = m_camera.orthoProjectionMatrix() *
+                                     m_camera.viewMatrix() *
                                      m_textureStore->volume().modelMatrix();
+
+    qDebug() << m_camera.orthoProjectionMatrix() * m_camera.viewMatrix() *
+                    m_textureStore->volume().modelMatrix()
+             << m_camera.projectionMatrix() * m_camera.viewMatrix() *
+                    m_textureStore->volume().modelMatrix();
 
     QVector3D rayOrigin =
         m_camera.viewMatrix().inverted().map(QVector3D(0, 0, 0));
