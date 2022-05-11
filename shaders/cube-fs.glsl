@@ -145,16 +145,18 @@ void main(void)
             vec3 viewDir = rayOrigin - position;
 
             if(sliceModel) {
+                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
                 if(sliceSide) {
-                    if(dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5)) >= 0.0){
+                    if(num >= 0.0){
                         src = vec4(0,0,0,0);
                     }
                 } else {
-                    if(dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5)) <= 0.0){
+                    if(num <= 0.0){
                         src = vec4(0,0,0,0);
                     }
                 }
             }
+
             if(src.a > 0.0){          
                 
                 src.rgb = ShadeBlinnPhong(position, -viewDir, viewDir, src.rgb);
