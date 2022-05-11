@@ -7,17 +7,19 @@ layout(location = 1) uniform sampler1D transferFunction;
 
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform mat4 modelViewProjectionMatrix;
 uniform vec2 viewportSize;
 uniform float aspectRatio;
 uniform float focalLength;
 uniform vec3 rayOrigin;
 
-uniform int gradientMethod;
 uniform int width;
 uniform int height;
 uniform int depth;
 
-// Render Settings:
+uniform vec3 planeNormal;
+uniform vec3 planePoint;
+
 uniform float ambientInt;
 uniform float diffuseInt;
 uniform float specInt;
@@ -26,6 +28,8 @@ uniform bool specOff;
 uniform bool maxInt;
 
 uniform int stepSize;
+uniform bool sliceModel;
+uniform bool sliceSide;
 
 float stepLength = 0.01;
 
@@ -140,6 +144,17 @@ void main(void)
             vec4 src = texture(transferFunction, intensity);
             vec3 viewDir = rayOrigin - position;
 
+            if(sliceModel) {
+                if(sliceSide) {
+                    if(dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5)) >= 0.0){
+                        src = vec4(0,0,0,0);
+                    }
+                } else {
+                    if(dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5)) <= 0.0){
+                        src = vec4(0,0,0,0);
+                    }
+                }
+            }
             if(src.a > 0.0){          
                 
                 src.rgb = ShadeBlinnPhong(position, -viewDir, viewDir, src.rgb);

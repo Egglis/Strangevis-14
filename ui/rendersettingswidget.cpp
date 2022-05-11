@@ -21,20 +21,24 @@ void RenderSettingsWidget::setupSettings()
     m_floatSliders.insert("diffuseInt",
                           new FloatSlider("Diffuse Intensity", 1.5f));
     m_floatSliders.insert("specInt",
-                          new FloatSlider("Specular Intensity", 0.0f));
-    m_floatSliders.insert("specCoeff",
-                          new FloatSlider("Specular Coefficient", 80.0f));
+                          new FloatSlider("Specular Intensity:", 1.0f));
 
-    m_floatSliders["specCoeff"]->setBounds(0.0f, 100.0f);
-    m_floatSliders["specCoeff"]->setValue(80.0f);
 
-    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights", false));
-    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection", false));
+    FloatSlider* specCoeff = new FloatSlider("Specular Coefficient:", 60.0f);
+    specCoeff->setBounds(0.0f, 100.0f);
+    specCoeff->setValue(60.0f);
+    m_floatSliders.insert("specCoeff", specCoeff);
 
-    m_intSliders.insert("stepSize", new IntSlider("Nr Slices", 257));
-    m_intSliders["stepSize"]->setSliderBounds(0, 1000);
-    m_intSliders["stepSize"]->setValue(257);
-};
+    m_boolCheckboxes.insert("specOff", new BoolCheckbox("Specular Highlights:", true));
+    m_boolCheckboxes.insert("maxInt", new BoolCheckbox("Maximum intensity projection:", false));
+
+    m_boolCheckboxes.insert("sliceModel", new BoolCheckbox("Show slicing on model:", true));
+    m_boolCheckboxes.insert("sliceSide", new BoolCheckbox("Swap slicing side", false));
+
+    connect(m_boolCheckboxes["sliceModel"], &BoolCheckbox::valueChanged, [this](const bool vis) {
+        m_boolCheckboxes["sliceSide"]->setVisible(vis);
+    });
+}
 
 void RenderSettingsWidget::setupWidgets()
 {

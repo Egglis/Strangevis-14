@@ -5,9 +5,9 @@
 VolumeRenderer::VolumeRenderer(
     const std::unique_ptr<ITextureStore>& textureStore,
     RenderSettings& settings, const CameraProperties& camera,
-    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort)
-    : m_textureStore{textureStore}, m_renderSettings{settings},
-      m_camera{camera}, m_openGLExtra{openGLExtra}, m_viewPort{viewPort}
+    QOpenGLExtraFunctions& openGLExtra, const ViewPort& viewPort, const Plane& plane)
+    : m_textureStore{textureStore}, m_renderSettings{settings}, m_camera{camera},
+      m_openGLExtra{openGLExtra}, m_viewPort{viewPort}, m_plane{plane}
 {
 }
 
@@ -64,6 +64,11 @@ void VolumeRenderer::setUniforms()
     m_cubeProgram.setUniformValue(location, static_cast<int>(height));
     location = m_cubeProgram.uniformLocation("depth");
     m_cubeProgram.setUniformValue(location, static_cast<int>(depth));
+
+    location = m_cubeProgram.uniformLocation("planeNormal");
+    m_cubeProgram.setUniformValue(location, m_plane.normal());
+    location = m_cubeProgram.uniformLocation("planePoint");
+    m_cubeProgram.setUniformValue(location, m_plane.point());
 
     for (const auto& [key, value] : m_renderSettings)
     {
