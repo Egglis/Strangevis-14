@@ -2,21 +2,19 @@
 
 #include "../geometry.h"
 
-// clang-format off
-#include <ImGui.h>
-#include <ImGuizmo.h>
-// clang-format on
 
 RayCastingWidget::RayCastingWidget(
     RenderProperties initialRenderProperties,
     std::unique_ptr<ITextureStore>& textureStore,
-    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    std::shared_ptr<ISharedProperties> properties,
+    CameraProperties& camera, QWidget* parent,
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f), m_textureStore{textureStore},
       m_transferFunctionName{initialRenderProperties.transferFunction},
       m_clippingPlane{initialRenderProperties.clippingPlane},
       m_cubePlaneIntersection{initialRenderProperties.clippingPlane},
-      m_imGuiReference{nullptr}, m_viewPort{width(), height()},
+      m_viewPort{width(), height()},
+      m_camera{camera},
       m_volumeRenderer{textureStore,
                        m_renderSettings,
                        m_camera,
@@ -25,8 +23,7 @@ RayCastingWidget::RayCastingWidget(
                        m_lightRenderer,
                        m_cubePlaneIntersection.plane()},
       m_lightRenderer{m_camera, m_renderSettings},
-      m_planeRenderer{textureStore, m_camera, m_renderSettings},
-      m_slicingPlaneControls{properties, m_camera}
+      m_planeRenderer{textureStore, m_camera, m_renderSettings}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);
     m_camera.zoomCamera(initialRenderProperties.zoomFactor);
@@ -68,7 +65,6 @@ void RayCastingWidget::updateLightTransformMatrix()
 void RayCastingWidget::initializeGL()
 {
     m_openGLExtra.initializeOpenGLFunctions();
-    m_imGuiReference = QtImGui::initialize(this, false);
 
     // initialize geometry
     Geometry::instance();
@@ -92,7 +88,6 @@ void RayCastingWidget::paintGL()
 
     if (m_textureStore->volume().loadingInProgress())
         return;
-    renderImGuizmo();
     m_volumeRenderer.paint();
     m_planeRenderer.paint();
     m_lightRenderer.paint();
@@ -115,19 +110,4 @@ void RayCastingWidget::changeRenderSettings(RenderSettings renderSettings)
 {
     m_renderSettings = renderSettings;
     update();
-}
-
-void RayCastingWidget::renderImGuizmo()
-{
-    QtImGui::newFrame(m_imGuiReference);
-
-    ImGuizmo::BeginFrame();
-    ImGuizmo::Enable(true);
-    auto rotationMatrix = m_camera.rotationMatrix();
-    ImGuizmo::ViewManipulate(rotationMatrix.data(), 2.0f * sqrt(3.0f),
-                             ImVec2(0, 0), ImVec2(128, 128), 0);
-    m_camera.rotateCamera(rotationMatrix);
-    m_slicingPlaneControls.paint();
-    ImGui::Render();
-    QtImGui::render(m_imGuiReference);
 }

@@ -34,6 +34,7 @@ class RayCastingWidget : public QOpenGLWidget
     RayCastingWidget(RenderProperties initialProperties,
                      std::unique_ptr<ITextureStore>& textureStore,
                      std::shared_ptr<ISharedProperties>,
+                     CameraProperties& camera,
                      QWidget* parent = nullptr,
                      Qt::WindowFlags f = Qt::WindowFlags());
 
@@ -51,8 +52,6 @@ class RayCastingWidget : public QOpenGLWidget
     void changeRenderSettings(RenderSettings renderSettings);
 
   private:
-    void renderImGuizmo();
-
     QOpenGLExtraFunctions m_openGLExtra;
     std::unique_ptr<ITextureStore>& m_textureStore;
     QOpenGLShaderProgram m_cubeProgram;
@@ -65,14 +64,11 @@ class RayCastingWidget : public QOpenGLWidget
     QString m_transferFunctionName;
     Plane m_clippingPlane;
     CubePlaneIntersection m_cubePlaneIntersection;
-    CameraProperties m_camera;
+    CameraProperties& m_camera;
 
-    QtImGui::RenderRef m_imGuiReference;
     VolumeRenderer m_volumeRenderer;
     PlaneRenderer m_planeRenderer;
     LightRenderer m_lightRenderer;
-    SlicingPlaneControls m_slicingPlaneControls;
-    
 
     qreal m_nearPlane = 0.5;
     qreal m_farPlane = 32.0;
