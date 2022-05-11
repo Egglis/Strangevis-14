@@ -116,7 +116,7 @@ void main(void)
     int dSliceNr = int(textureSize(volumeTexture, 0).x);
 
     stepLength =
-            defaultSliceNr ? 1.0f / float(dSliceNr) : 1.0f / float(sliceNr);
+        defaultSliceNr ? 1.0f / float(dSliceNr) : 1.0f / float(sliceNr);
 
     vec3 rayDirection;
     rayDirection.xy = 2.0 * gl_FragCoord.xy / viewportSize - 1.0;
@@ -161,15 +161,22 @@ void main(void)
             vec3 lightDir =
                 (headLight) ? rayOrigin : (lightPosition - position);
 
-            if(sliceModel) {
-                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
-                if(sliceSide) {
-                    if(num >= 0.0){
-                        src = vec4(0,0,0,0);
+            if (sliceModel)
+            {
+                float num =
+                    dot(planeNormal.xyz, (position - (planePoint + 1.0) * 0.5));
+                if (sliceSide)
+                {
+                    if (num >= 0.0)
+                    {
+                        src = vec4(0, 0, 0, 0);
                     }
-                } else {
-                    if(num <= 0.0){
-                        src = vec4(0,0,0,0);
+                }
+                else
+                {
+                    if (num <= 0.0)
+                    {
+                        src = vec4(0, 0, 0, 0);
                     }
                 }
             }
@@ -181,7 +188,9 @@ void main(void)
                     ShadeBlinnPhong(position, -lightDir, viewDir, src.rgb);
 
                 src.a =
-                        1.0 - exp(-src.a * rayLength * dSliceNr / sliceNr);
+                    defaultSliceNr
+                        ? 1.0 - exp(-src.a * rayLength)
+                        : 1.0 - exp(-src.a * rayLength * dSliceNr / sliceNr);
                 src.rgb = src.rgb * src.a;
                 color = color + (1.0 - color.a) * src;
 

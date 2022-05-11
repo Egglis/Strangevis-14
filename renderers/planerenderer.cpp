@@ -26,6 +26,8 @@ void PlaneRenderer::compileShader()
 
 void PlaneRenderer::paint()
 {
+    if (!std::get<bool>(m_renderSettings["showSlice"]))
+        return;
     int location;
     m_planeProgram.bind();
 
@@ -35,8 +37,6 @@ void PlaneRenderer::paint()
 
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);
-
-    m_planeProgram.setUniformValue("showSlice", std::get<bool>(m_renderSettings["showSlice"]));
 
     Geometry::instance().bindObliqueSliceIntersectionCoords();
     location = m_planeProgram.attributeLocation("vertexPosition");
