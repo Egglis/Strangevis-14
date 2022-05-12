@@ -22,6 +22,7 @@ class Geometry
     void drawCube();
 
     void bindObliqueSliceIntersectionCoords();
+    void releaseObliqueSliceIntersectionCoords();
     void drawObliqueSlice();
 
     void bindLightSource();
