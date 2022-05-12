@@ -12,6 +12,7 @@ class RectangularGridLayout;
 class MainWindowWidget;
 class HistogramWidget;
 class RenderSettingsWidget;
+class LightControlSettingsWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -36,6 +37,7 @@ class MainWindow : public QMainWindow
     MainWindowWidget* m_mainWidget;
     HistogramWidget* m_histogramWidget;
     RenderSettingsWidget* m_renderSettingsWidget;
+    LightControlSettingsWidget* m_lightSettingsWidget;
 
 };
 #endif // MAINWINDOW_H
