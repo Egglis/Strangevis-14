@@ -131,7 +131,6 @@ void ObliqueSliceRenderWidget::paintSelection()
     QPainter painter{this};
     painter.setPen(Qt::red);
     painter.drawEllipse(m_selectedBox);
-    painter.drawLine(rect().topLeft(), rect().bottomRight());
 }
 
 void ObliqueSliceRenderWidget::resizeGL(int w, int h)
