@@ -35,14 +35,9 @@ void VolumeRenderer::paint()
 void VolumeRenderer::setUniforms()
 {
     int location = -1;
-    auto modelViewProjectionMatrix = m_camera.orthoProjectionMatrix() *
-                                     m_camera.viewMatrix() *
+    auto modelViewProjectionMatrix = m_camera.orthoProjectionViewMatrix() * 
                                      m_textureStore->volume().modelMatrix();
 
-    qDebug() << m_camera.orthoProjectionMatrix() * m_camera.viewMatrix() *
-                    m_textureStore->volume().modelMatrix()
-             << m_camera.projectionMatrix() * m_camera.viewMatrix() *
-                    m_textureStore->volume().modelMatrix();
 
     QVector3D rayOrigin =
         m_camera.viewMatrix().inverted().map(QVector3D(0, 0, 0));

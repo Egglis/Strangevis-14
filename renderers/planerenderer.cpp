@@ -35,7 +35,6 @@ void PlaneRenderer::paint()
                                            m_camera.viewMatrix() *
                                            planeModelMatrix();
     
-    //qDebug() << modelViewProjectionMatrix;
     
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);

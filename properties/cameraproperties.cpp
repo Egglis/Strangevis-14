@@ -10,7 +10,7 @@ void CameraProperties::updateProjectionMatrix(float aspectRatio)
     m_projectionMatrix.perspective(m_fov, aspectRatio, m_nearPlane, m_farPlane);
 
     m_orthoProjectionMatrix.setToIdentity();
-    m_orthoProjectionMatrix.ortho(-2.0f*aspectRatio, 2.0f*aspectRatio, -2.0, 2.0f, m_nearPlane, m_farPlane);
+    m_orthoProjectionMatrix.ortho(-1.0f*aspectRatio, 1.0f*aspectRatio, -1.0f, 1.0f, m_nearPlane, m_farPlane);
 }
 
 void CameraProperties::rotateCamera(float angle, QVector3D axis)
