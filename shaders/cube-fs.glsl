@@ -172,27 +172,7 @@ void main(void)
             vec3 lightDir =
                 (headLight) ? rayOrigin : (lightPosition - position);
 
-            if (sliceModel)
-            {
-                float num =
-                    dot(planeNormal.xyz, (position - (planePoint + 1.0) * 0.5));
-                if (sliceSide)
-                {
-                    if (num >= 0.0)
-                    {
-                        src = vec4(0, 0, 0, 0);
-                    }
-                }
-                else
-                {
-                    if (num <= 0.0)
-                    {
-                        src = vec4(0, 0, 0, 0);
-                    }
-                }
-            }
-
-            if (src.a > 0.0)
+            if (src.a > 0.0 && !skip)
             {
 
                 src.rgb =
