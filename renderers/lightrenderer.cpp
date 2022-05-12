@@ -22,6 +22,13 @@ void LightRenderer::compileShader()
 
 void LightRenderer::paint()
 {
+    if (m_renderSettings.contains("maxInt") &&
+        m_renderSettings.contains("headLight"))
+    {
+        if (std::get<bool>(m_renderSettings["maxInt"]) ||
+            std::get<bool>(m_renderSettings["headLight"]))
+            return;
+    }
     int location;
     m_lightProgram.bind();
 

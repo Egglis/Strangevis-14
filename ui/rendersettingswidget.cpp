@@ -21,16 +21,16 @@ void RenderSettingsWidget::setupSettings()
         "maxInt", new BoolCheckbox("Maximum intensity projection:", false));
 
     m_boolCheckboxes.insert("sliceModel",
-                            new BoolCheckbox("Show slicing on model:", false));
+                            new BoolCheckbox("Slice model:", false));
     m_boolCheckboxes.insert("sliceSide",
-                            new BoolCheckbox("Swap slicing side", false));
+                            new BoolCheckbox("Swap slicing side:", false));
 
     m_boolCheckboxes.insert("showSlice",
-                            new BoolCheckbox("Show Slice:", true));
+                            new BoolCheckbox("Show slice:", true));
     m_boolCheckboxes.insert(
-        "defaultSliceNr", new BoolCheckbox("Default Number of slices:", true));
+        "defaultSliceNr", new BoolCheckbox("Default quality:", true));
 
-    IntSlider* sliceNr = new IntSlider("Number of slices:", 257);
+    IntSlider* sliceNr = new IntSlider("Quality:", 257);
     sliceNr->setSliderBounds(1, 1000);
     sliceNr->setValue(257);
     sliceNr->setEnabled(!m_boolCheckboxes["defaultSliceNr"]->getValue());
