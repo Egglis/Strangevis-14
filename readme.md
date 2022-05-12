@@ -67,3 +67,7 @@ The plane interaction tool consists of the two gizmos in the bottom left of the 
 ## Sliced View
 ![Slicing](images/slicing.png "Slicing")
 By enabling Show slicing on model, the model is cut at the plane. Swap slicing side swaps which side of the plane is rendered.
+
+## Maximum Intensity Projection
+![MIP](images/mip.png "MIP")
+The 3D renderer can be switched to show a Maximum Intensity Projection instead of the default DVR. This mode does not use shading, but all other tools operate as normal in this mode.
