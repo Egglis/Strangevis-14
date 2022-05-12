@@ -148,8 +148,19 @@ void main(void)
     while (rayLength > 0)
     {
         float intensity = texture(volumeTexture, position).r;
+        bool skip = false;
 
-        if (maxInt)
+        if(sliceModel) {
+                float num = dot(planeNormal.xyz, (position-(planePoint+1.0)*0.5));
+                if(sliceSide) {
+                    skip = (num >= 0.0); 
+                } else {
+                    skip = (num <= 0.0);
+                }
+        }
+
+
+        if (maxInt && !skip)
         {
             maxIntensity = max(intensity, maxIntensity);
         }
