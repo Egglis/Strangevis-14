@@ -11,13 +11,14 @@
 
 StackedRayCastingWidget::StackedRayCastingWidget(
     std::unique_ptr<ITextureStore>& textureStore,
-    std::shared_ptr<ISharedProperties> properties, QWidget* renderSettings, QWidget* lightSettings, QWidget* parent,
-    Qt::WindowFlags f)
+    std::shared_ptr<ISharedProperties> properties, QWidget* renderSettings,
+    QWidget* lightSettings, QWidget* parent, Qt::WindowFlags f)
     : QWidget{parent}, m_camera{}
 {
     m_rayCastingWidget =
         new RayCastingInteractor{textureStore, properties, m_camera, this, f};
-    m_imguizmoWidget = new ImguizmoWidget{properties, m_camera, renderSettings, lightSettings, this, f};
+    m_imguizmoWidget = new ImguizmoWidget{
+        properties, m_camera, renderSettings, lightSettings, this, f};
     m_imguizmoWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_imguizmoWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     m_layout = new QStackedLayout(this);
@@ -97,7 +98,9 @@ RayCastingInteractor::RayCastingInteractor(
     connect(&m_properties.get()->renderSettings(),
             &RenderSettingsProperties::renderSettingsChanged, this,
             &RayCastingInteractor::changeRenderSettings);
-
+    connect(&m_properties->clippingPlane(),
+            &ClippingPlaneProperties::selectedPointChanged,
+            [this]() { update(); });
 }
 
 void RayCastingInteractor::mousePressEvent(QMouseEvent* p_event)

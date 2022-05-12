@@ -2,16 +2,18 @@
 
 #include "../geometry.h"
 
+#include <QPainter>
 #include <QVector3D>
 
 ObliqueSliceRenderWidget::ObliqueSliceRenderWidget(
     std::unique_ptr<ITextureStore>& textureStore,
-    const std::shared_ptr<const ISharedProperties> properties, QWidget* parent,
+    const std::shared_ptr<ISharedProperties> properties, QWidget* parent,
     Qt::WindowFlags f)
     : QOpenGLWidget(parent, f),
       m_textureStore(textureStore), m_properties{properties},
       m_cubePlaneIntersection{m_properties->clippingPlane().plane()},
-      m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false}
+      m_prevRotation{0}, m_verticalFlipped{false}, m_horizontalFlipped{false},
+      m_selectedPoint{0, 0}
 {
     m_viewMatrix.scale(1 / sqrt(3.0));
     connect(&m_properties.get()->transferFunction(),
@@ -50,19 +52,47 @@ void ObliqueSliceRenderWidget::initializeGL()
             &tfn::TransferProperties::transferFunctionChanged,
             [this]() { update(); });
     updateObliqueSlice();
+    moveSelection(QPointF{width() / 2.f, height() / 2.f});
 }
 
 void ObliqueSliceRenderWidget::paintGL()
 {
-
+    m_sliceProgram.bind();
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (m_textureStore->volume().loadingInProgress())
         return;
 
-    Geometry::instance().allocateObliqueSlice(m_cubePlaneIntersection);
-    m_sliceProgram.bind();
+    paintSlice();
+    m_sliceProgram.release();
+    paintSelection();
+}
+
+bool ObliqueSliceRenderWidget::moveSelection(QPointF newSelection)
+{
+    if (newSelection == m_selectedPoint)
+        return false;
+    m_selectedPoint = newSelection;
+    m_selectedBox = QRectF{m_selectedPoint - QPointF{5, 5},
+                           m_selectedPoint + QPointF{5, 5}};
+    QVector3D normalizedPoint{
+        (static_cast<float>(m_selectedPoint.x() / width()) - 0.5f) * 2.f,
+        -(static_cast<float>(m_selectedPoint.y() / height()) - 0.5f) * 2.f, 0.f};
+
+    QMatrix4x4 modelViewMatrix =
+        m_aspectRatioMatrix * m_viewMatrix *
+        m_cubePlaneIntersection.getModelRotationMatrix() *
+        m_textureStore->volume().modelMatrix();
+    // QMatrix4x4 viewMatrix = m_aspectRatioMatrix * m_viewMatrix;
+    m_selectedVolumePoint = modelViewMatrix.inverted().map(normalizedPoint);
+    m_properties->clippingPlane().updateSelectedPoint(m_selectedVolumePoint);
+    qDebug() << m_selectedVolumePoint;
+    return true;
+}
+
+void ObliqueSliceRenderWidget::paintSlice()
+{
     QMatrix4x4 modelViewMatrix =
         m_aspectRatioMatrix * m_viewMatrix *
         m_cubePlaneIntersection.getModelRotationMatrix() *
@@ -88,12 +118,19 @@ void ObliqueSliceRenderWidget::paintGL()
 
     Geometry::instance().drawObliqueSlice();
 
+    Geometry::instance().releaseObliqueSliceIntersectionCoords();
+
     glActiveTexture(GL_TEXTURE0);
     m_textureStore->volume().release();
     glActiveTexture(GL_TEXTURE1);
     m_textureStore->transferFunction().release();
+}
 
-    m_sliceProgram.release();
+void ObliqueSliceRenderWidget::paintSelection()
+{
+    QPainter painter{this};
+    painter.setPen(Qt::red);
+    painter.drawEllipse(m_selectedBox);
 }
 
 void ObliqueSliceRenderWidget::resizeGL(int w, int h)

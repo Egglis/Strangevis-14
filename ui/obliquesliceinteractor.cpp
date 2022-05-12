@@ -21,6 +21,20 @@ void ObliqueSliceInteractor::resizeEvent(QResizeEvent* event)
     ObliqueSliceRenderWidget::resizeEvent(event);
 }
 
+void ObliqueSliceInteractor::mousePressEvent(QMouseEvent* event)
+{
+    auto currentPosition = event->position();
+    if (moveSelection(currentPosition))
+        update();
+}
+
+void ObliqueSliceInteractor::mouseMoveEvent(QMouseEvent* event)
+{
+    auto currentPosition = event->position();
+    if (event->buttons() & Qt::LeftButton && moveSelection(currentPosition))
+        update();
+}
+
 void ObliqueSliceInteractor::placeDial()
 {
     m_dial->setGeometry(geometry().width() - (DialSize + DialMargin),

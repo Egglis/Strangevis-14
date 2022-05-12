@@ -21,7 +21,7 @@ RayCastingWidget::RayCastingWidget(
                        m_lightRenderer,
                        m_cubePlaneIntersection.plane()},
       m_lightRenderer{m_camera, m_renderSettings}, m_planeRenderer{
-                                                       textureStore, m_camera,
+                                                       textureStore, properties, m_camera,
                                                        m_renderSettings}
 {
     m_camera.moveCamera(initialRenderProperties.cameraPosition);

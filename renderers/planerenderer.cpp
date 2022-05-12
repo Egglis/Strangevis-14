@@ -2,11 +2,12 @@
 
 #include "../geometry.h"
 
-PlaneRenderer::PlaneRenderer(const std::unique_ptr<ITextureStore>& textureStore,
-                             const CameraProperties& camera,
-                             RenderSettings& renderSettings)
-    : m_textureStore{textureStore}, m_camera{camera}, m_renderSettings{
-                                                          renderSettings}
+PlaneRenderer::PlaneRenderer(
+    const std::unique_ptr<ITextureStore>& textureStore,
+    const std::shared_ptr<const ISharedProperties> properties,
+    const CameraProperties& camera, RenderSettings& renderSettings)
+    : m_textureStore{textureStore}, m_camera{camera},
+      m_renderSettings{renderSettings}, m_properties{properties}
 {
 }
 
@@ -37,6 +38,19 @@ void PlaneRenderer::paint()
 
     location = m_planeProgram.uniformLocation("modelViewProjectionMatrix");
     m_planeProgram.setUniformValue(location, modelViewProjectionMatrix);
+
+    location = m_planeProgram.uniformLocation("modelMatrix");
+    m_planeProgram.setUniformValue(location, planeModelMatrix());
+
+    location = m_planeProgram.uniformLocation("selectedPoint");
+    auto point = m_properties->clippingPlane().selectedPoint();
+    m_planeProgram.setUniformValue(location, point);
+
+    location = m_planeProgram.uniformLocation("planeCorrection");
+    auto f = m_textureStore->volume().scaleFactor();
+    float correction = std::max({f.x(), f.y(), f.z()})/ std::min({f.x(), f.y(), f.z()});
+    m_planeProgram.setUniformValue(location, correction);
+
 
     Geometry::instance().bindObliqueSliceIntersectionCoords();
     location = m_planeProgram.attributeLocation("vertexPosition");

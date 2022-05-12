@@ -63,7 +63,7 @@ convexHullGiftWrapping(const std::vector<QVector3D>& input)
         // Set p as q for next iteration, so that q is added to
         // result 'hull'
         p = q;
-    } while (p != startingVertex); // While we don't come to first point
+    } while (p != startingVertex && output.size() < 6); // While we don't come to first point
     return output;
 }
 

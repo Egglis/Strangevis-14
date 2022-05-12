@@ -19,6 +19,8 @@ class ObliqueSliceInteractor : public ObliqueSliceRenderWidget
                            Qt::WindowFlags f = Qt::WindowFlags());
 
   protected:
+    virtual void mousePressEvent(QMouseEvent*);
+    virtual void mouseMoveEvent(QMouseEvent*);
     virtual void wheelEvent(QWheelEvent* event);
     virtual void resizeEvent(QResizeEvent* event);
 

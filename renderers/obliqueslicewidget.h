@@ -18,7 +18,7 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
   public:
     ObliqueSliceRenderWidget(
         std::unique_ptr<ITextureStore>& textureStore,
-        const std::shared_ptr<const ISharedProperties> properties,
+        const std::shared_ptr<ISharedProperties> properties,
         QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   public slots:
@@ -32,11 +32,15 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     virtual void paintGL();
     virtual void resizeGL(int w, int h);
     virtual void zoomCamera(float zoomFactor);
+    bool moveSelection(QPointF);
+
   private:
+    void paintSlice();
+    void paintSelection();
     void correctQuadForAspectRatio(int w, int h);
     void updateTransferTexture(tfn::ColorMap cmap);
     std::unique_ptr<ITextureStore>& m_textureStore;
-    const std::shared_ptr<const ISharedProperties> m_properties;
+    std::shared_ptr<ISharedProperties> m_properties;
     QOpenGLShaderProgram m_sliceProgram;
     CubePlaneIntersection m_cubePlaneIntersection;
     QMatrix4x4 m_viewMatrix;
@@ -44,6 +48,9 @@ class ObliqueSliceRenderWidget : public QOpenGLWidget,
     float m_prevRotation;
     bool m_horizontalFlipped;
     bool m_verticalFlipped;
+    QPointF m_selectedPoint;
+    QRectF m_selectedBox;
+    QVector3D m_selectedVolumePoint;
 };
 
 #endif // OBLIQUESLICEWIDGET_H
