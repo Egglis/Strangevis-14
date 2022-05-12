@@ -11,13 +11,13 @@
 
 StackedRayCastingWidget::StackedRayCastingWidget(
     std::unique_ptr<ITextureStore>& textureStore,
-    std::shared_ptr<ISharedProperties> properties, QWidget* parent,
+    std::shared_ptr<ISharedProperties> properties, QWidget* renderSettings, QWidget* parent,
     Qt::WindowFlags f)
     : QWidget{parent}, m_camera{}
 {
     m_rayCastingWidget =
         new RayCastingInteractor{textureStore, properties, m_camera, this, f};
-    m_imguizmoWidget = new ImguizmoWidget{properties, m_camera, this, f};
+    m_imguizmoWidget = new ImguizmoWidget{properties, m_camera, renderSettings, this, f};
     m_imguizmoWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_imguizmoWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     m_layout = new QStackedLayout(this);

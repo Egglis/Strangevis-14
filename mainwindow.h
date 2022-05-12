@@ -26,7 +26,6 @@ class MainWindow : public QMainWindow
     void fileOpen();
   private slots:
     void openHistogram();
-    void openRenderSettings();
 
   private:
     void createHistogramWidget();

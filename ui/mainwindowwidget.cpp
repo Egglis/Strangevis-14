@@ -17,8 +17,8 @@ MainWindowWidget::MainWindowWidget(QWidget* p_3dRenderWidget,
     m_3dRenderWidget->setParent(this);
     m_3dToolBarWidget->setParent(this);
 
-    m_mainWindowLayout->addLayout(m_3dRenderLayout, 1);
-    m_mainWindowLayout->addLayout(m_2dRenderLayout, 1);
+    m_mainWindowLayout->addLayout(m_3dRenderLayout, 3);
+    m_mainWindowLayout->addLayout(m_2dRenderLayout, 2);
 }
 
 QVBoxLayout* MainWindowWidget::create2dRenderLayout()
