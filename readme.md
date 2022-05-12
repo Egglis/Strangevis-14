@@ -30,6 +30,9 @@ A moveable light source can be controlled using the options in the top left, and
 
 The bottom left portion of the 3D view contains options for changing the volumetric rendering.
 
+## Load files
+To load a dataset, go to File .. Open and choose a dataset. A loading bar appears while loading.
+
 ## Transfer Function
 The Transfer Function tool is below the 3D view. This tool consists of a graph showing alpha vs data-value, and a list of pre-existing colormaps.
 
@@ -63,3 +66,4 @@ The plane interaction tool consists of the two gizmos in the bottom left of the 
 
 ## Sliced View
 ![Slicing](images/slicing.png "Slicing")
+By enabling Show slicing on model, the model is cut at the plane. Swap slicing side swaps which side of the plane is rendered.
