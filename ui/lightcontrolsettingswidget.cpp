@@ -21,8 +21,7 @@ void LightControlSettingsWidget::setupSettings()
     m_floatSliders.insert("ambientInt",
                           new FloatSlider("Ambient Intensity:", 0.1f));
     m_floatSliders["ambientInt"]->hide();
-    m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Brightness:", 1.5f));
+    m_floatSliders.insert("diffuseInt", new FloatSlider("Brightness:", 1.5f));
     m_floatSliders.insert("specInt",
                           new FloatSlider("Specular Intensity:", 1.0f));
     m_floatSliders["specInt"]->hide();
@@ -35,7 +34,7 @@ void LightControlSettingsWidget::setupSettings()
 
     m_boolCheckboxes.insert("specOff",
                             new BoolCheckbox("Specular Highlights:", true));
-                            m_boolCheckboxes["specOff"]->hide();
+    m_boolCheckboxes["specOff"]->hide();
 
     m_boolCheckboxes.insert("headLight",
                             new BoolCheckbox("Use Head Light:", false));
@@ -44,6 +43,18 @@ void LightControlSettingsWidget::setupSettings()
             [this](bool vis) {
                 m_floatSliders["specInt"]->setEnabled(vis);
                 m_floatSliders["specCoeff"]->setEnabled(vis);
+            });
+
+    connect(&m_properties->renderSettings(),
+            &RenderSettingsProperties::renderSettingsChanged,
+            [this](auto settings) {
+                if (settings.contains("maxInt"))
+                {
+                    m_boolCheckboxes["headLight"]->setEnabled(
+                        !std::get<bool>(settings["maxInt"]));
+                    m_floatSliders["diffuseInt"]->setEnabled(
+                        !std::get<bool>(settings["maxInt"]));
+                }
             });
 };
 
@@ -89,14 +100,17 @@ void LightControlSettingsWidget::updateRenderSettings()
 {
     for (auto s : m_floatSliders.keys())
     {
-        m_properties->renderSettings().updateSingleRenderSetting(s, m_floatSliders[s]->getValue());
+        m_properties->renderSettings().updateSingleRenderSetting(
+            s, m_floatSliders[s]->getValue());
     }
     for (auto s : m_boolCheckboxes.keys())
     {
-        m_properties->renderSettings().updateSingleRenderSetting(s, m_boolCheckboxes[s]->getValue());
+        m_properties->renderSettings().updateSingleRenderSetting(
+            s, m_boolCheckboxes[s]->getValue());
     }
     for (auto s : m_intSliders.keys())
     {
-        m_properties->renderSettings().updateSingleRenderSetting(s, m_intSliders[s]->getValue());
+        m_properties->renderSettings().updateSingleRenderSetting(
+            s, m_intSliders[s]->getValue());
     }
 }
