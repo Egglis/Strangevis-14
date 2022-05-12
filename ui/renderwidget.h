@@ -62,6 +62,8 @@ class StackedRayCastingWidget : public QWidget
   public:
     StackedRayCastingWidget(std::unique_ptr<ITextureStore>& textureStore,
                             std::shared_ptr<ISharedProperties> properties,
+                            QWidget* renderSettings,
+                            QWidget* lightSettings,
                             QWidget* parent = nullptr,
                             Qt::WindowFlags f = Qt::WindowFlags());
 

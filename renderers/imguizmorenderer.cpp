@@ -1,11 +1,14 @@
 #include "imguizmorenderer.h"
 
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+
 // clang-format off
 #include <ImGui.h>
 #include <ImGuizmo.h>
 // clang-format on
 ImguizmoWidget::ImguizmoWidget(std::shared_ptr<ISharedProperties> properties,
-                               CameraProperties& camera, QWidget* parent,
+                               CameraProperties& camera, QWidget* renderSettingsWidget, QWidget* lightSettingsWidget, QWidget* parent,
                                Qt::WindowFlags f)
     : QOpenGLWidget{parent, f}, m_camera{camera}, m_imGuiReference{nullptr},
       m_slicingPlaneControls{properties, m_camera}
@@ -16,7 +19,22 @@ ImguizmoWidget::ImguizmoWidget(std::shared_ptr<ISharedProperties> properties,
     m_refreshTimer->setInterval(1.f/60);
     connect(m_refreshTimer, &QTimer::timeout, [this](){update();});
     m_refreshTimer->start();
+
+    auto* hLayout = new QHBoxLayout(this);
+    auto* leftColumn = new QVBoxLayout();
+    leftColumn->addSpacing(256);
+    leftColumn->addStretch(3);
+    leftColumn->addWidget(renderSettingsWidget,1);
+    hLayout->addLayout(leftColumn);
+    hLayout->addStretch(3);
+
+    auto* rightColumn = new QVBoxLayout();
+    rightColumn->addWidget(lightSettingsWidget, 1);
+    rightColumn->addStretch(3);
+    rightColumn->addSpacing(2*256);
+    hLayout->addLayout(rightColumn);
 }
+
 void ImguizmoWidget::initializeGL()
 {
     m_imGuiReference = QtImGui::initialize(this, false);
