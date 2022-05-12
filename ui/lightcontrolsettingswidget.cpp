@@ -20,18 +20,22 @@ void LightControlSettingsWidget::setupSettings()
 {
     m_floatSliders.insert("ambientInt",
                           new FloatSlider("Ambient Intensity:", 0.1f));
+    m_floatSliders["ambientInt"]->hide();
     m_floatSliders.insert("diffuseInt",
-                          new FloatSlider("Diffuse Intensity:", 1.5f));
+                          new FloatSlider("Brightness:", 1.5f));
     m_floatSliders.insert("specInt",
                           new FloatSlider("Specular Intensity:", 1.0f));
+    m_floatSliders["specInt"]->hide();
 
     FloatSlider* specCoeff = new FloatSlider("Specular Coefficient:", 60.0f);
     specCoeff->setBounds(0.0f, 100.0f);
     specCoeff->setValue(60.0f);
     m_floatSliders.insert("specCoeff", specCoeff);
+    m_floatSliders["specCoeff"]->hide();
 
     m_boolCheckboxes.insert("specOff",
                             new BoolCheckbox("Specular Highlights:", true));
+                            m_boolCheckboxes["specOff"]->hide();
 
     m_boolCheckboxes.insert("headLight",
                             new BoolCheckbox("Use Head Light:", false));
